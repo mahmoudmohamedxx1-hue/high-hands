@@ -44,11 +44,17 @@ function latestCommitDates() {
     if (!existsSync(generatedPath)) return null;
     const dates = new Map();
     const source = readFileSync(generatedPath, 'utf8');
-    for (const match of source.matchAll(/  ("(?:[^"\\]|\\.)*"): ("\\d{4}-\\d{2}-\\d{2}"),/g)) {
+    for (const match of source.matchAll(/\x20{2}("(?:[^"\\]|\\.)*"): ("\\d{4}-\\d{2}-\\d{2}"),/g)) {
       dates.set(JSON.parse(match[1]), JSON.parse(match[2]));
     }
     return dates.size > 0 ? dates : null;
   };
+  // Vercel deployments do not guarantee a usable .git directory. The
+  // generated manifest is committed, so use it before probing git there.
+  if (process.env.VERCEL || process.env.CI) {
+    const committedDates = useCommittedDates();
+    if (committedDates) return committedDates;
+  }
   let gitAvailable = true;
   const isShallow = () => {
     try {
