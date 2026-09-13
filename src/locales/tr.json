@@ -709,7 +709,7 @@
         "needsKeys": "Ozellikleri etkinlestirmek icin API anahtarlarini yapilandiriniz",
         "some": "Bazi ozellikler API anahtari gerektiriyor"
       },
-      "skipSetup": "Kurulumu atlayın — tek bir World Monitor lisansı her şeyi açar. Erken erişim için bekleme listesine katılın.",
+      "skipSetup": "Kurulumu atlayın — tek bir HIGH-HANDS lisansı her şeyi açar. Erken erişim için bekleme listesine katılın.",
       "summary": {
         "desktop": "Masaustu modu",
         "web": "Web modu (salt okunur, sunucu tarafli kimlik bilgileri)",
@@ -774,7 +774,7 @@
         "status": "Durum",
         "duration": "Sure"
       },
-      "shellTitle": "World Monitor Ayarları",
+      "shellTitle": "HIGH-HANDS Ayarları",
       "shellSearchPlaceholder": "Ayarları ara...",
       "shellCancel": "İptal",
       "shellSaveClose": "Kaydet ve Kapat",
@@ -3478,10 +3478,10 @@
     "copyCoordinates": "Koordinatları kopyala"
   },
   "shell": {
-    "documentTitle": "World Monitor — Gerçek Zamanlı Küresel İstihbarat Paneli",
+    "documentTitle": "HIGH-HANDS — Gerçek Zamanlı Küresel İstihbarat Paneli",
     "metaDescription": "Gerçek zamanlı küresel istihbarat platformu. WIRED'de yer aldı. 190 ülkede 2M+ kişi tarafından kullanılıyor. Çatışmalar, piyasalar, askeri, OSINT tek görünümde.",
     "offlineTitle": "Çevrimdışısınız",
-    "offlineMessage": "World Monitor, gerçek zamanlı istihbarat verileri için internet bağlantısı gerektirir.",
+    "offlineMessage": "HIGH-HANDS, gerçek zamanlı istihbarat verileri için internet bağlantısı gerektirir.",
     "offlineRetry": "Yeniden Dene"
   },
   "widgets": {
@@ -3553,7 +3553,7 @@
   },
   "premium": {
     "pro": "PRO",
-    "lockedDesc": "World Monitor lisans anahtarı gereklidir",
+    "lockedDesc": "HIGH-HANDS lisans anahtarı gereklidir",
     "signInToUnlock": "Premium özelliklerin kilidini açmak için oturum açın",
     "signIn": "Kilidini Açmak İçin Oturum Aç",
     "upgradeDesc": "Premium analitiğe tam erişim için Pro'ya yükseltin",

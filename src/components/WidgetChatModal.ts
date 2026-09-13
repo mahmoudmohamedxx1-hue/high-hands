@@ -111,7 +111,8 @@ export function openWidgetChatModal(options: WidgetChatOptions): void {
 
   const isModify = options.mode === 'modify';
   const titleText = isModify ? t('widgets.modifyTitle') : t('widgets.chatTitle');
-  const proBadgeHtml = isPro ? `<span class="widget-pro-badge">${escapeHtml(t('widgets.proBadge'))}</span>` : '';
+  // PRO badge removed: widget building is available to everyone.
+  const proBadgeHtml = '';
 
   setTrustedHtml(modal, trustedHtml(`
     <div class="modal-header">

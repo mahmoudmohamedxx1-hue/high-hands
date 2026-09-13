@@ -1,20 +1,20 @@
 ---
-title: "World Monitor"
+title: "HIGH-HANDS"
 description: "Live global intelligence, API access, authentication, and agent capabilities."
 canonical: "https://www.worldmonitor.app/home.md"
 ---
 
-# World Monitor — By the time it's news, you already knew.
+# HIGH-HANDS — By the time it's news, you already knew.
 
 As of 2026-09-04.
 
-World Monitor is a free real-time global intelligence dashboard. It brings ships, aircraft, conflict events, alerts, infrastructure, markets, weather, cyber signals, and curated news onto one live map. Its analysis layer helps users see when separate signals begin to converge into one event that matters.
+HIGH-HANDS is a free real-time global intelligence dashboard. It brings ships, aircraft, conflict events, alerts, infrastructure, markets, weather, cyber signals, and curated news onto one live map. Its analysis layer helps users see when separate signals begin to converge into one event that matters.
 
-The core dashboard is open source under AGPL-3.0 and needs no signup. It runs in the browser, as an installable PWA, and as a desktop app for macOS, Windows, and Linux. World Monitor has also been [featured in WIRED](https://www.wired.com/story/world-monitor-elie-habib/).
+The core dashboard is open source under AGPL-3.0 and needs no signup. It runs in the browser, as an installable PWA, and as a desktop app for macOS, Windows, and Linux. HIGH-HANDS has also been [featured in WIRED](https://www.wired.com/story/world-monitor-elie-habib/).
 
-## What World Monitor answers
+## What HIGH-HANDS answers
 
-World Monitor is useful when a question depends on more than one live signal. Typical questions include:
+HIGH-HANDS is useful when a question depends on more than one live signal. Typical questions include:
 
 - What changed in a country, region, market, or supply route since the last briefing?
 - Does a conflict, sanction, outage, or chokepoint disruption have a credible transmission path into commodities or markets?
@@ -26,13 +26,13 @@ The dashboard supports these tasks with country briefs, conflict tracking, resil
 
 ## How the correlation surface works
 
-World Monitor is designed as a correlation surface, not a single-feed news reader. A useful assessment often has three parts:
+HIGH-HANDS is designed as a correlation surface, not a single-feed news reader. A useful assessment often has three parts:
 
 1. **Pressure:** a conflict, sanction, election, disaster, outage, or other event changes the local situation.
 2. **Transmission:** shipping lanes, ports, pipelines, airspace, cables, suppliers, or financial links can carry that pressure elsewhere.
 3. **Consequence:** markets, energy flows, commodity availability, infrastructure risk, or public safety begin to respond.
 
-Users can compare these parts on one map and then open the underlying panels for detail. World Monitor does not claim that two nearby signals prove causation. It gives analysts a shared place to test the connection, inspect the cited sources, and decide what evidence is still missing.
+Users can compare these parts on one map and then open the underlying panels for detail. HIGH-HANDS does not claim that two nearby signals prove causation. It gives analysts a shared place to test the connection, inspect the cited sources, and decide what evidence is still missing.
 
 ## What you get
 
@@ -47,7 +47,7 @@ Users can compare these parts on one map and then open the underlying panels for
 
 ## Sources, provenance, and freshness
 
-World Monitor exposes the providers behind the product instead of asking users to trust a hidden source list. The [Data source catalog](https://www.worldmonitor.app/sources/) lists the current provider inventory by intelligence domain. The [data-source methodology](https://www.worldmonitor.app/docs/data-sources) explains coverage and provenance in more detail.
+HIGH-HANDS exposes the providers behind the product instead of asking users to trust a hidden source list. The [Data source catalog](https://www.worldmonitor.app/sources/) lists the current provider inventory by intelligence domain. The [data-source methodology](https://www.worldmonitor.app/docs/data-sources) explains coverage and provenance in more detail.
 
 Data surfaces include source identity, timestamps, methodology, or related context when the upstream provider makes that information available. Update intervals differ by source and domain. Cached data, delayed providers, and temporary source degradation can affect freshness. Check the timestamp and source information in a returned record before you use it in a time-sensitive decision. Operational availability is published on the [status page](https://status.worldmonitor.app).
 
@@ -55,11 +55,11 @@ Data surfaces include source identity, timestamps, methodology, or related conte
 
 The public dashboard is free and does not require an account. Pro adds advanced analysis, research, customization, and higher-value workflows. API plans cover programmatic and business use. Current features, limits, prices, and licensing terms are in the [machine-readable pricing guide](https://www.worldmonitor.app/pricing.md) and on the [visual pricing page](https://www.worldmonitor.app/pro#pricing).
 
-Public discovery endpoints do not make every data operation anonymous. An MCP or REST call can require OAuth or a World Monitor API key. Read the [authentication guide](https://www.worldmonitor.app/docs/usage-auth) and [rate-limit guide](https://www.worldmonitor.app/docs/usage-rate-limits.md) before building an integration.
+Public discovery endpoints do not make every data operation anonymous. An MCP or REST call can require OAuth or a HIGH-HANDS API key. Read the [authentication guide](https://www.worldmonitor.app/docs/usage-auth) and [rate-limit guide](https://www.worldmonitor.app/docs/usage-rate-limits.md) before building an integration.
 
 ## Live instances
 
-- [World Monitor](https://www.worldmonitor.app/dashboard) — geopolitics, military activity, conflicts, and infrastructure
+- [HIGH-HANDS](https://www.worldmonitor.app/dashboard) — geopolitics, military activity, conflicts, and infrastructure
 - [Tech Monitor](https://tech.worldmonitor.app/dashboard) — startups, AI and machine learning, cloud, and cybersecurity
 - [Finance Monitor](https://finance.worldmonitor.app/dashboard) — global markets, trading, and central banks
 - [Commodity Monitor](https://commodity.worldmonitor.app/dashboard) — mining, metals, energy, and supply chains
@@ -82,13 +82,13 @@ Use a descriptive `User-Agent` for HTTP requests. Preserve source names, timesta
 
 ## Trust boundaries
 
-World Monitor is not a general web-search engine, a complete historical archive, a classified-intelligence system, or a trading-execution venue. It does not place orders. It can show correlation and provide evidence, but it cannot prove causation or replace professional judgment. For consequential security, financial, legal, or operational decisions, inspect the primary sources and confirm the current state independently.
+HIGH-HANDS is not a general web-search engine, a complete historical archive, a classified-intelligence system, or a trading-execution venue. It does not place orders. It can show correlation and provide evidence, but it cannot prove causation or replace professional judgment. For consequential security, financial, legal, or operational decisions, inspect the primary sources and confirm the current state independently.
 
 ## Documentation
 
 - [Brand identity](https://www.worldmonitor.app/world-monitor.md) — official name, canonical domain, NAP, and press mentions
 - [Product and API documentation](https://www.worldmonitor.app/docs/documentation)
-- [Competitor comparisons](https://www.worldmonitor.app/compare/) — World Monitor against Liveuamap, ACLED, GDELT, Dataminr, Recorded Future, Deep State Map, chokepoint trackers and MCP servers, with the cells each competitor wins
+- [Competitor comparisons](https://www.worldmonitor.app/compare/) — HIGH-HANDS against Liveuamap, ACLED, GDELT, Dataminr, Recorded Future, Deep State Map, chokepoint trackers and MCP servers, with the cells each competitor wins
 - [Source catalog](https://www.worldmonitor.app/sources/)
 - [Support and contact](https://www.worldmonitor.app/support.md)
 - [GitHub repository](https://github.com/koala73/worldmonitor)

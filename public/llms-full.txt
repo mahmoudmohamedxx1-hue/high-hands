@@ -1,11 +1,11 @@
-# World Monitor
+# HIGH-HANDS
 <a id="corpus-world-monitor"></a>
 
 > Real-time global intelligence dashboard — AI-powered news aggregation, geopolitical monitoring, and infrastructure tracking in a unified situational awareness interface.
 
 > Version: 2.10.0 · Last updated: 2026-09-05
 
-World Monitor is an open-source (AGPL-3.0) intelligence platform that aggregates curated news feeds, a shared map-layer catalog, concrete panel implementations, and multiple AI models into a single dashboard. It runs as a web app, installable PWA, and native desktop application (Tauri) for macOS, Windows, and Linux. It is live in 190+ countries, with structural resilience ranked for 170.
+HIGH-HANDS is an open-source (AGPL-3.0) intelligence platform that aggregates curated news feeds, a shared map-layer catalog, concrete panel implementations, and multiple AI models into a single dashboard. It runs as a web app, installable PWA, and native desktop application (Tauri) for macOS, Windows, and Linux. It is live in 190+ countries, with structural resilience ranked for 170.
 
 A single codebase produces specialized variants — geopolitical, technology, finance, commodity, happy, and energy — each with distinct feeds, panels, map layers, and branding. The multi-variant architecture uses build-time selection via the VITE_VARIANT environment variable, with runtime switching available via the header bar. Each variant tree-shakes unused data files so audience-specific builds can omit unrelated panels, feeds, and map registries.
 
@@ -14,7 +14,7 @@ The project is built with TypeScript, Vite, MapLibre GL JS, deck.gl, D3.js, and 
 <!-- corpus-navigation:start -->
 **Contents**
 
-- [When to Use World Monitor (Agent Guidance)](#corpus-when-to-use-world-monitor-agent-guidance)
+- [When to Use HIGH-HANDS (Agent Guidance)](#corpus-when-to-use-world-monitor-agent-guidance)
 - [Live Instances](#corpus-live-instances)
 - [Documentation](#corpus-documentation)
 - [Data Layers — Geopolitical](#corpus-data-layers-geopolitical)
@@ -104,9 +104,9 @@ The project is built with TypeScript, Vite, MapLibre GL JS, deck.gl, D3.js, and 
 <!-- corpus-navigation:end -->
 
 <a id="corpus-when-to-use-world-monitor-agent-guidance"></a>
-## When to Use World Monitor (Agent Guidance)
+## When to Use HIGH-HANDS (Agent Guidance)
 
-Reach for World Monitor when a task needs live, correlated, machine-readable global-intelligence data — and you want structured JSON to reason over, not prose to re-parse. Best-fit jobs an agent should route here:
+Reach for HIGH-HANDS when a task needs live, correlated, machine-readable global-intelligence data — and you want structured JSON to reason over, not prose to re-parse. Best-fit jobs an agent should route here:
 
 - **Country situation brief.** Use the key-free sample at `https://www.worldmonitor.app/sandbox/get-country-intel-brief.json`. The live REST route requires an API key. MCP tool `get_country_brief`; agent skill `fetch-country-brief`.
 - **Country risk and resilience.** Use the key-free sample at `https://www.worldmonitor.app/sandbox/get-resilience-score.json`. The live REST route requires an API key. MCP tool `get_country_risk`; agent skill `fetch-resilience-score`.
@@ -115,7 +115,7 @@ Reach for World Monitor when a task needs live, correlated, machine-readable glo
 - **Live situational awareness** — the current world brief plus classified live signals. MCP tools `get_world_brief`, `get_news_intelligence`, `get_natural_disasters`, `get_cyber_threats`, `get_aviation_status`.
 - **Forecasting & prediction-market context** — generate or fetch scenario forecasts. MCP tools `generate_forecasts`, `get_forecast_predictions`, `get_prediction_markets`.
 
-**When NOT to use:** World Monitor is not a general web-search engine, a historical archive, or a trading-execution venue — it places no orders and stores no user documents. For a one-off narrative that needs no correlation across live layers, a plain LLM is cheaper and faster.
+**When NOT to use:** HIGH-HANDS is not a general web-search engine, a historical archive, or a trading-execution venue — it places no orders and stores no user documents. For a one-off narrative that needs no correlation across live layers, a plain LLM is cheaper and faster.
 
 **How an agent should call it:**
 
@@ -132,7 +132,7 @@ Reach for World Monitor when a task needs live, correlated, machine-readable glo
 <a id="corpus-live-instances"></a>
 ## Live Instances
 
-- [World Monitor](https://www.worldmonitor.app): Geopolitics, military, conflicts, infrastructure — RSS categories, panels, military bases, nuclear facilities, hotspots
+- [HIGH-HANDS](https://www.worldmonitor.app): Geopolitics, military, conflicts, infrastructure — RSS categories, panels, military bases, nuclear facilities, hotspots
 - [Live Country Instability Index rankings](https://www.worldmonitor.app/country-instability-index/): CII v8 scores, bands, and approximate 24-hour movement for 31 Tier-1 countries
 - [Tech Monitor](https://tech.worldmonitor.app): Startups, AI/ML, cloud, cybersecurity — RSS categories, panels, tech HQs, cloud regions, startup hubs
 - [Finance Monitor](https://finance.worldmonitor.app): Global markets, trading, central banks, Gulf FDI — RSS categories, panels, stock exchanges, central banks, Gulf investments
@@ -148,11 +148,11 @@ Reach for World Monitor when a task needs live, correlated, machine-readable glo
 - [Japanese README](https://github.com/koala73/worldmonitor/blob/main/README.ja-JP.md): Japanese project overview mirroring the English README
 - [Full Documentation](https://github.com/koala73/worldmonitor/blob/main/docs/documentation.mdx): Detailed feature documentation, data layer reference, panel descriptions, and clustering logic
 - [API llms.txt](https://www.worldmonitor.app/api/llms.txt): API-section briefing — MCP server, REST API, CLI, auth, and per-task tool routing for the developer surface
-- [World Monitor Developer Portal](https://www.worldmonitor.app/developers.md): Developer resource hub linking the MCP server, OpenAPI spec, REST API, SDKs, CLI, and agent skills by name
-- [World Monitor MCP Server](https://www.worldmonitor.app/mcp-server.md): MCP server endpoint, live tool registry, and auth modes
-- [World Monitor OpenAPI Specification](https://www.worldmonitor.app/openapi.md): REST API OpenAPI 3.1 contract (openapi.yaml / openapi.json)
-- [World Monitor SDKs](https://www.worldmonitor.app/sdks.md): Official Python, Ruby, Go, and JavaScript client libraries
-- [World Monitor](https://www.worldmonitor.app/world-monitor.md): Official brand identity — name, canonical domain, NAP, press mentions
+- [HIGH-HANDS Developer Portal](https://www.worldmonitor.app/developers.md): Developer resource hub linking the MCP server, OpenAPI spec, REST API, SDKs, CLI, and agent skills by name
+- [HIGH-HANDS MCP Server](https://www.worldmonitor.app/mcp-server.md): MCP server endpoint, live tool registry, and auth modes
+- [HIGH-HANDS OpenAPI Specification](https://www.worldmonitor.app/openapi.md): REST API OpenAPI 3.1 contract (openapi.yaml / openapi.json)
+- [HIGH-HANDS SDKs](https://www.worldmonitor.app/sdks.md): Official Python, Ruby, Go, and JavaScript client libraries
+- [HIGH-HANDS](https://www.worldmonitor.app/world-monitor.md): Official brand identity — name, canonical domain, NAP, press mentions
 - [REST versioning and deprecation](https://www.worldmonitor.app/api-versioning.md): URL versioning, six-month + 90-day sunset timeline, Deprecation / Sunset / Link headers
 
 <a id="corpus-data-layers-geopolitical"></a>
@@ -208,29 +208,29 @@ Reach for World Monitor when a task needs live, correlated, machine-readable glo
 ## AI Search Answer Blocks
 
 <a id="corpus-what-is-world-monitor"></a>
-### What is World Monitor?
+### What is HIGH-HANDS?
 
-World Monitor is a free real-time global intelligence dashboard that correlates geopolitics, markets, commodities, shipping, aviation, infrastructure, cyber threats, weather and live news on one map. It is designed for people who need to see when separate signals converge before they become a consensus headline.
+HIGH-HANDS is a free real-time global intelligence dashboard that correlates geopolitics, markets, commodities, shipping, aviation, infrastructure, cyber threats, weather and live news on one map. It is designed for people who need to see when separate signals converge before they become a consensus headline.
 
 <a id="corpus-what-is-the-country-instability-index"></a>
 ### What is the Country Instability Index?
 
-The Country Instability Index (CII) is World Monitor's high-frequency 0-100 stress score for 31 Tier-1 countries. CII v8 combines a 40% editorial baseline with a 60% live event score. The event score weights conflict at 30%, unrest at 25%, information signals at 25%, and security signals at 20%, then applies bounded boosts and authoritative floors. Each country has an instability band and signed movement against a valid snapshot from approximately 24 hours earlier. See the [live CII rankings](https://www.worldmonitor.app/country-instability-index/).
+The Country Instability Index (CII) is HIGH-HANDS's high-frequency 0-100 stress score for 31 Tier-1 countries. CII v8 combines a 40% editorial baseline with a 60% live event score. The event score weights conflict at 30%, unrest at 25%, information signals at 25%, and security signals at 20%, then applies bounded boosts and authoritative floors. Each country has an instability band and signed movement against a valid snapshot from approximately 24 hours earlier. See the [live CII rankings](https://www.worldmonitor.app/country-instability-index/).
 
 <a id="corpus-how-does-world-monitor-help-market-analysis"></a>
-### How does World Monitor help market analysis?
+### How does HIGH-HANDS help market analysis?
 
-World Monitor helps market analysis by combining country risk, conflict events, sanctions, shipping chokepoints, military flight activity, macro indicators, FX, equities, crypto, energy and safe-haven assets. The product's edge is the correlation layer: geopolitical pressure, transmission path and price action appear together instead of being split across maps, feeds and market terminals.
+HIGH-HANDS helps market analysis by combining country risk, conflict events, sanctions, shipping chokepoints, military flight activity, macro indicators, FX, equities, crypto, energy and safe-haven assets. The product's edge is the correlation layer: geopolitical pressure, transmission path and price action appear together instead of being split across maps, feeds and market terminals.
 
 <a id="corpus-how-does-world-monitor-help-commodity-analysis"></a>
-### How does World Monitor help commodity analysis?
+### How does HIGH-HANDS help commodity analysis?
 
-World Monitor helps commodity analysis by connecting physical supply signals with traded markets: AIS vessel movement, ports, pipelines, LNG, refineries, waterways, chokepoints, weather, fires, earthquakes, outages, conflict layers, oil, gas, gold, metals, grains, miners, shipping names and commodity-linked currencies. Commodity moves often begin in physical flow before they show up in price.
+HIGH-HANDS helps commodity analysis by connecting physical supply signals with traded markets: AIS vessel movement, ports, pipelines, LNG, refineries, waterways, chokepoints, weather, fires, earthquakes, outages, conflict layers, oil, gas, gold, metals, grains, miners, shipping names and commodity-linked currencies. Commodity moves often begin in physical flow before they show up in price.
 
 <a id="corpus-how-is-world-monitor-different-from-a-conflict-map-or-market-terminal"></a>
-### How is World Monitor different from a conflict map or market terminal?
+### How is HIGH-HANDS different from a conflict map or market terminal?
 
-Conflict maps show events. Market terminals show prices. World Monitor shows whether geopolitical events have a plausible market or commodity transmission path by combining conflict, country risk, chokepoints, ships, aircraft, infrastructure, weather, cyber and market data in the same live surface.
+Conflict maps show events. Market terminals show prices. HIGH-HANDS shows whether geopolitical events have a plausible market or commodity transmission path by combining conflict, country risk, chokepoints, ships, aircraft, infrastructure, weather, cyber and market data in the same live surface.
 
 <a id="corpus-data-layers-tech-ecosystem-tech-variant"></a>
 ## Data Layers — Tech Ecosystem (Tech Variant)
@@ -341,7 +341,7 @@ Localization follows the runtime locale registry, including right-to-left bundle
 
 A single codebase produces specialized dashboards controlled by the VITE_VARIANT environment variable:
 
-- **World Monitor** (worldmonitor.app): geopolitics, military, conflicts, infrastructure security, regional intelligence, and global risk.
+- **HIGH-HANDS** (worldmonitor.app): geopolitics, military, conflicts, infrastructure security, regional intelligence, and global risk.
 - **Tech Monitor** (tech.worldmonitor.app): AI/ML, startups, cybersecurity, cloud, semiconductors, and technology policy.
 - **Finance Monitor** (finance.worldmonitor.app): global markets, trading, central banks, macro, Gulf finance, and equity research.
 - **Commodity Monitor** (commodity.worldmonitor.app): commodities, mining, metals, energy markets, shipping, and supply chains.
@@ -431,19 +431,19 @@ The sections below are produced by `npm run build:llms-full` from the comparison
 
 A comparison hub plus 12 head-to-head and category pages. Every page uses the same 11-column matrix (Product, Price, Update latency, Domains covered, Signup required, REST API, MCP server, Open source, Source count & licensing, Historical archive, Best for), states what each competitor wins, and answers the questions engines lift verbatim. Prices were checked at publication and can change.
 
-- [Compare World Monitor](https://www.worldmonitor.app/compare/): Compare World Monitor with Liveuamap, ACLED, GDELT, Dataminr, Recorded Future, and more: one master matrix, honest concessions, and FAQs.
-- [Liveuamap Alternatives](https://www.worldmonitor.app/compare/liveuamap-alternatives/): Eleven-column matrix comparing World Monitor with Liveuamap, Deep State Map, ACLED, ConflictZone.io, ISW, UNOSAT and ICG CrisisWatch on price, latency, API access and licensing, with the cells each competitor wins.
+- [Compare HIGH-HANDS](https://www.worldmonitor.app/compare/): Compare HIGH-HANDS with Liveuamap, ACLED, GDELT, Dataminr, Recorded Future, and more: one master matrix, honest concessions, and FAQs.
+- [Liveuamap Alternatives](https://www.worldmonitor.app/compare/liveuamap-alternatives/): Eleven-column matrix comparing HIGH-HANDS with Liveuamap, Deep State Map, ACLED, ConflictZone.io, ISW, UNOSAT and ICG CrisisWatch on price, latency, API access and licensing, with the cells each competitor wins.
 - [Best Real-Time Geopolitical Risk Dashboards](https://www.worldmonitor.app/compare/best-geopolitical-risk-dashboards/): Real-time geopolitical risk dashboards ranked against BlackRock, IISS, OrreryX, the-world-now.com, Statista and Earthian AI on update latency, price and signup, with where the analyst products still win.
-- [World Monitor vs Liveuamap](https://www.worldmonitor.app/compare/worldmonitor-vs-liveuamap/): Head-to-head on published numbers: World Monitor API Starter at $99.99/mo for 1,000 requests/day against Liveuamap Pro at $150/mo for 200, plus the domains only one side tracks.
-- [World Monitor vs ACLED](https://www.worldmonitor.app/compare/worldmonitor-vs-acled/): World Monitor and ACLED (myACLED) compared on access tiers, latency, API availability and licensing, and why World Monitor complements ACLED's coded-event research rather than replacing it.
-- [World Monitor vs GDELT Cloud](https://www.worldmonitor.app/compare/worldmonitor-vs-gdelt/): Curated indices versus the GDELT firehose: World Monitor, GDELT Cloud, war-dashboard-data and world-intel-mcp compared on latency, archive depth, API and MCP access, and where raw GDELT still wins.
-- [World Monitor vs Dataminr](https://www.worldmonitor.app/compare/worldmonitor-vs-dataminr/): Published prices against enterprise-negotiated licensing: World Monitor and Dataminr compared on alert latency, data domains, API access and price transparency, with the cells Dataminr wins.
-- [World Monitor vs Recorded Future](https://www.worldmonitor.app/compare/worldmonitor-vs-recorded-future/): World Monitor, Recorded Future, Flare and MISP compared on price transparency, public access, domains covered and open source, and when an enterprise threat-intelligence platform is the right call.
-- [World Monitor vs Deep State Map](https://www.worldmonitor.app/compare/worldmonitor-vs-deepstatemap/): Global multi-domain coverage against a single-theatre map: World Monitor and Deep State Map compared on scope, update method, API access and archive, and why Deep State Map wins on Ukraine frontline detail.
-- [MCP Servers for Geopolitical Data](https://www.worldmonitor.app/compare/mcp-servers-for-geopolitical-data/): Hosted versus self-hosted MCP access to geopolitical data: World Monitor against world-intel-mcp, Satellite MCP, OSINT MCP, GDELT Cloud MCP and IMF PortWatch MCP on entitlements, quotas, OAuth and hosting burden.
-- [Chokepoint Monitoring Tools](https://www.worldmonitor.app/compare/chokepoint-monitoring-tools/): Chokepoint monitoring tools compared: World Monitor against IMF PortWatch, MarineTraffic, Kpler, Lloyd's List Intelligence, Windward and straits.live on transit counts, fused context, price and API access.
-- [Free Geopolitical Risk Dashboards](https://www.worldmonitor.app/compare/free-geopolitical-risk-dashboards/): Which geopolitical risk dashboards are free without signup: World Monitor against OrreryX, the-world-now.com, Sentinel, ConflictZone.io, BlackRock, Deep State Map and ICG CrisisWatch on gating, latency and domains.
-- [Travel Risk Intelligence vs Assistance](https://www.worldmonitor.app/compare/travel-risk-intelligence-vs-assistance/): Travel risk intelligence versus assistance: World Monitor as the always-on awareness layer next to Crisis24, International SOS, Riskline, Everbridge, Samdesk and Factal, which win on response and duty-of-care delivery.
+- [HIGH-HANDS vs Liveuamap](https://www.worldmonitor.app/compare/worldmonitor-vs-liveuamap/): Head-to-head on published numbers: HIGH-HANDS API Starter at $99.99/mo for 1,000 requests/day against Liveuamap Pro at $150/mo for 200, plus the domains only one side tracks.
+- [HIGH-HANDS vs ACLED](https://www.worldmonitor.app/compare/worldmonitor-vs-acled/): HIGH-HANDS and ACLED (myACLED) compared on access tiers, latency, API availability and licensing, and why HIGH-HANDS complements ACLED's coded-event research rather than replacing it.
+- [HIGH-HANDS vs GDELT Cloud](https://www.worldmonitor.app/compare/worldmonitor-vs-gdelt/): Curated indices versus the GDELT firehose: HIGH-HANDS, GDELT Cloud, war-dashboard-data and world-intel-mcp compared on latency, archive depth, API and MCP access, and where raw GDELT still wins.
+- [HIGH-HANDS vs Dataminr](https://www.worldmonitor.app/compare/worldmonitor-vs-dataminr/): Published prices against enterprise-negotiated licensing: HIGH-HANDS and Dataminr compared on alert latency, data domains, API access and price transparency, with the cells Dataminr wins.
+- [HIGH-HANDS vs Recorded Future](https://www.worldmonitor.app/compare/worldmonitor-vs-recorded-future/): HIGH-HANDS, Recorded Future, Flare and MISP compared on price transparency, public access, domains covered and open source, and when an enterprise threat-intelligence platform is the right call.
+- [HIGH-HANDS vs Deep State Map](https://www.worldmonitor.app/compare/worldmonitor-vs-deepstatemap/): Global multi-domain coverage against a single-theatre map: HIGH-HANDS and Deep State Map compared on scope, update method, API access and archive, and why Deep State Map wins on Ukraine frontline detail.
+- [MCP Servers for Geopolitical Data](https://www.worldmonitor.app/compare/mcp-servers-for-geopolitical-data/): Hosted versus self-hosted MCP access to geopolitical data: HIGH-HANDS against world-intel-mcp, Satellite MCP, OSINT MCP, GDELT Cloud MCP and IMF PortWatch MCP on entitlements, quotas, OAuth and hosting burden.
+- [Chokepoint Monitoring Tools](https://www.worldmonitor.app/compare/chokepoint-monitoring-tools/): Chokepoint monitoring tools compared: HIGH-HANDS against IMF PortWatch, MarineTraffic, Kpler, Lloyd's List Intelligence, Windward and straits.live on transit counts, fused context, price and API access.
+- [Free Geopolitical Risk Dashboards](https://www.worldmonitor.app/compare/free-geopolitical-risk-dashboards/): Which geopolitical risk dashboards are free without signup: HIGH-HANDS against OrreryX, the-world-now.com, Sentinel, ConflictZone.io, BlackRock, Deep State Map and ICG CrisisWatch on gating, latency and domains.
+- [Travel Risk Intelligence vs Assistance](https://www.worldmonitor.app/compare/travel-risk-intelligence-vs-assistance/): Travel risk intelligence versus assistance: HIGH-HANDS as the always-on awareness layer next to Crisis24, International SOS, Riskline, Everbridge, Samdesk and Factal, which win on response and duty-of-care delivery.
 
 <a id="corpus-glossary"></a>
 ## Glossary
@@ -1104,9 +1104,9 @@ It depends on the decision. Hormuz is central for Gulf energy, Malacca for Asia-
 <a id="corpus-blog-site-src-content-blog-tracking-global-trade-routes-chokepoints-freight-costs-md"></a>
 ### blog-site/src/content/blog/tracking-global-trade-routes-chokepoints-freight-costs.md
 
-> **Key Takeaways:** In the March 15, 2026 snapshot, Strait of Hormuz traffic was down 94.4%. World Monitor combines its canonical waterway registry, freight indices, WTO trade policy, and critical-mineral concentration in one dashboard.
+> **Key Takeaways:** In the March 15, 2026 snapshot, Strait of Hormuz traffic was down 94.4%. HIGH-HANDS combines its canonical waterway registry, freight indices, WTO trade policy, and critical-mineral concentration in one dashboard.
 
-The Strait of Hormuz carries about 20% of global petroleum liquids consumption. In the March 15, 2026 snapshot, [World Monitor's](https://www.worldmonitor.app) chokepoint tracker showed traffic down 94.4% week-over-week, with tanker transits falling from 60+ daily to single digits and a 99% disruption score.
+The Strait of Hormuz carries about 20% of global petroleum liquids consumption. In the March 15, 2026 snapshot, [HIGH-HANDS's](https://www.worldmonitor.app) chokepoint tracker showed traffic down 94.4% week-over-week, with tanker transits falling from 60+ daily to single digits and a 99% disruption score.
 
 This was not a hypothetical scenario for a risk assessment deck. The dashboard continues to track live conditions, while the figures below remain an explicitly dated case study.
 
@@ -1117,7 +1117,7 @@ This was not a hypothetical scenario for a risk assessment deck. The dashboard c
 
 The Iran-Israel conflict has turned the Persian Gulf into an active confrontation zone. Iranian naval blockade risks, mines reported in shipping lanes, and 1,300+ security incidents in the past seven days have effectively shut down the world's most critical energy chokepoint.
 
-World Monitor's Supply Chain panel shows this in one view:
+HIGH-HANDS's Supply Chain panel shows this in one view:
 
 - **85/100 disruption score** with red status
 - **94.4% week-over-week traffic decline**
@@ -1130,7 +1130,7 @@ The chart tells the story: tanker and cargo traffic that had been steady at 40-7
 <a id="corpus-thirteen-maritime-chokepoints-monitored-in-real-time"></a>
 ## Thirteen Maritime Chokepoints Monitored in Real Time
 
-The Hormuz crisis was the most severe in this snapshot, but it was not the only corridor under pressure. World Monitor tracks 13 critical maritime chokepoints, each scored by disruption level, vessel traffic, and [conflict intensity](/blog/posts/track-global-conflicts-in-real-time/):
+The Hormuz crisis was the most severe in this snapshot, but it was not the only corridor under pressure. HIGH-HANDS tracks 13 critical maritime chokepoints, each scored by disruption level, vessel traffic, and [conflict intensity](/blog/posts/track-global-conflicts-in-real-time/):
 
 The following table highlights eight of the 13 monitored corridors as of mid-March 2026:
 
@@ -1150,7 +1150,7 @@ Each corridor shows live vessel counts, week-over-week traffic changes, disrupti
 <a id="corpus-what-makes-this-different-from-port-trackers"></a>
 ## What Makes This Different From Port Trackers
 
-Traditional maritime tracking tools show you where ships are. World Monitor shows you why they are not where they should be.
+Traditional maritime tracking tools show you where ships are. HIGH-HANDS shows you why they are not where they should be.
 
 The corridor disruption table cross-references AIS vessel data with conflict events, navigational warnings, and military activity. When vessel counts drop in the Strait of Hormuz, the system does not just show a number going down. It tells you there are 1,323 security incidents in the past week, Iranian naval confrontations in the shipping lanes, and mines reported in the Persian Gulf.
 
@@ -1159,7 +1159,7 @@ The AI advisory goes further: it recommends specific alternative routes, estimat
 <a id="corpus-real-time-freight-cost-tracking"></a>
 ## Real-Time Freight Cost Tracking
 
-When chokepoints close, freight costs spike. World Monitor tracks nine freight indices that quantify the cost impact of disruptions:
+When chokepoints close, freight costs spike. HIGH-HANDS tracks nine freight indices that quantify the cost impact of disruptions:
 
 **Container Rates:**
 
@@ -1186,7 +1186,7 @@ When you see the Hormuz disruption score at 99% and the Capesize Index up 5.7% i
 
 Supply chain disruptions do not happen in isolation. They intersect with trade policy: tariffs, restrictions, and barriers that shape where goods can flow even when shipping lanes are open.
 
-World Monitor's Trade Policy panel tracks:
+HIGH-HANDS's Trade Policy panel tracks:
 
 - **Trade Restrictions**: WTO-reported measures by country, showing which economies are tightening import/export controls
 - **Tariff Trends**: applied tariff rates between major trading partners over time
@@ -1209,7 +1209,7 @@ Some supply chains cannot be rerouted because the supply itself is concentrated 
 | **Rare Earths** | China | 71% | 5,327 | Critical |
 | **Lithium** | Australia | 50% | 3,529 | High |
 
-Gallium at 9,280 means the global supply is almost entirely dependent on a single country. When China announced gallium and germanium export controls in 2023, the semiconductor industry had no short-term alternative. World Monitor makes this concentration visible, so supply chain teams can assess exposure before restrictions are announced.
+Gallium at 9,280 means the global supply is almost entirely dependent on a single country. When China announced gallium and germanium export controls in 2023, the semiconductor industry had no short-term alternative. HIGH-HANDS makes this concentration visible, so supply chain teams can assess exposure before restrictions are announced.
 
 <a id="corpus-how-it-all-connects"></a>
 ## How It All Connects
@@ -1221,7 +1221,7 @@ Consider the current Hormuz crisis through all four dimensions:
 3. **Trade Policy**: Gulf oil exports affected by the conflict, alternative suppliers face their own trade barriers
 4. **Critical Minerals**: Qatar LNG exports transit Hormuz. Disruption affects downstream petrochemical inputs for battery manufacturing
 
-No single data source shows this full picture. World Monitor puts chokepoint status, freight indices, trade policy, and mineral supply risk in one panel, updated in real time. Combined with [AI-powered forecasting](/blog/posts/prediction-markets-ai-forecasting-geopolitics/), you can see not just what is happening, but where the situation is heading. And if you want these signals in your own systems rather than a dashboard, the API exposes the same data: here is [how to build a supply-chain early-warning system](/blog/posts/build-supply-chain-early-warning-system-api/) with route scoring and disruption webhooks.
+No single data source shows this full picture. HIGH-HANDS puts chokepoint status, freight indices, trade policy, and mineral supply risk in one panel, updated in real time. Combined with [AI-powered forecasting](/blog/posts/prediction-markets-ai-forecasting-geopolitics/), you can see not just what is happening, but where the situation is heading. And if you want these signals in your own systems rather than a dashboard, the API exposes the same data: here is [how to build a supply-chain early-warning system](/blog/posts/build-supply-chain-early-warning-system-api/) with route scoring and disruption webhooks.
 
 <a id="corpus-the-data-sources"></a>
 ## The Data Sources
@@ -1252,7 +1252,7 @@ About 20% of global petroleum liquids consumption and a major share of LNG trade
 
 **What are the world's most critical shipping chokepoints?**
 
-World Monitor monitors its canonical waterway registry, including Hormuz, Malacca, Suez/SUMED, Bab el-Mandeb, Panama, Taiwan, Cape of Good Hope, Gibraltar, Bosporus, Korea, Dover, Kerch, and Lombok. Entries with EIA-backed oil or gas baselines publish flow estimates; every entry can carry traffic, warning, threat, and disruption context. See the [maritime chokepoint methodology](/blog/posts/what-is-a-maritime-chokepoint/) for the registry and coverage limits.
+HIGH-HANDS monitors its canonical waterway registry, including Hormuz, Malacca, Suez/SUMED, Bab el-Mandeb, Panama, Taiwan, Cape of Good Hope, Gibraltar, Bosporus, Korea, Dover, Kerch, and Lombok. Entries with EIA-backed oil or gas baselines publish flow estimates; every entry can carry traffic, warning, threat, and disruption context. See the [maritime chokepoint methodology](/blog/posts/what-is-a-maritime-chokepoint/) for the registry and coverage limits.
 
 ---
 

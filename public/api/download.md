@@ -1,19 +1,19 @@
 ---
-title: "World Monitor desktop downloads"
+title: "HIGH-HANDS desktop downloads"
 description: "Download endpoint parameters and platform-specific release redirects."
 canonical: "https://www.worldmonitor.app/api/download.md"
 ---
 
-# World Monitor desktop downloads
+# HIGH-HANDS desktop downloads
 
-`GET /api/download` redirects to the latest GitHub Release asset for the World Monitor desktop app. This markdown twin documents the redirect so agents can read it without following a binary `302`.
+`GET /api/download` redirects to the latest GitHub Release asset for the HIGH-HANDS desktop app. This markdown twin documents the redirect so agents can read it without following a binary `302`.
 
 One published binary serves every in-app variant. `variant` is an identity hint, not an asset selector. An unknown `platform` or unsupported `variant` redirects to the GitHub releases page instead of guessing an installer.
 
 ## Query parameters
 
 - **`platform`** (required for a binary): one of the platform ids below.
-- **`variant`** (optional): `full`, `world`, `tech`, `finance`, `commodity`, `energy`, or `happy`. Every supported value resolves to the same World Monitor artifact.
+- **`variant`** (optional): `full`, `world`, `tech`, `finance`, `commodity`, `energy`, or `happy`. Every supported value resolves to the same HIGH-HANDS artifact.
 
 ## Platforms
 

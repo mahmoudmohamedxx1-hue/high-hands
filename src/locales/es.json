@@ -712,7 +712,7 @@
         "needsKeys": "Configurar claves API para desbloquear funciones",
         "some": "Algunas funciones necesitan claves API"
       },
-      "skipSetup": "Omita la configuración — una sola licencia de World Monitor lo desbloquea todo. Únase a la lista de espera para acceso anticipado.",
+      "skipSetup": "Omita la configuración — una sola licencia de HIGH-HANDS lo desbloquea todo. Únase a la lista de espera para acceso anticipado.",
       "summary": {
         "desktop": "Modo escritorio",
         "web": "Modo web (credenciales administradas por el servidor de solo lectura)",
@@ -847,7 +847,7 @@
           "submitBtn": "Ver planes API"
         }
       },
-      "shellTitle": "Configuración de World Monitor",
+      "shellTitle": "Configuración de HIGH-HANDS",
       "shellSearchPlaceholder": "Buscar configuración...",
       "shellCancel": "Cancelar",
       "shellSaveClose": "Guardar y cerrar",
@@ -3497,10 +3497,10 @@
     "copyCoordinates": "Copiar coordenadas"
   },
   "shell": {
-    "documentTitle": "World Monitor — Panel de Control de Inteligencia Global en Tiempo Real",
+    "documentTitle": "HIGH-HANDS — Panel de Control de Inteligencia Global en Tiempo Real",
     "metaDescription": "Plataforma de inteligencia global en tiempo real. Destacado en WIRED. Utilizado por más de 2M de personas en 190 países. Conflictos, mercados, militares, OSINT en una sola vista.",
     "offlineTitle": "Estás sin conexión",
-    "offlineMessage": "World Monitor requiere una conexión a internet para datos de inteligencia en tiempo real.",
+    "offlineMessage": "HIGH-HANDS requiere una conexión a internet para datos de inteligencia en tiempo real.",
     "offlineRetry": "Reintentar"
   },
   "widgets": {
@@ -3572,7 +3572,7 @@
   },
   "premium": {
     "pro": "PRO",
-    "lockedDesc": "Requiere una clave de licencia de World Monitor",
+    "lockedDesc": "Requiere una clave de licencia de HIGH-HANDS",
     "signInToUnlock": "Inicia sesión para desbloquear funciones premium",
     "signIn": "Inicia Sesión para Desbloquear",
     "upgradeDesc": "Actualiza a Pro para acceso completo a análisis premium",

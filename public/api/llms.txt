@@ -1,8 +1,8 @@
-# World Monitor API
+# HIGH-HANDS API
 
-> Machine-readable entry point for the World Monitor developer surface — the MCP server, REST API, CLI, SDKs, and agent skills that expose the platform's real-time global-intelligence tools as structured JSON.
+> Machine-readable entry point for the HIGH-HANDS developer surface — the MCP server, REST API, CLI, SDKs, and agent skills that expose the platform's real-time global-intelligence tools as structured JSON.
 
-World Monitor's data is available to agents and applications through interchangeable surfaces that share one auth model and one tool inventory: an MCP server (Streamable HTTP), a versioned REST API, a zero-dependency CLI, official SDKs (Python, Ruby, Go, JavaScript), and published agent skills. Every surface returns source-attributed structured JSON and supports server-side JMESPath projection to cut response size 80–95%.
+HIGH-HANDS's data is available to agents and applications through interchangeable surfaces that share one auth model and one tool inventory: an MCP server (Streamable HTTP), a versioned REST API, a zero-dependency CLI, official SDKs (Python, Ruby, Go, JavaScript), and published agent skills. Every surface returns source-attributed structured JSON and supports server-side JMESPath projection to cut response size 80–95%.
 
 This is the API-section companion to the site-wide briefing at https://www.worldmonitor.app/llms.txt and the human documentation at https://www.worldmonitor.app/docs/llms.txt.
 
@@ -50,10 +50,10 @@ This is the API-section companion to the site-wide briefing at https://www.world
 
 ## Developer Resource Pages
 
-- [World Monitor Developer Portal](https://www.worldmonitor.app/developers.md): Hub linking every developer resource by name
-- [World Monitor MCP Server](https://www.worldmonitor.app/mcp-server.md): MCP server endpoint, tools, and auth
-- [World Monitor OpenAPI Specification](https://www.worldmonitor.app/openapi.md): REST API OpenAPI 3.1 contract (openapi.yaml / openapi.json)
-- [World Monitor SDKs](https://www.worldmonitor.app/sdks.md): Official Python, Ruby, Go, and JavaScript client libraries
+- [HIGH-HANDS Developer Portal](https://www.worldmonitor.app/developers.md): Hub linking every developer resource by name
+- [HIGH-HANDS MCP Server](https://www.worldmonitor.app/mcp-server.md): MCP server endpoint, tools, and auth
+- [HIGH-HANDS OpenAPI Specification](https://www.worldmonitor.app/openapi.md): REST API OpenAPI 3.1 contract (openapi.yaml / openapi.json)
+- [HIGH-HANDS SDKs](https://www.worldmonitor.app/sdks.md): Official Python, Ruby, Go, and JavaScript client libraries
 
 ## Optional
 

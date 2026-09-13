@@ -706,7 +706,7 @@
         "needsKeys": "配置API密钥以解锁功能",
         "some": "部分功能需要API密钥"
       },
-      "skipSetup": "跳过设置 — 一个World Monitor许可证即可解锁全部功能。加入候补名单抢先体验。",
+      "skipSetup": "跳过设置 — 一个HIGH-HANDS许可证即可解锁全部功能。加入候补名单抢先体验。",
       "summary": {
         "desktop": "桌面模式",
         "web": "网页模式（只读，服务器管理凭证）",
@@ -771,7 +771,7 @@
         "status": "状态",
         "duration": "耗时"
       },
-      "shellTitle": "World Monitor 设置",
+      "shellTitle": "HIGH-HANDS 设置",
       "shellSearchPlaceholder": "搜索设置...",
       "shellCancel": "取消",
       "shellSaveClose": "保存并关闭",
@@ -3459,10 +3459,10 @@
     "copyCoordinates": "复制坐标"
   },
   "shell": {
-    "documentTitle": "World Monitor — 实时全球情报仪表板",
+    "documentTitle": "HIGH-HANDS — 实时全球情报仪表板",
     "metaDescription": "实时全球情报平台。刊登于 WIRED。全球 190 个国家 200 万+ 用户使用。冲突、市场、军事、OSINT 信息一览无遗。",
     "offlineTitle": "您已离线",
-    "offlineMessage": "World Monitor 需要互联网连接来获取实时情报数据。",
+    "offlineMessage": "HIGH-HANDS 需要互联网连接来获取实时情报数据。",
     "offlineRetry": "重试"
   },
   "widgets": {
@@ -3534,7 +3534,7 @@
   },
   "premium": {
     "pro": "PRO",
-    "lockedDesc": "需要 World Monitor 许可证密钥",
+    "lockedDesc": "需要 HIGH-HANDS 许可证密钥",
     "signInToUnlock": "登录以解锁高级功能",
     "signIn": "登录以解锁",
     "upgradeDesc": "升级到 Pro 以获得完整的高级分析访问权限",

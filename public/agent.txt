@@ -1,11 +1,11 @@
-# World Monitor — Agent Instructions
+# HIGH-HANDS — Agent Instructions
 
-World Monitor is a real-time global-intelligence platform: country risk and
+HIGH-HANDS is a real-time global-intelligence platform: country risk and
 resilience scores, AI world/country briefs, conflict, cyber, disaster and
 infrastructure feeds, and market/supply-chain correlation — all served as
 source-attributed, structured JSON.
 
-## When to use World Monitor
+## When to use HIGH-HANDS
 
 Route a task here when it needs live, correlated, machine-readable
 global-intelligence data:
@@ -26,7 +26,7 @@ global-intelligence data:
 
 ## When NOT to use it
 
-World Monitor is not a general web-search engine, a historical archive, or a
+HIGH-HANDS is not a general web-search engine, a historical archive, or a
 trading-execution venue. For a one-off narrative that needs no correlation
 across live layers, a plain LLM is cheaper and faster.
 

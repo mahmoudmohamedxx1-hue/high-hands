@@ -783,7 +783,7 @@
         "some": "Neke funkcije trebaju API ključeve"
       },
       "reserveEarlyAccess": "Rezerviši Rani Pristup",
-      "skipSetup": "Preskoči postavljanje — jedna World Monitor licenca otključava sve. Pridruži se listi čekanja za rani pristup.",
+      "skipSetup": "Preskoči postavljanje — jedna HIGH-HANDS licenca otključava sve. Pridruži se listi čekanja za rani pristup.",
       "summary": {
         "desktop": "Desktop režim",
         "web": "Web režim (samo čitanje, kredencijali upravljani serverom)",
@@ -2302,7 +2302,7 @@
       "loadError": "Climate News privremeno nije dostupan"
     },
     "chatAnalyst": {
-      "infoTooltip": "<strong>WM Analyst</strong> AI analitičar sa živim kontekstom kroz geopolitičke, tržišne, vojne i ekonomske domene. Pogonjen s Claude-om sa podacima u realnom vremenu ubrizganim iz aktivnih WorldMonitor feedova."
+      "infoTooltip": "<strong>HH Analyst</strong> AI analitičar sa živim kontekstom kroz geopolitičke, tržišne, vojne i ekonomske domene. Pogonjen s Claude-om sa podacima u realnom vremenu ubrizganim iz aktivnih WorldMonitor feedova."
     },
     "cotPositioning": {
       "infoTooltip": "<strong>CFTC COT Positioning</strong> Izvještaj Commitments of Traders: neto pozicioniranje komercijalaca, velikih špekulanata i malih trgovaca na robama i financijskim futures. Objavljeno tjedno (petak). Izvor: CFTC."
@@ -3579,7 +3579,7 @@
   },
   "premium": {
     "pro": "PRO",
-    "lockedDesc": "Zahtijeva ključ World Monitor licence",
+    "lockedDesc": "Zahtijeva ključ HIGH-HANDS licence",
     "signInToUnlock": "Prijavite se da biste otključali premium značajke",
     "signIn": "Prijavite se za Otključavanje",
     "upgradeDesc": "Nadogradite se na Pro za potpun pristup premium analitici",

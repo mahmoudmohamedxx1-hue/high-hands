@@ -1,6 +1,6 @@
-# World Monitor Developer Portal
+# HIGH-HANDS Developer Portal
 
-> Section-scoped llms.txt for the developer surface — the MCP server, REST API, SDKs, CLI, sandbox, and agent skills that expose World Monitor's real-time global-intelligence data as structured JSON. Fetch this file instead of the site-wide briefing when the task is "build against or integrate World Monitor".
+> Section-scoped llms.txt for the developer surface — the MCP server, REST API, SDKs, CLI, sandbox, and agent skills that expose HIGH-HANDS's real-time global-intelligence data as structured JSON. Fetch this file instead of the site-wide briefing when the task is "build against or integrate HIGH-HANDS".
 
 All developer surfaces share one tool inventory and one subscription auth model (API key `X-WorldMonitor-Key: wm_<40-hex>` or OAuth 2.1 `scope=mcp`). `get_sources` is the sole credential-free, daily-quota-free MCP data tool; anonymous calls use a separate fail-closed 10/minute/IP ceiling. Every other MCP data tool is subscription-gated. Every surface returns source-attributed structured JSON and supports server-side JMESPath projection.
 
@@ -31,4 +31,4 @@ All developer surfaces share one tool inventory and one subscription auth model 
 
 - [Site-wide llms.txt](https://www.worldmonitor.app/llms.txt) · [API section](https://www.worldmonitor.app/api/llms.txt) · [Docs section](https://www.worldmonitor.app/docs/llms.txt) · [Blog section](https://www.worldmonitor.app/blog/llms.txt)
 - [Developer portal (human)](https://www.worldmonitor.app/developers.md) · [agents.md](https://www.worldmonitor.app/agents.md)
-- [World Monitor brand identity](https://www.worldmonitor.app/world-monitor.md) · [REST versioning and deprecation](https://www.worldmonitor.app/api-versioning.md)
+- [HIGH-HANDS brand identity](https://www.worldmonitor.app/world-monitor.md) · [REST versioning and deprecation](https://www.worldmonitor.app/api-versioning.md)

@@ -343,7 +343,7 @@
         "OLLAMA_API_URL": "e.g. http://127.0.0.1:11434 (Ollama) or http://127.0.0.1:1234/v1 (LM Studio) — OpenAI-compatible endpoint.",
         "OLLAMA_MODEL": "e.g. llama3.1:8b — model tag to use for summarization."
       },
-      "skipSetup": "Hoppa över installationen — en enda World Monitor-licens låser upp allt. Gå med i väntelistan för tidig tillgång.",
+      "skipSetup": "Hoppa över installationen — en enda HIGH-HANDS-licens låser upp allt. Gå med i väntelistan för tidig tillgång.",
       "reserveEarlyAccess": "Reservera din tidig åtkomst"
     },
     "countryIntel": {
@@ -464,7 +464,7 @@
           "title": "Behöver du en API-nyckel?"
         }
       },
-      "shellTitle": "World Monitor-inställningar",
+      "shellTitle": "HIGH-HANDS-inställningar",
       "shellSearchPlaceholder": "Sök inställningar...",
       "shellCancel": "Avbryt",
       "shellSaveClose": "Spara & Stäng",
@@ -3478,10 +3478,10 @@
     "copyCoordinates": "Kopiera koordinater"
   },
   "shell": {
-    "documentTitle": "World Monitor — Realtidsinstrumentpanel för global underrättelse",
+    "documentTitle": "HIGH-HANDS — Realtidsinstrumentpanel för global underrättelse",
     "metaDescription": "Realtidsplattform för global underrättelse. Presenterad i WIRED. Används av 2M+ personer i 190 länder. Konflikter, marknader, militär, OSINT i en vy.",
     "offlineTitle": "Du är offline",
-    "offlineMessage": "World Monitor kräver en internetanslutning för realtidsunderrättelsedata.",
+    "offlineMessage": "HIGH-HANDS kräver en internetanslutning för realtidsunderrättelsedata.",
     "offlineRetry": "Försök igen"
   },
   "widgets": {
@@ -3553,7 +3553,7 @@
   },
   "premium": {
     "pro": "PRO",
-    "lockedDesc": "Kräver en World Monitor-licensnyckel",
+    "lockedDesc": "Kräver en HIGH-HANDS-licensnyckel",
     "signInToUnlock": "Logga in för att låsa upp premiumfunktioner",
     "signIn": "Logga in för att låsa upp",
     "upgradeDesc": "Uppgradera till Pro för fullständig åtkomst till premiumanalytik",

@@ -779,7 +779,7 @@
         "some": "कुछ फीचर API की चाहते हैं"
       },
       "reserveEarlyAccess": "जल्दी एक्सेस रिजर्व करें",
-      "skipSetup": "सेटअप छोड़ें — एक World Monitor लाइसेंस सब अनलॉक करता है। जल्दी एक्सेस के लिए इंतजार सूची में शामिल हों।",
+      "skipSetup": "सेटअप छोड़ें — एक HIGH-HANDS लाइसेंस सब अनलॉक करता है। जल्दी एक्सेस के लिए इंतजार सूची में शामिल हों।",
       "summary": {
         "desktop": "डेस्कटॉप मोड",
         "web": "वेब मोड (सिर्फ पढ़ने के लिए, सर्वर-प्रबंधित क्रेडेंशियल्स)",
@@ -810,7 +810,7 @@
       }
     },
     "settingsWindow": {
-      "shellTitle": "World Monitor सेटिंग्स",
+      "shellTitle": "HIGH-HANDS सेटिंग्स",
       "shellSearchPlaceholder": "सेटिंग्स खोजें...",
       "shellCancel": "रद्द करें",
       "shellSaveClose": "सहेजें और बंद करें",

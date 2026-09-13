@@ -740,7 +740,7 @@
         "OLLAMA_API_URL": "e.g. http://127.0.0.1:11434 (Ollama) or http://127.0.0.1:1234/v1 (LM Studio) — OpenAI-compatible endpoint.",
         "OLLAMA_MODEL": "e.g. llama3.1:8b — model tag to use for summarization."
       },
-      "skipSetup": "Passez la configuration — une seule licence World Monitor débloque tout. Rejoignez la liste d'attente pour un accès anticipé.",
+      "skipSetup": "Passez la configuration — une seule licence HIGH-HANDS débloque tout. Rejoignez la liste d'attente pour un accès anticipé.",
       "reserveEarlyAccess": "Réservez votre accès anticipé"
     },
     "settingsWindow": {
@@ -777,7 +777,7 @@
           "submitBtn": "Voir les forfaits API"
         }
       },
-      "shellTitle": "Paramètres de World Monitor",
+      "shellTitle": "Paramètres de HIGH-HANDS",
       "shellSearchPlaceholder": "Rechercher des paramètres...",
       "shellCancel": "Annuler",
       "shellSaveClose": "Enregistrer et fermer",
@@ -3497,10 +3497,10 @@
     "copyCoordinates": "Copier les coordonnées"
   },
   "shell": {
-    "documentTitle": "World Monitor — Tableau de Bord de Renseignement Mondial en Temps Réel",
+    "documentTitle": "HIGH-HANDS — Tableau de Bord de Renseignement Mondial en Temps Réel",
     "metaDescription": "Plateforme de renseignement mondial en temps réel. Présenté dans WIRED. Utilisé par plus de 2 millions de personnes dans 190 pays. Conflits, marchés, militaire, OSINT en une seule vue.",
     "offlineTitle": "Vous êtes hors ligne",
-    "offlineMessage": "World Monitor nécessite une connexion Internet pour les données de renseignement en temps réel.",
+    "offlineMessage": "HIGH-HANDS nécessite une connexion Internet pour les données de renseignement en temps réel.",
     "offlineRetry": "Réessayer"
   },
   "widgets": {
@@ -3572,7 +3572,7 @@
   },
   "premium": {
     "pro": "PRO",
-    "lockedDesc": "Nécessite une clé de licence World Monitor",
+    "lockedDesc": "Nécessite une clé de licence HIGH-HANDS",
     "signInToUnlock": "Se connecter pour déverrouiller les fonctionnalités premium",
     "signIn": "Se connecter pour déverrouiller",
     "upgradeDesc": "Passer à Pro pour un accès complet à l'analytique premium",

@@ -1,9 +1,9 @@
 {
   "shell": {
-    "documentTitle": "World Monitor — Real-Time Global Intelligence Dashboard",
+    "documentTitle": "HIGH-HANDS — Real-Time Global Intelligence Dashboard",
     "metaDescription": "Real-time global intelligence platform. Featured in WIRED. Used by 2M+ people across 190 countries. Conflicts, markets, military, OSINT in one view.",
     "offlineTitle": "You're Offline",
-    "offlineMessage": "World Monitor requires an internet connection for real-time intelligence data.",
+    "offlineMessage": "HIGH-HANDS requires an internet connection for real-time intelligence data.",
     "offlineRetry": "Retry"
   },
   "header": {
@@ -262,7 +262,7 @@
   },
   "premium": {
     "pro": "PRO",
-    "lockedDesc": "Requires a World Monitor license key",
+    "lockedDesc": "Requires a HIGH-HANDS license key",
     "signInToUnlock": "Sign in to unlock premium features",
     "signIn": "Sign In to Unlock",
     "upgradeDesc": "Upgrade to Pro for full access to premium analytics",
@@ -537,7 +537,7 @@
       "infoTooltip": "<strong>Central Bank Watch</strong> Latest statements, rate decisions, and communications from the Federal Reserve, ECB, Bank of England, and other major central banks worldwide."
     },
     "chatAnalyst": {
-      "infoTooltip": "<strong>WM Analyst</strong> AI analyst with live context across geopolitical, market, military, and economic domains. Powered by Claude with real-time data injected from active WorldMonitor feeds."
+      "infoTooltip": "<strong>HH Analyst</strong> AI analyst with live context across geopolitical, market, military, and economic domains. Powered by Claude with real-time data injected from active HIGH-HANDS feeds."
     },
     "chokepointStrip": {
       "infoTooltip": "Live status for the seven global oil & gas shipping chokepoints. Flow estimates calibrated from Portwatch DWT + AIS observations. See /docs/methodology/chokepoints for methodology.",
@@ -818,7 +818,7 @@
         "staged": "Staged (save with OK)"
       },
       "reserveEarlyAccess": "Reserve Your Early Access",
-      "skipSetup": "Skip the setup — a single World Monitor license unlocks everything. Join the waitlist for early access.",
+      "skipSetup": "Skip the setup — a single HIGH-HANDS license unlocks everything. Join the waitlist for early access.",
       "status": {
         "invalid": "Invalid",
         "looksInvalid": "Looks invalid",
@@ -846,7 +846,7 @@
       "shellCancel": "Cancel",
       "shellSaveClose": "Save & Close",
       "shellSearchPlaceholder": "Search settings...",
-      "shellTitle": "World Monitor Settings",
+      "shellTitle": "HIGH-HANDS Settings",
       "sidecarError": "Could not reach sidecar to toggle verbose mode",
       "sidecarUnreachable": "Sidecar not reachable.",
       "table": {

@@ -241,62 +241,34 @@ const DEFAULT_STORED: StoredLiveChannels = {
   order: DEFAULT_LIVE_CHANNELS.map((c) => c.id),
 };
 
+/**
+ * Main switcher channels route through the SAME-ORIGIN /api/live/hls proxy
+ * (Next sandbox API) so hls.js never hits upstream CORS/referer walls.
+ * Entries here need no YouTube fallback detection at boot — but each channel
+ * in the default switcher still carries one for when the proxy is missing
+ * (e.g. upstream worldmonitor.app deploys).
+ */
 const DIRECT_HLS_MAP: Readonly<Record<string, string>> = {
-  'sky': 'https://linear901-oo-hls0-prd-gtm.delivery.skycdp.com/17501/sde-fast-skynews/master.m3u8',
-  'euronews': 'https://dash4.antik.sk/live/test_euronews/playlist.m3u8',
-  'dw': 'https://dwamdstream103.akamaized.net/hls/live/2015526/dwstream103/master.m3u8',
-  'france24': 'https://amg00106-france24-france24-samsunguk-qvpp8.amagi.tv/playlist/amg00106-france24-france24-samsunguk/playlist.m3u8',
-  'alarabiya': 'https://live.alarabiya.net/alarabiapublish/alarabiya.smil/playlist.m3u8',
-  'aljazeera': 'https://live-hls-apps-aje-fa.getaj.net/AJE/index.m3u8',
-  'bloomberg': 'https://bloomberg.com/media-manifest/streams/us.m3u8',
-  'cnn': 'https://turnerlive.warnermediacdn.com/hls/live/586495/cnngo/cnn_slate/VIDEO_0_3564000.m3u8',
-  'abc-news': 'https://lnc-abc-news.tubi.video/index.m3u8',
-  'nbc-news': 'https://dai2.xumo.com/amagi_hls_data_xumo1212A-xumo-nbcnewsnow/CDN/master.m3u8',
-  'ndtv': 'https://ndtvindiaelemarchana.akamaized.net/hls/live/2003679/ndtvindia/master.m3u8',
-  'i24-news': 'https://bcovlive-a.akamaihd.net/6e3dd61ac4c34d6f8fb9698b565b9f50/eu-central-1/5377161796001/playlist-all_dvr.m3u8',
-  'cgtn-arabic': 'https://news.cgtn.com/resource/live/arabic/cgtn-a.m3u8',
-  'cbs-news': 'https://cbsn-us.cbsnstream.cbsnews.com/out/v1/55a8648e8f134e82a470f83d562deeca/master.m3u8',
-  'trt-world': 'https://tv-trtworld.medya.trt.com.tr/master.m3u8',
-  'sky-news-arabia': 'https://live-stream.skynewsarabia.com/c-horizontal-channel/horizontal-stream/index.m3u8',
-  'al-hadath': 'https://av.alarabiya.net/alarabiapublish/alhadath.smil/playlist.m3u8',
-  'rt': 'https://rt-glb.rttv.com/dvr/rtnews/playlist.m3u8',
-  'abc-news-au': 'https://abc-iview-mediapackagestreams-2.akamaized.net/out/v1/6e1cc6d25ec0480ea099a5399d73bc4b/index.m3u8',
-  'bbc-news': 'https://vs-hls-push-uk.live.fastly.md.bbci.co.uk/x=4/i=urn:bbc:pips:service:bbc_news_channel_hd/iptv_hd_abr_v1.m3u8',
-  'tagesschau24': 'https://tagesschau.akamaized.net/hls/live/2020115/tagesschau/tagesschau_1/master.m3u8',
-  'india-today': 'https://indiatodaylive.akamaized.net/hls/live/2014320/indiatoday/indiatodaylive/playlist.m3u8',
-  'rudaw': 'https://svs.itworkscdn.net/rudawlive/rudawlive.smil/playlist.m3u8',
-  'kan-11': 'https://kan11.media.kan.org.il/hls/live/2024514/2024514/master.m3u8',
-  'tv5monde-info': 'https://ott.tv5monde.com/Content/HLS/Live/channel(info)/index.m3u8',
-  'arise-news': 'https://liveedge-arisenews.visioncdn.com/live-hls/arisenews/arisenews/arisenews_web/master.m3u8',
-  'nhk-world': 'https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp-en/index_4M.m3u8',
-  'cbc-news': 'https://cbcnewshd-f.akamaihd.net/i/cbcnews_1@8981/index_2500_av-p.m3u8',
-  'record-news': 'https://stream.ads.ottera.tv/playlist.m3u8?network_id=2116',
-  'abp-news': 'https://abplivetv.pc.cdn.bitgravity.com/httppush/abp_livetv/abp_abpnews/master.m3u8',
-  'nrk1': 'https://nrk-nrk1.akamaized.net/21/0/hls/nrk_1/playlist.m3u8',
-  'aljazeera-balkans': 'https://live-hls-web-ajb.getaj.net/AJB/index.m3u8',
-  'sabc-news': 'https://sabconetanw.cdn.mangomolo.com/news/smil:news.stream.smil/chunklist_b250000_t64MjQwcA==.m3u8',
-  'arirang-news': 'https://amdlive-ch01-ctnd-com.akamaized.net/arirang_1ch/smil:arirang_1ch.smil/playlist.m3u8',
-  'fox-news': 'https://247preview.foxnews.com/hls/live/2020027/fncv3preview/primary.m3u8',
-  'aljazeera-arabic': 'https://live-hls-web-aja.getaj.net/AJA/index.m3u8',
-  'cgtn': 'https://news.cgtn.com/resource/live/english/cgtn-news.m3u8',
-  'gb-news': 'https://live-gbnews.simplestreamcdn.com/live5/gbnews/bitrate1.isml/manifest.m3u8',
-  'reuters-tv': 'https://reuters-reutersnow-1-eu.rakuten.wurl.tv/playlist.m3u8',
-  'the-guardian': 'https://rakuten-guardian-1-ie.samsung.wurl.tv/playlist.m3u8',
-  'phoenix': 'https://zdf-hls-19.akamaized.net/hls/live/2016502/de/veryhigh/master.m3u8',
-  'ctv-news': 'https://pe-fa-lp02a.9c9media.com/live/News1Digi/p/hls/00000201/38ef78f479b07aa0/index/0c6a10a2/live/stream/h264/v1/3500000/manifest.m3u8',
-  'al-qahera-news': 'https://bcovlive-a.akamaihd.net/d30cbb3350af4cb7a6e05b9eb1bfd850/eu-west-1/6057955906001/playlist.m3u8',
-  'aljazeera-mubasher': 'https://live-hls-web-ajm.getaj.net/AJM/index.m3u8',
-  'alarabiya-business': 'https://live.alarabiya.net/alarabiapublish/aswaaq.smil/playlist.m3u8',
-  'rtp3': 'https://streaming-live.rtp.pt/livetvhlsDVR/rtpnHDdvr.smil/playlist.m3u8?DVR=',
-  'dw-arabic': 'https://dwamdstream103.akamaized.net/hls/live/2015526/dwstream103/index.m3u8',
-  'dw-espanol': 'https://dwamdstream104.akamaized.net/hls/live/2015530/dwstream104/stream04/streamPlaylist.m3u8',
-  'rt-arabic': 'https://rt-arb.rttv.com/dvr/rtarab/playlist.m3u8',
-  'rt-espanol': 'https://rt-esp.rttv.com/dvr/rtesp/playlist.m3u8',
-  'cgtn-espanol': 'https://news.cgtn.com/resource/live/espanol/cgtn-e.m3u8',
-  'press-tv': 'https://cdnlive.presstv.ir/cdnlive/smil:cdnlive.smil/playlist.m3u8',
+  'bloomberg': '/api/live/hls?u=' + encodeURIComponent('https://bloomberg.com/media-manifest/streams/us.m3u8') + '&ref=' + encodeURIComponent('https://www.bloomberg.com/'),
+  'aljazeera': '/api/live/hls?u=' + encodeURIComponent('https://live-hls-apps-aje-fa.getaj.net/AJE/index.m3u8') + '&ref=' + encodeURIComponent('https://www.aljazeera.com/'),
+  'dw': '/api/live/hls?u=' + encodeURIComponent('https://dwamdstream103.akamaized.net/hls/live/2015526/dwstream103/master.m3u8'),
+  'euronews': '/api/live/hls?u=' + encodeURIComponent('https://dash4.antik.sk/live/test_euronews/playlist.m3u8') + '&ref=' + encodeURIComponent('https://www.euronews.com/'),
+  'france24': '/api/live/hls?u=' + encodeURIComponent('https://amg00106-france24-france24-samsunguk-qvpp8.amagi.tv/playlist/amg00106-france24-france24-samsunguk/playlist.m3u8') + '&ref=' + encodeURIComponent('https://www.france24.com/'),
+  'alarabiya': '/api/live/hls?u=' + encodeURIComponent('https://live.alarabiya.net/alarabiapublish/alarabiya.smil/playlist.m3u8') + '&ref=' + encodeURIComponent('https://www.alarabiya.net/'),
 };
 
 interface ProxiedHlsEntry { url: string; referer: string; }
+
+/**
+ * Channels whose free HLS upstream is permanently dead but which run a 24/7
+ * live channel on YouTube (e.g. Turner retired the keyless CNN slate stream).
+ * The /embed/live?channel=<id> iframe form plays whatever is live right now —
+ * no relay-resolved videoId and no API key needed. Used as the single-view
+ * player source and as the multiview tile source/fallback for these channels.
+ */
+const YOUTUBE_LIVE_CHANNEL_IDS: Readonly<Record<string, string>> = {
+  'cnn': 'UCupvZG-5ko_eiXAupbDfxWw', // CNN — turnerlive slate HLS retired
+};
 const PROXIED_HLS_MAP: Readonly<Record<string, ProxiedHlsEntry>> = {
   'cnbc': { url: 'https://cdn-ca2-na.lncnetworks.host/hls/cnbc_live/index.m3u8', referer: 'https://livenewschat.eu/' },
 };
@@ -392,6 +364,8 @@ export class LiveNewsPanel extends Panel {
   private useDesktopEmbedProxy = isDesktopRuntime();
   private desktopEmbedIframe: HTMLIFrameElement | null = null;
   private desktopEmbedSession: { iframe: HTMLIFrameElement; channelId: string; sessionToken: number } | null = null;
+  /** 24/7 YouTube live-channel embed iframe (YOUTUBE_LIVE_CHANNEL_IDS). */
+  private ytLiveIframe: HTMLIFrameElement | null = null;
   private desktopEmbedRenderToken = 0;
   private channelSwitchGeneration = 0;
   private suppressChannelClick = false;
@@ -407,6 +381,14 @@ export class LiveNewsPanel extends Panel {
   // Native HLS <video> element for direct stream playback (bypasses iframe/cookie issues)
   private nativeVideoElement: HTMLVideoElement | null = null;
   private hlsInstance: import('hls.js').default | null = null;
+
+  // ── Multi-view grid (self-hosted): up to 4 channels playing at once ──────
+  private multiViewActive = false;
+  private multiViewChannelIds: string[] = [];
+  private multiViewHlsInstances = new Map<string, import('hls.js').default>();
+  private multiViewVideos = new Map<string, HTMLVideoElement>();
+  private multiViewGeneration = 0;
+  private multiViewBtn: HTMLButtonElement | null = null;
   private hlsFailureCooldown = new Map<string, number>();
   private readonly HLS_COOLDOWN_MS = 5 * 60 * 1000;
   private liveMediaSessionToken = 0;
@@ -416,6 +398,10 @@ export class LiveNewsPanel extends Panel {
   private idleCallbackId: number | ReturnType<typeof setTimeout> | null = null;
   // Play-all cascade: start this panel's channel, but never start a disabled or collapsed panel.
   private readonly boundPlayAllStarter = () => {
+    if (this.multiViewActive) {
+      void this.renderMultiViewGrid();
+      return;
+    }
     if (this.canHostLiveMedia()) this.triggerInit();
   };
 
@@ -555,6 +541,7 @@ export class LiveNewsPanel extends Panel {
       this.isPlaying ||
       !!this.player ||
       !!this.desktopEmbedIframe ||
+      !!this.ytLiveIframe ||
       !!this.nativeVideoElement ||
       this.ownsLiveNewsMedia() ||
       (this.alwaysOn && !document.hidden && this.isPanelVisible());
@@ -797,6 +784,7 @@ export class LiveNewsPanel extends Panel {
 
     this.desktopEmbedIframe = null;
     this.desktopEmbedSession = null;
+    this.ytLiveIframe = null;
     this.desktopEmbedRenderToken += 1;
     this.isPlayerReady = false;
     this.currentVideoId = null;
@@ -842,7 +830,7 @@ export class LiveNewsPanel extends Panel {
   }
 
   private togglePlayback(): void {
-    if (this.isPlaying || this.player || this.desktopEmbedIframe || this.nativeVideoElement) {
+    if (this.isPlaying || this.player || this.desktopEmbedIframe || this.ytLiveIframe || this.nativeVideoElement) {
       stopLiveMediaPlayback('live-news', 'user-paused');
       return;
     }
@@ -957,6 +945,12 @@ export class LiveNewsPanel extends Panel {
         return;
       }
       e.preventDefault();
+      // In multi-view mode the tabs become a picker: clicking toggles the
+      // channel in/out of the 2×2 grid instead of switching the single feed.
+      if (this.multiViewActive) {
+        this.toggleMultiViewChannel(channel);
+        return;
+      }
       this.switchChannel(channel);
     });
     return btn;
@@ -1024,8 +1018,310 @@ export class LiveNewsPanel extends Panel {
     const toolbar = document.createElement('div');
     toolbar.className = 'live-news-toolbar';
     toolbar.appendChild(this.channelSwitcher);
+    this.createMultiViewButton(toolbar);
     this.createManageButton(toolbar);
     this.element.insertBefore(toolbar, this.content);
+  }
+
+  // ── Multi-view grid (self-hosted) ─────────────────────────────────────────
+  // Plays up to 4 channels simultaneously in a 2×2 grid. Bypasses the
+  // single-stream live-media-controller on purpose (all tiles are muted on
+  // start; unmute happens per tile via the native controls, which counts as
+  // a user gesture).
+
+  private createMultiViewButton(toolbar: HTMLElement): void {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'live-news-multiview-btn';
+    btn.title = 'Multi-view: play up to 4 channels at the same time';
+    btn.textContent = '◱ MULTI';
+    btn.setAttribute('aria-pressed', 'false');
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleMultiView();
+    });
+    this.multiViewBtn = btn;
+    toolbar.appendChild(btn);
+  }
+
+  private toggleMultiView(): void {
+    this.multiViewActive = !this.multiViewActive;
+    this.multiViewBtn?.setAttribute('aria-pressed', String(this.multiViewActive));
+    this.multiViewBtn?.classList.toggle('active', this.multiViewActive);
+    if (this.multiViewActive) {
+      if (this.multiViewChannelIds.length === 0) {
+        // Default selection: the first channels that have a direct HLS stream.
+        this.multiViewChannelIds = this.channels
+          .filter(c => Boolean(DIRECT_HLS_MAP[c.id]))
+          .slice(0, 4)
+          .map(c => c.id);
+      }
+      void this.renderMultiViewGrid();
+    } else {
+      this.destroyMultiView();
+      this.renderPlaceholder();
+    }
+    this.syncMultiViewTabStates();
+  }
+
+  private toggleMultiViewChannel(channel: LiveChannel): void {
+    const idx = this.multiViewChannelIds.indexOf(channel.id);
+    if (idx !== -1) {
+      this.multiViewChannelIds.splice(idx, 1);
+      this.destroyMultiViewTile(channel.id);
+      this.removeMultiViewTileDom(channel.id);
+      if (this.multiViewChannelIds.length === 0) {
+        // Empty grid exits multi-view entirely.
+        this.multiViewActive = false;
+        this.multiViewBtn?.setAttribute('aria-pressed', 'false');
+        this.multiViewBtn?.classList.remove('active');
+        this.renderPlaceholder();
+      }
+    } else if (this.multiViewChannelIds.length < 4) {
+      this.multiViewChannelIds.push(channel.id);
+      void this.addMultiViewTile(channel);
+    }
+    this.syncMultiViewTabStates();
+  }
+
+  private syncMultiViewTabStates(): void {
+    this.channelSwitcher?.querySelectorAll('.live-channel-btn').forEach(btn => {
+      const el = btn as HTMLElement;
+      const id = el.dataset.channelId ?? '';
+      el.classList.toggle('selected', this.multiViewActive && this.multiViewChannelIds.includes(id));
+    });
+  }
+
+  private async renderMultiViewGrid(): Promise<void> {
+    const generation = ++this.multiViewGeneration;
+    this.destroyPlayer();
+    this.playerContainer = null;
+    this.playerElement = null;
+    setTrustedHtml(this.content, trustedHtml('', "legacy direct innerHTML migration"));
+
+    const grid = document.createElement('div');
+    grid.className = 'live-news-multiview';
+    const channels = this.channels.filter(c => this.multiViewChannelIds.includes(c.id));
+    for (const channel of channels) {
+      grid.appendChild(this.buildMultiViewTileDom(channel));
+    }
+    this.content.appendChild(grid);
+
+    let HlsCtor: (typeof import('hls.js'))['default'] | null = null;
+    if (!this.hasNativeHlsSupport()) {
+      const mod = await import('hls.js');
+      HlsCtor = mod.default;
+    }
+    if (generation !== this.multiViewGeneration || !this.element?.isConnected) return;
+    for (const channel of channels) {
+      if (generation !== this.multiViewGeneration) return;
+      this.startMultiViewTile(channel, HlsCtor);
+    }
+  }
+
+  private hasNativeHlsSupport(): boolean {
+    const probe = document.createElement('video');
+    return Boolean(probe.canPlayType('application/vnd.apple.mpegurl'));
+  }
+
+  private async addMultiViewTile(channel: LiveChannel): Promise<void> {
+    const generation = this.multiViewGeneration;
+    const grid = this.content.querySelector('.live-news-multiview');
+    if (!grid) return;
+    // Reuse the tile DOM (it may exist from a previous render pass).
+    if (!grid.querySelector(`.multiview-tile[data-channel-id="${channel.id}"]`)) {
+      grid.appendChild(this.buildMultiViewTileDom(channel));
+    }
+    let HlsCtor: (typeof import('hls.js'))['default'] | null = null;
+    if (!this.hasNativeHlsSupport()) {
+      const mod = await import('hls.js');
+      HlsCtor = mod.default;
+    }
+    if (generation !== this.multiViewGeneration || !this.element?.isConnected) return;
+    this.startMultiViewTile(channel, HlsCtor);
+  }
+
+  private buildMultiViewTileDom(channel: LiveChannel): HTMLElement {
+    const tile = document.createElement('div');
+    tile.className = 'multiview-tile';
+    tile.dataset.channelId = channel.id;
+
+    const head = document.createElement('div');
+    head.className = 'multiview-tile-head';
+    const name = document.createElement('span');
+    name.className = 'multiview-tile-name';
+    name.textContent = this.getChannelDisplayName(channel);
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'multiview-tile-close';
+    close.textContent = '×';
+    close.title = `Remove ${name.textContent} from multi-view`;
+    close.setAttribute('aria-label', close.title);
+    close.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleMultiViewChannel(channel);
+    });
+    head.append(name, close);
+
+    const videoHolder = document.createElement('div');
+    videoHolder.className = 'multiview-tile-video';
+
+    tile.append(head, videoHolder);
+    return tile;
+  }
+
+  private startMultiViewTile(
+    channel: LiveChannel,
+    HlsCtor: (typeof import('hls.js'))['default'] | null,
+  ): void {
+    const url = this.getDirectHlsUrl(channel.id) || this.getProxiedHlsUrl(channel.id) || channel.hlsUrl;
+    const tile = this.content.querySelector<HTMLElement>(`.multiview-tile[data-channel-id="${channel.id}"]`);
+    const holder = tile?.querySelector('.multiview-tile-video') ?? null;
+    if (!url || !tile || !holder) {
+      // Dead upstream with a 24/7 YouTube live channel (e.g. CNN): mount the
+      // live-channel embed instead of leaving an empty/black tile.
+      const ytLiveChannelId = YOUTUBE_LIVE_CHANNEL_IDS[channel.id];
+      if (ytLiveChannelId && tile && holder) {
+        this.mountMultiViewYouTubeTile(holder as HTMLElement, ytLiveChannelId);
+        return;
+      }
+      tile?.classList.add('multiview-tile-offline');
+      return;
+    }
+
+    const video = document.createElement('video');
+    video.className = 'live-news-native-video';
+    video.muted = true; // grid tiles start muted (autoplay policy + mix)
+    video.playsInline = true;
+    video.controls = true;
+    video.autoplay = true;
+    video.setAttribute('referrerpolicy', 'no-referrer');
+    video.style.cssText = 'width:100%;height:100%;object-fit:contain;background:#000';
+    holder.appendChild(video);
+    this.multiViewVideos.set(channel.id, video);
+
+    if (this.hasNativeHlsSupport()) {
+      video.src = url;
+      // Native HLS can still fail at the media level (fMP4/CMAF segments some
+      // builds can't decode, transient manifest errors) WITHOUT firing a media
+      // 'error' event — the tile then sits black forever. Watch both a real
+      // error and a stall, then fall back to hls.js, then mark the tile offline.
+      let fellBack = false;
+      const fallbackToHlsJs = async () => {
+        if (fellBack || !video.isConnected) return;
+        fellBack = true;
+        let Hls: (typeof import('hls.js'))['default'] | null = null;
+        try {
+          ({ default: Hls } = await import('hls.js'));
+        } catch { /* import failed below */ }
+        if (!video.isConnected) return;
+        if (!Hls || !Hls.isSupported()) {
+          this.degradeMultiViewTile(channel, tile, holder);
+          return;
+        }
+        try { video.pause(); } catch { /* noop */ }
+        video.removeEventListener('error', onNativeError);
+        video.removeAttribute('src');
+        try { video.load(); } catch { /* noop */ }
+        const hls = new Hls({ enableWorker: true });
+        hls.loadSource(url);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.ERROR, (_evt, data) => {
+          if (!data?.fatal) return;
+          console.warn('[LiveNews][multiview] HLS fatal for', channel.id, data.type);
+          try { hls.destroy(); } catch { /* already gone */ }
+          this.multiViewHlsInstances.delete(channel.id);
+          this.degradeMultiViewTile(channel, tile, holder);
+        });
+        this.multiViewHlsInstances.set(channel.id, hls);
+        void video.play().catch(() => { /* autoplay policy — controls are shown */ });
+      };
+      const onNativeError = () => { void fallbackToHlsJs(); };
+      video.addEventListener('error', onNativeError, { once: true });
+      const watchdog = setTimeout(() => {
+        if (!video.isConnected) return;
+        if (video.readyState < 2 || (video.paused && video.currentTime === 0)) {
+          void fallbackToHlsJs();
+        }
+      }, 8000);
+      video.addEventListener('playing', () => clearTimeout(watchdog), { once: true });
+      return;
+    }
+    if (!HlsCtor) return;
+    const hls = new HlsCtor({ enableWorker: true });
+    hls.loadSource(url);
+    hls.attachMedia(video);
+    hls.on(HlsCtor.Events.ERROR, (_evt, data) => {
+      if (!data?.fatal) return;
+      console.warn('[LiveNews][multiview] HLS fatal for', channel.id, data.type);
+      try { hls.destroy(); } catch { /* already gone */ }
+      this.multiViewHlsInstances.delete(channel.id);
+      this.degradeMultiViewTile(channel, tile, holder);
+    });
+    this.multiViewHlsInstances.set(channel.id, hls);
+  }
+
+  /**
+   * Mount a 24/7 YouTube live-channel iframe in a multiview tile (e.g. CNN
+   * after its free HLS upstream died). Replaces the dead <video> element.
+   */
+  private mountMultiViewYouTubeTile(holder: HTMLElement, ytChannelId: string): void {
+    holder.querySelectorAll('video').forEach((v) => {
+      try { v.pause(); v.removeAttribute('src'); v.load(); } catch { /* noop */ }
+    });
+    setTrustedHtml(holder, trustedHtml('', "multiview youtube live tile"));
+    const iframe = document.createElement('iframe');
+    iframe.className = 'live-news-multiview-yt-frame';
+    iframe.src = `https://www.youtube.com/embed/live?channel=${encodeURIComponent(ytChannelId)}&autoplay=1&mute=1&rel=0`;
+    iframe.title = 'YouTube live feed';
+    iframe.style.cssText = 'width:100%;height:100%;border:0;background:#000;display:block';
+    iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    iframe.allowFullscreen = true;
+    iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+    holder.appendChild(iframe);
+  }
+
+  /**
+   * Degrade a failed multiview tile: prefer the 24/7 YouTube live-channel
+   * embed when the channel has one, otherwise mark the tile offline.
+   */
+  private degradeMultiViewTile(
+    channel: LiveChannel,
+    tile: HTMLElement | null | undefined,
+    holder: Element | null,
+  ): void {
+    const ytLiveChannelId = YOUTUBE_LIVE_CHANNEL_IDS[channel.id];
+    if (ytLiveChannelId && tile && holder) {
+      this.mountMultiViewYouTubeTile(holder as HTMLElement, ytLiveChannelId);
+      tile.classList.remove('multiview-tile-offline');
+      return;
+    }
+    tile?.classList.add('multiview-tile-offline');
+  }
+
+  private destroyMultiViewTile(channelId: string): void {
+    const hls = this.multiViewHlsInstances.get(channelId);
+    if (hls) {
+      try { hls.destroy(); } catch { /* already gone */ }
+      this.multiViewHlsInstances.delete(channelId);
+    }
+    const video = this.multiViewVideos.get(channelId);
+    if (video) {
+      try { video.pause(); video.removeAttribute('src'); video.load(); } catch { /* noop */ }
+      video.remove();
+      this.multiViewVideos.delete(channelId);
+    }
+  }
+
+  private removeMultiViewTileDom(channelId: string): void {
+    this.content.querySelector(`.multiview-tile[data-channel-id="${channelId}"]`)?.remove();
+  }
+
+  private destroyMultiView(): void {
+    this.multiViewGeneration++;
+    for (const id of [...this.multiViewHlsInstances.keys()]) this.destroyMultiViewTile(id);
+    this.multiViewVideos.clear();
+    this.content.querySelector('.live-news-multiview')?.remove();
   }
 
   private createManageButton(toolbar: HTMLElement): void {
@@ -1109,6 +1405,14 @@ export class LiveNewsPanel extends Panel {
   }
 
   private async resolveChannelVideo(channel: LiveChannel, forceFallback = false): Promise<void> {
+    // 24/7 YouTube live channels (dead free HLS upstream): no videoId
+    // resolution — the /embed/live?channel= form plays the current stream.
+    if (YOUTUBE_LIVE_CHANNEL_IDS[channel.id]) {
+      channel.videoId = undefined;
+      channel.isLive = true;
+      return;
+    }
+
     const useFallbackVideo = channel.useFallbackOnly || forceFallback;
 
     if (this.getDirectHlsUrl(channel.id) || this.getProxiedHlsUrl(channel.id) || channel.hlsUrl) {
@@ -1370,9 +1674,42 @@ export class LiveNewsPanel extends Panel {
     this.startBotCheckTimeout();
   }
 
+  /**
+   * 24/7 YouTube live channel embed (e.g. CNN). Plays the channel's CURRENT
+   * live stream via /embed/live?channel= — works without the relay-resolved
+   * videoId; YouTube serves the iframe embed directly.
+   */
+  private renderYouTubeLiveChannelEmbed(ytChannelId: string): void {
+    this.destroyPlayer();
+    this.ensurePlayerContainer();
+    if (!this.playerContainer) return;
+    setTrustedHtml(this.playerContainer, trustedHtml('', "youtube live channel embed"));
+    const params = new URLSearchParams({
+      autoplay: this.isPlaying ? '1' : '0',
+      mute: this.isMuted ? '1' : '0',
+      rel: '0',
+    });
+    const iframe = document.createElement('iframe');
+    iframe.className = 'live-news-embed-frame live-news-yt-live-frame';
+    iframe.src = `https://www.youtube.com/embed/live?channel=${encodeURIComponent(ytChannelId)}&${params.toString()}`;
+    iframe.title = `${this.activeChannel?.name ?? 'Live'} live feed`;
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.style.border = '0';
+    iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen; storage-access';
+    iframe.allowFullscreen = true;
+    iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+    iframe.setAttribute('loading', 'eager');
+    this.ytLiveIframe = iframe;
+    this.playerContainer.appendChild(iframe);
+    this.isPlayerReady = true;
+    this.currentVideoId = null;
+    this.updateLiveIndicator();
+  }
+
   private async renderNativeHlsPlayer(): Promise<void> {
     const hlsUrl = this.getDirectHlsUrl(this.activeChannel.id) || this.getProxiedHlsUrl(this.activeChannel.id) || this.activeChannel.hlsUrl;
-    if (!hlsUrl || !(hlsUrl.startsWith('https://') || hlsUrl.startsWith('http://127.0.0.1'))) return;
+    if (!hlsUrl || !(hlsUrl.startsWith('https://') || hlsUrl.startsWith('http://127.0.0.1') || hlsUrl.startsWith('/api/live/hls'))) return;
     const sessionToken = this.liveMediaSessionToken;
 
     this.destroyPlayer();
@@ -1548,6 +1885,14 @@ export class LiveNewsPanel extends Panel {
 
     if (this.getDirectHlsUrl(this.activeChannel.id) || this.getProxiedHlsUrl(this.activeChannel.id) || this.activeChannel.hlsUrl) {
       void this.renderNativeHlsPlayer();
+      return;
+    }
+
+    // Dead free HLS upstream with a 24/7 YouTube live channel (e.g. CNN):
+    // play the channel's current live stream via the live-channel embed.
+    const ytLiveChannelId = YOUTUBE_LIVE_CHANNEL_IDS[this.activeChannel.id];
+    if (ytLiveChannelId) {
+      this.renderYouTubeLiveChannelEmbed(ytLiveChannelId);
       return;
     }
 
@@ -1882,6 +2227,7 @@ export class LiveNewsPanel extends Panel {
     this.liveMediaSessionToken += 1;
     unregisterLiveMediaStarter('live-news', this.boundPlayAllStarter);
     releaseLiveMediaPlayback('live-news');
+    this.destroyMultiView();
     this.destroyPlayer();
     this.unsubscribeStreamSettings?.();
     this.unsubscribeStreamSettings = null;

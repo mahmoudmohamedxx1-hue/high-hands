@@ -1,9 +1,9 @@
 {
   "shell": {
-    "documentTitle": "World Monitor — Dashibodi ya Ujasusi ya Ulimwenguni ya Wakati Halisi",
+    "documentTitle": "HIGH-HANDS — Dashibodi ya Ujasusi ya Ulimwenguni ya Wakati Halisi",
     "metaDescription": "Jukwaa la kijasusi la ulimwengu la wakati halisi. Imeangaziwa katika WIRED. Inatumiwa na watu milioni 2+ katika nchi 190. Migogoro, masoko, kijeshi, OSINT katika mtazamo mmoja.",
     "offlineTitle": "Uko Nje ya Mtandao",
-    "offlineMessage": "World Monitor inahitaji muunganisho wa intaneti kwa data ya wakati halisi ya kijasusi.",
+    "offlineMessage": "HIGH-HANDS inahitaji muunganisho wa intaneti kwa data ya wakati halisi ya kijasusi.",
     "offlineRetry": "Jaribu tena"
   },
   "widgets": {
@@ -779,7 +779,7 @@
         "some": "Baadhi ya vipengele vinahitaji funguo za API"
       },
       "reserveEarlyAccess": "Hifadhi Ufikiaji Wako wa Mapema",
-      "skipSetup": "Ruka usanidi - leseni moja ya World Monitor itafungua kila kitu. Jiunge na orodha ya wanaosubiri ili upate ufikiaji wa mapema.",
+      "skipSetup": "Ruka usanidi - leseni moja ya HIGH-HANDS itafungua kila kitu. Jiunge na orodha ya wanaosubiri ili upate ufikiaji wa mapema.",
       "summary": {
         "desktop": "Hali ya eneo-kazi",
         "web": "Hali ya wavuti (kusoma pekee, vitambulisho vinavyodhibitiwa na seva)",

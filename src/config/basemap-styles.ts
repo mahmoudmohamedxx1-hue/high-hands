@@ -67,6 +67,68 @@ const CARTO_STYLES: Record<string, string> = {
   'positron': CARTO_POSITRON,
 };
 
+/**
+ * Real satellite imagery basemap (ESRI World Imagery raster tiles, keyless).
+ * Returned as a StyleSpecification OBJECT so DeckGLMap's init branch does
+ * not misclassify it as a remote fallback string style. MapLibre's {z}/{y}/{x}
+ * tile scheme matches ESRI's path order.
+ */
+const ESRI_SATELLITE_STYLE: StyleSpecification = {
+  version: 8,
+  sources: {
+    esri: {
+      type: 'raster',
+      tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+      tileSize: 256,
+      maxzoom: 19,
+      attribution: 'Imagery © <a href="https://www.esri.com/" target="_blank" rel="noopener">Esri</a>, Maxar, Earthstar Geographics',
+    },
+  },
+  layers: [
+    { id: 'esri-satellite', type: 'raster', source: 'esri' },
+  ],
+};
+
+/** ESRI World Street Map — urban detail: roads, cities, labels (keyless raster). */
+const ESRI_STREETS_STYLE: StyleSpecification = {
+  version: 8,
+  sources: {
+    esri: {
+      type: 'raster',
+      tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'],
+      tileSize: 256,
+      maxzoom: 19,
+      attribution: '© <a href="https://www.esri.com/" target="_blank" rel="noopener">Esri</a>, HERE, Garmin, USGS, NGA',
+    },
+  },
+  layers: [
+    { id: 'esri-streets', type: 'raster', source: 'esri' },
+  ],
+};
+
+/** ESRI World Topo Map — terrain contours, parks, boundaries (keyless raster). */
+const ESRI_TOPO_STYLE: StyleSpecification = {
+  version: 8,
+  sources: {
+    esri: {
+      type: 'raster',
+      tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}'],
+      tileSize: 256,
+      maxzoom: 19,
+      attribution: '© <a href="https://www.esri.com/" target="_blank" rel="noopener">Esri</a>, USGS, NOAA',
+    },
+  },
+  layers: [
+    { id: 'esri-topo', type: 'raster', source: 'esri' },
+  ],
+};
+
+const ESRI_STYLES: Record<string, StyleSpecification> = {
+  satellite: ESRI_SATELLITE_STYLE,
+  streets: ESRI_STREETS_STYLE,
+  topo: ESRI_TOPO_STYLE,
+};
+
 async function tryBuildRegisteredPMTilesStyle(flavor: PMTilesTheme): Promise<StyleSpecification | null> {
   try {
     const style = await buildPMTilesStyle(flavor);
@@ -82,6 +144,8 @@ async function tryBuildRegisteredPMTilesStyle(flavor: PMTilesTheme): Promise<Sty
 export async function getStyleForProvider(provider: MapProvider, mapTheme: string): Promise<StyleSpecification | string> {
   const lightFallback = isLightMapTheme(mapTheme);
   switch (provider) {
+    case 'esri':
+      return ESRI_STYLES[mapTheme] ?? ESRI_SATELLITE_STYLE;
     case 'pmtiles': {
       const style = await tryBuildRegisteredPMTilesStyle(asPMTilesTheme(mapTheme));
       if (style) return style;

@@ -20,40 +20,38 @@ interface WebcamFeed {
   country: string;
   region: WebcamRegion;
   channelHandle: string;
-  fallbackVideoId: string;
+  // Stable YouTube channel id — the embed uses /embed/live_stream?channel= so
+  // YouTube resolves the channel's CURRENT live stream per request from the
+  // viewer's IP. Immune to stale/dead video ids and datacenter-IP scraping junk.
+  channelId: string;
 }
 
-// Verified YouTube live stream IDs — validated Feb 2026 via title cross-check.
-// IDs may rotate; update when stale.
+// Channel ids verified via canonical link + og:title cross-check (Sep 2026).
 const WEBCAM_FEEDS: WebcamFeed[] = [
-  // Middle East — Jerusalem & Tehran adjacent (conflict hotspots)
-  { id: 'jerusalem', city: 'Jerusalem', country: 'Israel', region: 'middle-east', channelHandle: '@TheWesternWall', fallbackVideoId: 'e34xb-Fbl0U' },
-  { id: 'middle-east', city: 'Middle East', country: 'Multi', region: 'middle-east', channelHandle: '@MiddleEastCams', fallbackVideoId: 'oxT5R6I0N6E' },
-  { id: 'tel-aviv', city: 'Tel Aviv', country: 'Israel', region: 'middle-east', channelHandle: '@IsraelLiveCam', fallbackVideoId: 'gmtlJ_m2r5A' },
-  { id: 'mecca', city: 'Mecca', country: 'Saudi Arabia', region: 'middle-east', channelHandle: '@MakkahLive', fallbackVideoId: 'kJwEsQTegxk' },
-  { id: 'beirut-mtv', city: 'Beirut', country: 'Lebanon', region: 'middle-east', channelHandle: '@MTVLebanonNews', fallbackVideoId: 'djF-Lkgfp6k' },
+  // Middle East
+  { id: 'jerusalem', city: 'Jerusalem (i24)', country: 'Israel', region: 'middle-east', channelHandle: '@i24NEWS', channelId: 'UCvHDpsWKADrDia0c99X37vg' },
+  { id: 'middle-east', city: 'Middle East', country: 'Multi', region: 'middle-east', channelHandle: '@AlJazeeraEnglish', channelId: 'UCNye-wNBqNL5ZzHSJj3l8Bg' },
+  { id: 'mecca', city: 'Mecca', country: 'Saudi Arabia', region: 'middle-east', channelHandle: '@QuranTV', channelId: 'UCos52azQNBgW63_9uDJoPDA' },
+  { id: 'beirut-mtv', city: 'Beirut & Levant', country: 'Lebanon', region: 'middle-east', channelHandle: '@WorldConflictLive247', channelId: 'UC2SO-5oK1SE4IqNXh4oqq1A' },
   // Europe
-  { id: 'kyiv', city: 'Kyiv', country: 'Ukraine', region: 'europe', channelHandle: '@DWNews', fallbackVideoId: '-Q7FuPINDjA' },
-  { id: 'odessa', city: 'Odessa', country: 'Ukraine', region: 'europe', channelHandle: '@UkraineLiveCam', fallbackVideoId: 'e2gC37ILQmk' },
-  { id: 'paris', city: 'Paris', country: 'France', region: 'europe', channelHandle: '@PalaisIena', fallbackVideoId: 'OzYp4NRZlwQ' },
-  { id: 'st-petersburg', city: 'St. Petersburg', country: 'Russia', region: 'europe', channelHandle: '@SPBLiveCam', fallbackVideoId: 'CjtIYbmVfck' },
-  { id: 'london', city: 'London', country: 'UK', region: 'europe', channelHandle: '@EarthCam', fallbackVideoId: 'Lxqcg1qt0XU' },
+  { id: 'kyiv', city: 'Amsterdam', country: 'Netherlands', region: 'europe', channelHandle: '@AmsterdamLive', channelId: 'UCCbkDvw6wI4Z5VX3BhSuw7w' },
+  { id: 'berlin-dw', city: 'Berlin (DW)', country: 'Germany', region: 'europe', channelHandle: '@DWNews', channelId: 'UCknLrEdhRCp1aegoMqRaCZg' },
+  { id: 'paris', city: 'Paris (F24)', country: 'France', region: 'europe', channelHandle: '@FRANCE24', channelId: 'UCQfwfsi5VrQ8yKZ-UWmAEFg' },
+  { id: 'london', city: 'London (Sky)', country: 'UK', region: 'europe', channelHandle: '@SkyNews', channelId: 'UCoMdktPbSTixAyNGwb-UYkQ' },
   // Americas
-  { id: 'washington', city: 'Washington DC', country: 'USA', region: 'americas', channelHandle: '@AxisCommunications', fallbackVideoId: '1wV9lLe14aU' },
-  { id: 'new-york', city: 'New York', country: 'USA', region: 'americas', channelHandle: '@EarthCam', fallbackVideoId: '4qyZLflp-sI' },
-  { id: 'los-angeles', city: 'Los Angeles', country: 'USA', region: 'americas', channelHandle: '@VeniceVHotel', fallbackVideoId: 'EO_1LWqsCNE' },
-  { id: 'miami', city: 'Miami', country: 'USA', region: 'americas', channelHandle: '@FloridaLiveCams', fallbackVideoId: '5YCajRjvWCg' },
-  // Asia-Pacific — Taipei first (strait hotspot), then Shanghai, Tokyo, Seoul
-  { id: 'taipei', city: 'Taipei', country: 'Taiwan', region: 'asia', channelHandle: '@JackyWuTaipei', fallbackVideoId: 'z_fY1pj1VBw' },
-  { id: 'shanghai', city: 'Shanghai', country: 'China', region: 'asia', channelHandle: '@SkylineWebcams', fallbackVideoId: '76EwqI5XZIc' },
-  { id: 'tokyo', city: 'Tokyo', country: 'Japan', region: 'asia', channelHandle: '@TokyoLiveCam4K', fallbackVideoId: '_k-5U7IeK8g' },
-  { id: 'seoul', city: 'Seoul', country: 'South Korea', region: 'asia', channelHandle: '@UNvillage_live', fallbackVideoId: '-JhoMGoAfFc' },
-  { id: 'sydney', city: 'Sydney', country: 'Australia', region: 'asia', channelHandle: '@WebcamSydney', fallbackVideoId: '7pcL-0Wo77U' },
+  { id: 'washington', city: 'Washington DC', country: 'USA', region: 'americas', channelHandle: '@cspan', channelId: 'UCb--64Gl51jIEVE-GLDAVTg' },
+  { id: 'new-york', city: 'New York', country: 'USA', region: 'americas', channelHandle: '@EarthCam', channelId: 'UC6qrG3W8SMK0jior2olka3g' },
+  { id: 'miami', city: 'Miami Surf', country: 'USA', region: 'americas', channelHandle: '@surfline', channelId: 'UC4i3-yfVazfuqwoz71T79Sw' },
+  // Asia-Pacific — Taipei first (strait hotspot), then Tokyo, Seoul
+  { id: 'taipei', city: 'Taipei', country: 'Taiwan', region: 'asia', channelHandle: '@JackyWuTaipei', channelId: 'UCmmxf8r3US6KJnhMKBG8DEw' },
+  { id: 'shanghai', city: 'World Cams', country: 'Multi', region: 'asia', channelHandle: '@SkylineWebcams', channelId: 'UC2WMV4vCYurHdHPd9pCqYSg' },
+  { id: 'tokyo', city: 'Tokyo (Kabukicho)', country: 'Japan', region: 'asia', channelHandle: '@KabukichoLive', channelId: 'UChKERpE7Um0Uq1btm_a9g5A' },
+  { id: 'seoul', city: 'Seoul', country: 'South Korea', region: 'asia', channelHandle: '@SeoulVibes', channelId: 'UC2j9YVeDkez-niRM85BsvsA' },
+  { id: 'sydney', city: 'Sydney', country: 'Australia', region: 'asia', channelHandle: '@WebcamSydney', channelId: 'UCLav_kTu9PmAEChvGyrPbhQ' },
   // Space
-  { id: 'iss-earth', city: 'ISS Earth View', country: 'Space', region: 'space', channelHandle: '@NASA', fallbackVideoId: 'vytmBNhc9ig' },
-  { id: 'nasa-live', city: 'NASA TV', country: 'Space', region: 'space', channelHandle: '@NASA', fallbackVideoId: 'zPH5KtjJFaQ' },
-  { id: 'space-x', city: 'SpaceX', country: 'Space', region: 'space', channelHandle: '@SpaceX', fallbackVideoId: 'fO9e9jnhYK8' },
-  { id: 'space-walk', city: 'Space', country: 'Space', region: 'space', channelHandle: '@NASA', fallbackVideoId: 'fO9e9jnhYK8' },
+  { id: 'iss-earth', city: 'ISS Earth View', country: 'Space', region: 'space', channelHandle: '@ISSLiveStream', channelId: 'UCGoxeUWHR00E0gjibgjK38w' },
+  { id: 'nasa-live', city: 'NASA TV', country: 'Space', region: 'space', channelHandle: '@NASA', channelId: 'UCLA_DiR1FfKNvjuUpBHmylQ' },
+  { id: 'space-x', city: 'Sen Space', country: 'Space', region: 'space', channelHandle: '@Sen', channelId: 'UCkvW_7kp9LJrztmgA4q4bJQ' },
 ];
 
 const MAX_GRID_CELLS = 4;
@@ -314,24 +312,27 @@ export class LiveWebcamsPanel extends Panel {
     }
   }
 
-  private buildEmbedUrl(videoId: string): string {
+  private buildEmbedUrl(feed: WebcamFeed): string {
     const quality = getStreamQuality();
     if (isDesktopRuntime()) {
       // Use local sidecar embed — YouTube rejects tauri:// parent origin with error 153.
       // The sidecar serves the embed from http://127.0.0.1:PORT which YouTube accepts.
-      const params = new URLSearchParams({ videoId, autoplay: '1', mute: '1' });
+      const params = new URLSearchParams({ channel: feed.channelId, autoplay: '1', mute: '1' });
       if (quality !== 'auto') params.set('vq', quality);
       params.set('parentOrigin', window.location.origin);
       return `http://localhost:${getLocalApiPort()}/api/youtube-embed?${params.toString()}`;
     }
     const vq = quality !== 'auto' ? `&vq=${quality}` : '';
-    return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1&rel=0&enablejsapi=1&origin=${window.location.origin}${vq}`;
+    // Channel live embed: YouTube resolves the channel's CURRENT live stream
+    // per request from the viewer's own IP — no server-side videoId scraping
+    // (which returns recommendation junk from datacenter IPs) and no stale ids.
+    return `https://www.youtube.com/embed/live_stream?channel=${feed.channelId}&autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1&rel=0&enablejsapi=1&origin=${window.location.origin}${vq}`;
   }
 
   private createIframe(feed: WebcamFeed): HTMLIFrameElement {
     const iframe = document.createElement('iframe');
     iframe.className = 'webcam-iframe';
-    iframe.src = this.buildEmbedUrl(feed.fallbackVideoId);
+    iframe.src = this.buildEmbedUrl(feed);
     iframe.title = `${feed.city} live webcam`;
     iframe.allow = 'autoplay; encrypted-media; picture-in-picture; storage-access';
     iframe.referrerPolicy = 'strict-origin-when-cross-origin';
@@ -596,7 +597,7 @@ export class LiveWebcamsPanel extends Panel {
 
     const openBtn = document.createElement('a');
     openBtn.className = 'offline-retry webcam-embed-open';
-    openBtn.href = `https://www.youtube.com/watch?v=${encodeURIComponent(feed.fallbackVideoId)}`;
+    openBtn.href = `https://www.youtube.com/channel/${encodeURIComponent(feed.channelId)}/live`;
     openBtn.target = '_blank';
     openBtn.rel = 'noopener noreferrer';
     openBtn.textContent = t('components.liveNews.openOnYouTube') || 'Open on YouTube';

@@ -1,14 +1,14 @@
 ---
-title: "World Monitor support and contact"
+title: "HIGH-HANDS support and contact"
 description: "Support contacts, service status, and issue reporting."
 canonical: "https://www.worldmonitor.app/support.md"
 ---
 
-# Support & Contact - World Monitor
+# Support & Contact - HIGH-HANDS
 
 Last updated: July 5, 2026
 
-How to reach World Monitor, by concern. Human-readable version: https://www.worldmonitor.app/docs/support
+How to reach HIGH-HANDS, by concern. Human-readable version: https://www.worldmonitor.app/docs/support
 
 ## Channels
 
@@ -39,7 +39,7 @@ How to reach World Monitor, by concern. Human-readable version: https://www.worl
 
 ```json
 {
-  "product": "World Monitor",
+  "product": "HIGH-HANDS",
   "support_email": "support@worldmonitor.app",
   "enterprise_email": "enterprise@worldmonitor.app",
   "issues_url": "https://github.com/koala73/worldmonitor/issues",

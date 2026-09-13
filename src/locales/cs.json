@@ -715,7 +715,7 @@
         "needsKeys": "Pro odemknutí funkcí nakonfigurujte klíče API",
         "some": "Některé funkce vyžadují klíče API"
       },
-      "skipSetup": "Přeskočit nastavení — jedna licence World Monitor odemkne vše. Zapište se na čekací listinu pro předběžný přístup.",
+      "skipSetup": "Přeskočit nastavení — jedna licence HIGH-HANDS odemkne vše. Zapište se na čekací listinu pro předběžný přístup.",
       "summary": {
         "desktop": "Desktopový režim",
         "web": "Webový režim (pouze pro čtení, přihlašovací údaje spravuje server)",
@@ -780,7 +780,7 @@
         "status": "Stav",
         "duration": "Trvání"
       },
-      "shellTitle": "Nastavení World Monitor",
+      "shellTitle": "Nastavení HIGH-HANDS",
       "shellSearchPlaceholder": "Hledání v nastavení...",
       "shellCancel": "Zrušit",
       "shellSaveClose": "Uložit a zavřít",
@@ -3516,10 +3516,10 @@
     "copyCoordinates": "Kopírovat souřadnice"
   },
   "shell": {
-    "documentTitle": "World Monitor — Přehled reálných globálních informací",
+    "documentTitle": "HIGH-HANDS — Přehled reálných globálních informací",
     "metaDescription": "Platforma globálních informací v reálném čase. Vyznamenáno v WIRED. Používáno 2M+ lidí v 190 zemích. Konflikty, trhy, armáda, OSINT v jednom pohledu.",
     "offlineTitle": "Jste offline",
-    "offlineMessage": "World Monitor vyžaduje internetové připojení pro data zpravodajství v reálném čase.",
+    "offlineMessage": "HIGH-HANDS vyžaduje internetové připojení pro data zpravodajství v reálném čase.",
     "offlineRetry": "Zkusit znovu"
   },
   "widgets": {
@@ -3591,7 +3591,7 @@
   },
   "premium": {
     "pro": "PRO",
-    "lockedDesc": "Vyžaduje licenční klíč World Monitor",
+    "lockedDesc": "Vyžaduje licenční klíč HIGH-HANDS",
     "signInToUnlock": "Přihlaste se a odemkněte prémiové funkce",
     "signIn": "Přihlášení pro odemčení",
     "upgradeDesc": "Upgradujte na Pro a získejte plný přístup k prémiové analýze",

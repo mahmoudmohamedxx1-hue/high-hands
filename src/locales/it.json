@@ -712,7 +712,7 @@
         "needsKeys": "Configura le chiavi API per sbloccare funzionalità",
         "some": "Alcune funzionalità richiedono chiavi API"
       },
-      "skipSetup": "Salta la configurazione — una singola licenza World Monitor sblocca tutto. Iscriviti alla lista d'attesa per l'accesso anticipato.",
+      "skipSetup": "Salta la configurazione — una singola licenza HIGH-HANDS sblocca tutto. Iscriviti alla lista d'attesa per l'accesso anticipato.",
       "summary": {
         "desktop": "Modalità desktop",
         "web": "Modalità Web (credenziali di sola lettura, gestite dal server)",
@@ -847,7 +847,7 @@
           "submitBtn": "Vedi i piani API"
         }
       },
-      "shellTitle": "Impostazioni World Monitor",
+      "shellTitle": "Impostazioni HIGH-HANDS",
       "shellSearchPlaceholder": "Cerca impostazioni...",
       "shellCancel": "Annulla",
       "shellSaveClose": "Salva e chiudi",
@@ -3497,10 +3497,10 @@
     "copyCoordinates": "Copia coordinate"
   },
   "shell": {
-    "documentTitle": "World Monitor — Dashboard di intelligence globale in tempo reale",
+    "documentTitle": "HIGH-HANDS — Dashboard di intelligence globale in tempo reale",
     "metaDescription": "Piattaforma di intelligence globale in tempo reale. In primo piano su WIRED. Utilizzata da 2M+ persone in 190 paesi. Conflitti, mercati, militari, OSINT in un'unica vista.",
     "offlineTitle": "Sei Offline",
-    "offlineMessage": "World Monitor richiede una connessione Internet per i dati di intelligence in tempo reale.",
+    "offlineMessage": "HIGH-HANDS richiede una connessione Internet per i dati di intelligence in tempo reale.",
     "offlineRetry": "Riprova"
   },
   "widgets": {
@@ -3572,7 +3572,7 @@
   },
   "premium": {
     "pro": "PRO",
-    "lockedDesc": "Richiede una chiave di licenza World Monitor",
+    "lockedDesc": "Richiede una chiave di licenza HIGH-HANDS",
     "signInToUnlock": "Accedi per sbloccare le funzioni premium",
     "signIn": "Accedi per Sbloccare",
     "upgradeDesc": "Esegui l'upgrade a Pro per accesso completo all'analitiche premium",

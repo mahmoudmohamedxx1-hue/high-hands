@@ -1,7 +1,7 @@
 {
   "$comment": "Machine-readable homepage view served at /?mode=agent (vercel.json rewrite). Structured summary for AI agents instead of marketing HTML. Parity with the MCP server card and agent card is guarded in tests/agent-mode-view.test.mjs.",
   "kind": "agent-view",
-  "product": "World Monitor",
+  "product": "HIGH-HANDS",
   "url": "https://www.worldmonitor.app",
   "description": "Live global-intelligence platform: real-time markets, conflict events, country risk and resilience, global procurement opportunities, shipping chokepoints, aviation/maritime activity, energy, climate, health, cyber threats, on-demand NLP utilities (classification, entity extraction, news clusters, keyword spikes), forecasts and AI-generated briefs — machine-readable JSON, correlated across layers.",
   "endpoints": {

@@ -98,8 +98,8 @@ import { getCachedGpsInterference } from '@/services/gps-interference';
 import { dataFreshness } from '@/services/data-freshness';
 import { mlWorker } from '@/services/ml-worker';
 import { WM_OPEN_NOTIFICATIONS_FOR_COUNTRY } from '@/utils/notify-country-link';
-import { AuthLauncher } from '@/components/AuthLauncher';
-import { AuthHeaderWidget } from '@/components/AuthHeaderWidget';
+// AuthLauncher/AuthHeaderWidget imports removed: the self-hosted build
+// renders no Clerk auth surface (see setupAuthWidget).
 import { t } from '@/services/i18n';
 import { TvModeController } from '@/services/tv-mode';
 import { getAuthState, subscribeAuthState } from '@/services/auth-state';
@@ -146,6 +146,16 @@ import {
 } from '@/app/responsive-zone-listener';
 import { stageVariantSelection } from '@/services/variant-panel-ownership';
 import { transferSourceGateOwnershipToUser as releaseSourceGateOwnership } from '@/services/source-cap';
+import {
+  getAllCountryCodes,
+  getCountryNameByCode,
+  nameToCountryCode,
+  preloadCountryGeometry,
+  isCountryGeometryLoaded,
+} from '@/services/country-geometry';
+import { getCountryMapFocus } from '@/app/country-map-focus';
+import type { SeverityFilter } from '@/components/MapContainer';
+import { getMapProvider, getMapTheme, setMapProvider, setMapTheme, type MapProvider } from '@/config/basemap';
 
 function readStorageValue(key: string): string | null {
   try {
@@ -309,6 +319,9 @@ export class EventHandlerManager implements AppModule {
   private boundMapResizeMoveHandler: ((e: MouseEvent) => void) | null = null;
   private boundMapEndResizeHandler: (() => void) | null = null;
   private boundMapResizeVisChangeHandler: (() => void) | null = null;
+  private boundMapHeightTouchMoveHandler: ((e: TouchEvent) => void) | null = null;
+  private boundMapHeightTouchEndHandler: ((e: TouchEvent) => void) | null = null;
+  private mapSizeObserver: ResizeObserver | null = null;
   private boundMapWidthResizeMoveHandler: ((e: MouseEvent) => void) | null = null;
   private boundMapWidthTouchMoveHandler: ((e: TouchEvent) => void) | null = null;
   private boundMapWidthTouchEndHandler: ((e: TouchEvent) => void) | null = null;
@@ -558,6 +571,19 @@ export class EventHandlerManager implements AppModule {
       window.removeEventListener('blur', this.boundMapEndResizeHandler);
       this.boundMapEndResizeHandler = null;
     }
+    if (this.boundMapHeightTouchMoveHandler) {
+      document.removeEventListener('touchmove', this.boundMapHeightTouchMoveHandler);
+      this.boundMapHeightTouchMoveHandler = null;
+    }
+    if (this.boundMapHeightTouchEndHandler) {
+      document.removeEventListener('touchend', this.boundMapHeightTouchEndHandler);
+      document.removeEventListener('touchcancel', this.boundMapHeightTouchEndHandler);
+      this.boundMapHeightTouchEndHandler = null;
+    }
+    if (this.mapSizeObserver) {
+      this.mapSizeObserver.disconnect();
+      this.mapSizeObserver = null;
+    }
     if (this.boundMapWidthResizeMoveHandler) {
       document.removeEventListener('mousemove', this.boundMapWidthResizeMoveHandler);
       this.boundMapWidthResizeMoveHandler = null;
@@ -640,6 +666,18 @@ export class EventHandlerManager implements AppModule {
     this.ctx.authModal?.destroy();
     this.ctx.authModal = null;
     overlayHistory.reset();
+  }
+
+  /**
+   * PRO removed: the ⭐ PRO header button and mobile menu item no longer
+   * exist — every feature is permanently accessible.
+   */
+  syncSandboxProUi(): void {
+    // no-op: PRO UI removed
+  }
+
+  wireSandboxProButtons(): void {
+    // no-op: PRO UI removed
   }
 
   setupSearchControls(): void {
@@ -836,6 +874,8 @@ export class EventHandlerManager implements AppModule {
       trackMapViewChange(regionSelect.value);
     });
 
+    this.setupMapFilterBar();
+
     this.boundResizeHandler = debounce(() => {
       this.ctx.map?.setIsResizing(false);
       this.ctx.map?.render();
@@ -844,6 +884,7 @@ export class EventHandlerManager implements AppModule {
 
     this.setupMapResize();
     this.setupMapWidthResize();
+    this.setupMapSizePresets();
     this.setupMapSideToggle();
     this.setupMapPin();
 
@@ -1669,7 +1710,7 @@ export class EventHandlerManager implements AppModule {
         // Closing first keeps two overlays off the screen at once, and the
         // settings modal owns its own history entry on mobile.
         this.closeEmbedDialog();
-        void this.ctx.unifiedSettings?.open('embeds');
+        void this.ctx.unifiedSettings?.open('settings');
       });
       actions.appendChild(manageButton);
     }
@@ -2265,7 +2306,9 @@ export class EventHandlerManager implements AppModule {
     // would otherwise accumulate anonymous listeners that retain the
     // stale AppContext closure — every click would fire all of them.
     this.boundNotifyForCountryHandler = (_e: Event) => {
-      this.ctx.unifiedSettings?.open('notifications');
+      // Notifications tab removed (account-backend feature): land on the
+      // general settings tab instead.
+      this.ctx.unifiedSettings?.open('settings');
     };
     window.addEventListener(
       WM_OPEN_NOTIFICATIONS_FOR_COUNTRY,
@@ -2274,24 +2317,10 @@ export class EventHandlerManager implements AppModule {
   }
 
   setupAuthWidget(): void {
-    const modal = new AuthLauncher();
-    this.ctx.authModal = modal;
-
-    // The standalone gear remains available to every user. Signed-in users
-    // also get explicit Settings and Plan & billing destinations inside the
-    // avatar menu, keeping account and subscription actions in one place.
-    const widget = new AuthHeaderWidget(
-      () => modal.open(),
-      () => this.ctx.unifiedSettings?.open('settings'),
-      () => this.ctx.unifiedSettings?.open('billing'),
-    );
-    this.ctx.authHeaderWidget = widget;
-    const mount = document.getElementById('authWidgetMount');
-    if (mount) {
-      mount.appendChild(widget.getElement());
-    }
-
-    this.mobilePrimaryNav.setupAuth(modal);
+    // Self-hosted build: no Clerk auth surface. The header/mobile sign-in
+    // widgets are not rendered, the auth modal is never created (call sites
+    // use `?.`), and anonymous sessions get full access (see panel-gating).
+    this.mobilePrimaryNav.setupAuth(null);
   }
 
   setupPlaybackControl(): void {
@@ -2447,6 +2476,124 @@ export class EventHandlerManager implements AppModule {
     return !this.ctx.isMobile && !!this.ctx.findingsBadge?.isPopupEnabled();
   }
 
+  // ─── Map filter bar (self-hosted): country selector + severity chips ────────
+
+  setupMapFilterBar(): void {
+    const input = document.getElementById('countryFilterInput') as HTMLInputElement | null;
+    const clearBtn = document.getElementById('countryFilterClear') as HTMLButtonElement | null;
+    const sevBar = document.getElementById('mapFilterBar');
+    if (!input || !sevBar) return;
+
+    // Populate the country datalist once geometry is loaded (all renderers).
+    const populateCountryList = (): void => {
+      const datalist = document.getElementById('wmCountryList');
+      if (!datalist || datalist.childElementCount > 0 || !isCountryGeometryLoaded()) return;
+      const codes = getAllCountryCodes();
+      const names = codes
+        .map((code) => getCountryNameByCode(code))
+        .filter((name): name is string => Boolean(name))
+        .sort((a, b) => a.localeCompare(b));
+      for (const name of names) {
+        const option = document.createElement('option');
+        option.value = name;
+        datalist.appendChild(option);
+      }
+    };
+    void preloadCountryGeometry().then(populateCountryList).catch(() => {});
+    // Geometry may already be loaded (country brief opened earlier).
+    populateCountryList();
+
+    const applyCountryFocus = (name: string): void => {
+      const trimmed = name.trim();
+      clearBtn?.toggleAttribute('hidden', trimmed.length === 0);
+      if (!trimmed) {
+        this.ctx.map?.clearCountryHighlight();
+        return;
+      }
+      const code = nameToCountryCode(trimmed);
+      if (!code) {
+        showToast(`No country found for “${trimmed}”`);
+        return;
+      }
+      const focus = getCountryMapFocus(code);
+      if (focus) {
+        this.ctx.map?.setCenter(focus.lat, focus.lon, focus.zoom);
+      }
+      // 2D renderers draw the highlight polygon; globe just flies.
+      this.ctx.map?.highlightCountry(code);
+      track('country-filter-focus', { code, source: 'map-filter-bar' });
+    };
+
+    input.addEventListener('change', () => applyCountryFocus(input.value));
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') applyCountryFocus(input.value);
+      if (e.key === 'Escape') {
+        input.value = '';
+        applyCountryFocus('');
+      }
+    });
+    clearBtn?.addEventListener('click', () => {
+      input.value = '';
+      applyCountryFocus('');
+      input.focus();
+    });
+
+    // Severity chips: filter map event layers by severity threshold.
+    sevBar.querySelectorAll<HTMLButtonElement>('.severity-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const level = (btn.dataset.sev ?? 'all') as SeverityFilter;
+        sevBar.querySelectorAll('.severity-btn').forEach((b) => b.classList.toggle('active', b === btn));
+        this.ctx.map?.setSeverityFilter(level);
+        track('map-severity-filter', { level });
+      });
+    });
+
+    // Basemap style chips (SAT / URBAN / TOPO / DARK / LIGHT): one-tap switch
+    // of the 2D map's base layer, persisted via the provider/theme prefs that
+    // Settings → Preferences also uses, then broadcast so DeckGLMap reloads.
+    const basemapBar = document.getElementById('mapFilterBar');
+    if (basemapBar) {
+      const BASEMAP_TARGETS: Record<string, { provider: MapProvider; theme: string }> = {
+        satellite: { provider: 'esri', theme: 'satellite' },
+        urban: { provider: 'esri', theme: 'streets' },
+        topo: { provider: 'esri', theme: 'topo' },
+        dark: { provider: 'carto', theme: 'dark-matter' },
+        light: { provider: 'carto', theme: 'positron' },
+      };
+      const chipForCurrentPrefs = (): string => {
+        const provider = getMapProvider();
+        const theme = getMapTheme(provider);
+        if (provider === 'esri') {
+          if (theme === 'streets') return 'urban';
+          if (theme === 'topo') return 'topo';
+          return 'satellite';
+        }
+        if (theme === 'positron' || theme === 'voyager' || theme === 'light' || theme === 'white') return 'light';
+        return 'dark';
+      };
+      const syncBasemapChips = (): void => {
+        const active = chipForCurrentPrefs();
+        basemapBar.querySelectorAll<HTMLButtonElement>('.basemap-btn').forEach((b) => {
+          b.classList.toggle('active', b.dataset.basemap === active);
+        });
+      };
+      basemapBar.querySelectorAll<HTMLButtonElement>('.basemap-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const target = BASEMAP_TARGETS[btn.dataset.basemap ?? ''];
+          if (!target) return;
+          setMapProvider(target.provider);
+          setMapTheme(target.provider, target.theme);
+          syncBasemapChips();
+          window.dispatchEvent(new CustomEvent('map-theme-changed'));
+          track('map-basemap-style', { style: btn.dataset.basemap, provider: target.provider, theme: target.theme });
+        });
+      });
+      syncBasemapChips();
+      // Keep chip state in sync when the style is changed from Settings instead.
+      window.addEventListener('map-theme-changed', syncBasemapChips);
+    }
+  }
+
   setupMapResize(): void {
     const mapSection = document.getElementById('mapSection');
     const mapContainer = document.getElementById('mapContainer');
@@ -2541,6 +2688,11 @@ export class EventHandlerManager implements AppModule {
     // switch the resized element or the storage key under the drag.
     let dragTarget: HTMLElement | null = null;
     let dragKey = 'map-height';
+    // Which input stream owns the current drag — mouse or touch. Guards the
+    // document-level move handlers so a touch drag cannot be steered by
+    // synthesized mousemove events and vice versa.
+    let heightDragSource: 'mouse' | 'touch' = 'mouse';
+    let activeHeightTouchId: number | null = null;
 
     this.boundMapEndResizeHandler = () => {
       if (!isResizing) return;
@@ -2574,6 +2726,8 @@ export class EventHandlerManager implements AppModule {
 
     resizeHandle.addEventListener('mousedown', (e) => {
       isResizing = true;
+      heightDragSource = 'mouse';
+      activeHeightTouchId = null;
       startY = e.clientY;
       dragTarget = getTarget();
       dragKey = getHeightKey();
@@ -2633,7 +2787,7 @@ export class EventHandlerManager implements AppModule {
     });
 
     this.boundMapResizeMoveHandler = (e: MouseEvent) => {
-      if (!isResizing) return;
+      if (!isResizing || heightDragSource !== 'mouse') return;
       const target = dragTarget ?? getTarget();
 
       const deltaY = e.clientY - startY;
@@ -2653,6 +2807,140 @@ export class EventHandlerManager implements AppModule {
       if (document.hidden) endResize();
     };
     document.addEventListener('visibilitychange', this.boundMapResizeVisChangeHandler);
+
+    // Touch path (mobile/tablet): mirrors the width handle's tracked-finger
+    // pattern — beginDrag captures the height and target, move applies the
+    // delta, and only the SAME finger lifting ends the drag. passive:false on
+    // touchmove stops the page from scrolling while the map resizes.
+    const beginHeightDrag = (clientY: number, source: 'mouse' | 'touch'): boolean => {
+      if (isResizing) return false;
+      isResizing = true;
+      heightDragSource = source;
+      startY = clientY;
+      dragTarget = getTarget();
+      dragKey = getHeightKey();
+      startHeight = dragTarget.offsetHeight;
+      this.ctx.map?.setIsResizing(true);
+      mapSection.classList.add('resizing');
+      document.body.style.cursor = 'ns-resize';
+      return true;
+    };
+    resizeHandle.addEventListener('touchstart', (e: TouchEvent) => {
+      const touch = e.changedTouches[0];
+      if (!touch || !beginHeightDrag(touch.clientY, 'touch')) return;
+      activeHeightTouchId = touch.identifier;
+      e.preventDefault();
+    }, { passive: false });
+    this.boundMapHeightTouchMoveHandler = (e: TouchEvent) => {
+      if (!isResizing || heightDragSource !== 'touch' || activeHeightTouchId === null) return;
+      const touch = Array.from(e.touches).find(t => t.identifier === activeHeightTouchId);
+      if (!touch) return;
+      e.preventDefault();
+      const target = dragTarget ?? getTarget();
+      const deltaY = touch.clientY - startY;
+      const newHeight = Math.max(getMinHeight(), Math.min(startHeight + deltaY, getMaxHeight()));
+      if (target === mapContainer) target.style.flex = 'none';
+      target.style.height = `${newHeight}px`;
+      this.ctx.map?.resize();
+      syncHeightSeparatorAria();
+    };
+    this.boundMapHeightTouchEndHandler = (e: TouchEvent) => {
+      if (heightDragSource !== 'touch' || activeHeightTouchId === null) return;
+      if (!Array.from(e.changedTouches).some(t => t.identifier === activeHeightTouchId)) return;
+      endResize();
+      activeHeightTouchId = null;
+    };
+    document.addEventListener('touchmove', this.boundMapHeightTouchMoveHandler, { passive: false });
+    document.addEventListener('touchend', this.boundMapHeightTouchEndHandler);
+    document.addEventListener('touchcancel', this.boundMapHeightTouchEndHandler);
+  }
+
+  /**
+   * Map size presets (S / M / L / MAX) in the map header — one tap adjusts
+   * the map's height, persisted to the same storage keys the drag handle
+   * uses so presets and manual drags agree on a single source of truth.
+   */
+  setupMapSizePresets(): void {
+    const mapSection = document.getElementById('mapSection');
+    const mapContainer = document.getElementById('mapContainer');
+    const toggle = document.getElementById('mapSizeToggle');
+    if (!mapSection || !toggle || !mapContainer) return;
+
+    const isSplit = () => window.innerWidth >= SPLIT_LAYOUT_MIN_WIDTH;
+    const getHeightKey = () => (isSplit() ? 'map-split-height' : 'map-height');
+    const getMinHeight = () => (isSplit() ? 280 : 350);
+    const getMaxHeight = () => {
+      if (!isSplit()) return Math.max(getMinHeight(), window.innerHeight - 150);
+      const bottomGrid = document.getElementById('mapBottomGrid');
+      const isEmpty = !bottomGrid || bottomGrid.children.length === 0;
+      const totalAvailable = window.innerHeight - 60;
+      return isEmpty ? totalAvailable - 25 : totalAvailable - 300;
+    };
+    const presetHeight = (preset: string): number => {
+      const max = getMaxHeight();
+      switch (preset) {
+        case 's': return Math.min(Math.max(getMinHeight(), Math.round(window.innerHeight * 0.4)), max);
+        case 'm': return Math.min(Math.max(getMinHeight(), Math.round(window.innerHeight * 0.6)), max);
+        case 'l': return Math.min(Math.max(getMinHeight(), Math.round(window.innerHeight * 0.8)), max);
+        case 'max': return max;
+        default: return 0;
+      }
+    };
+    const getTarget = () => (isSplit() ? mapContainer : mapSection);
+
+    const applyPreset = (preset: string): void => {
+      const height = presetHeight(preset);
+      if (height <= 0) return;
+      // A collapsed map must expand first, otherwise the height lands on a
+      // hidden section and the user sees nothing happen.
+      mapSection.classList.remove('collapsed');
+      mapSection.classList.remove('hidden');
+      const target = getTarget();
+      if (target === mapContainer) target.style.flex = 'none';
+      target.style.height = `${height}px`;
+      writeStorageValue(getHeightKey(), `${height}px`);
+      this.ctx.map?.setIsResizing(true);
+      this.ctx.map?.resize();
+      requestAnimationFrame(() => this.ctx.map?.setIsResizing(false));
+      syncActivePreset();
+    };
+
+    // Highlight the chip closest to the current height (within 60px) — the
+    // drag handle and presets stay visually consistent with each other.
+    const syncActivePreset = (): void => {
+      const current = getTarget().offsetHeight;
+      const buttons = Array.from(toggle.querySelectorAll<HTMLButtonElement>('.map-size-btn'));
+      let best: string | null = null;
+      let bestDelta = Number.POSITIVE_INFINITY;
+      for (const btn of buttons) {
+        const preset = btn.dataset.size;
+        if (!preset) continue;
+        const delta = Math.abs(presetHeight(preset) - current);
+        if (delta < bestDelta) { bestDelta = delta; best = preset; }
+      }
+      for (const btn of buttons) {
+        btn.classList.toggle('active', best !== null && btn.dataset.size === best && bestDelta <= 60);
+      }
+    };
+
+    for (const btn of Array.from(toggle.querySelectorAll<HTMLButtonElement>('.map-size-btn'))) {
+      btn.addEventListener('click', () => {
+        const preset = btn.dataset.size;
+        if (!preset) return;
+        applyPreset(preset);
+        track('map-size-preset', { preset });
+      });
+    }
+
+    // Keep the active chip honest when the map is resized by any other path
+    // (drag handle, keyboard, dblclick, layout restore, split-zone switch).
+    if (typeof ResizeObserver !== 'undefined') {
+      this.mapSizeObserver = new ResizeObserver(() => syncActivePreset());
+      this.mapSizeObserver.observe(mapSection);
+      if (isSplit()) this.mapSizeObserver.observe(mapContainer);
+    }
+
+    syncActivePreset();
   }
 
   setupMapWidthResize(): void {

@@ -8,7 +8,7 @@ import type { Layer, LayersList, PickingInfo } from '@deck.gl/core';
 import { GeoJsonLayer, ScatterplotLayer, PathLayer, IconLayer, TextLayer, PolygonLayer } from '@deck.gl/layers';
 import maplibregl from 'maplibre-gl';
 import type { StyleSpecification } from 'maplibre-gl';
-import { FALLBACK_DARK_STYLE, FALLBACK_LIGHT_STYLE, getMapProvider, getMapTheme, isLightMapTheme } from '@/config/basemap';
+import { FALLBACK_DARK_STYLE, FALLBACK_LIGHT_STYLE, getMapProvider, getMapTheme, isLightMapTheme, type MapProvider } from '@/config/basemap';
 import { getStyleForProvider } from '@/config/basemap-styles';
 import Supercluster from 'supercluster';
 import type {
@@ -119,6 +119,7 @@ import {
   getLayersForVariant,
   resolveLayerLabel,
   bindLayerSearch,
+  applyLayerGrouping,
   getLayerExplanation,
   hasCuratedLayerExplanation,
   isLayerEntitled,
@@ -275,6 +276,12 @@ const LAYER_ZOOM_THRESHOLDS: Partial<Record<keyof MapLayers, { minZoom: number; 
 };
 // Export for external use
 export { LAYER_ZOOM_THRESHOLDS };
+
+/** ISO2 → regional-indicator flag emoji (US → 🇺🇸). */
+function iso2ToFlagEmoji(code: string): string {
+  if (!/^[A-Za-z]{2}$/.test(code)) return '';
+  return String.fromCodePoint(...[...code.toUpperCase()].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65));
+}
 
 // Theme-aware overlay color function — refreshed each buildLayers() call
 function getOverlayColors() {
@@ -689,7 +696,7 @@ export class DeckGLMap {
 
   // Country highlight state
   private countryGeoJsonLoaded = false;
-  private countryHoverSetup = false;
+  private countryHoverMap: maplibregl.Map | null = null;
   private highlightedCountryCode: string | null = null;
   private hoveredCountryIso2: string | null = null;
   private hoveredCountryName: string | null = null;
@@ -1054,12 +1061,31 @@ export class DeckGLMap {
 
     const attribution = document.createElement('div');
     attribution.className = 'map-attribution';
-    setTrustedHtml(attribution, trustedHtml(isHappyVariant
-      ? '© <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
-      : '© <a href="https://protomaps.com" target="_blank" rel="noopener">Protomaps</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>', "legacy direct innerHTML migration"));
     wrapper.appendChild(attribution);
 
     this.container.appendChild(wrapper);
+    this.updateBasemapAttribution(getMapProvider(), getMapTheme(getMapProvider()));
+  }
+
+  /** Keeps the corner attribution in sync with the active basemap style. */
+  private updateBasemapAttribution(provider: MapProvider, mapTheme: string): void {
+    const attr = this.container?.querySelector('.map-attribution');
+    if (!attr) return;
+    let html: string;
+    if (isHappyVariant) {
+      html = '© <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
+    } else if (provider === 'esri') {
+      html = mapTheme === 'satellite'
+        ? 'Imagery © <a href="https://www.esri.com/" target="_blank" rel="noopener">Esri</a>, Maxar, Earthstar Geographics'
+        : mapTheme === 'topo'
+          ? '© <a href="https://www.esri.com/" target="_blank" rel="noopener">Esri</a>, USGS, NOAA'
+          : '© <a href="https://www.esri.com/" target="_blank" rel="noopener">Esri</a>, HERE, Garmin, USGS, NGA';
+    } else if (provider === 'carto' || provider === 'openfreemap') {
+      html = '© <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
+    } else {
+      html = '© <a href="https://protomaps.com" target="_blank" rel="noopener">Protomaps</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
+    }
+    setTrustedHtml(attr, trustedHtml(html, "legacy direct innerHTML migration"));
   }
 
   /**
@@ -1358,11 +1384,12 @@ export class DeckGLMap {
     const provider = getMapProvider();
     const mapTheme = getMapTheme(provider);
     console.warn('[DeckGLMap] Map provider changed repeatedly during startup; using latest provider state');
+    if (provider === 'esri' || provider === 'carto') {
+      return { mapTheme, style: await getStyleForProvider(provider, mapTheme) };
+    }
     return {
       mapTheme,
-      style: provider === 'carto'
-        ? await getStyleForProvider(provider, mapTheme)
-        : (isLightMapTheme(mapTheme) ? FALLBACK_LIGHT_STYLE : FALLBACK_DARK_STYLE),
+      style: isLightMapTheme(mapTheme) ? FALLBACK_LIGHT_STYLE : FALLBACK_DARK_STYLE,
     };
   }
 
@@ -5536,7 +5563,7 @@ export class DeckGLMap {
       link.href = streamUrl;
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
-      link.textContent = 'Open on Windy \u2197';
+      link.textContent = 'Watch live \u2197';
       popup.appendChild(link);
     }
 
@@ -5854,6 +5881,7 @@ export class DeckGLMap {
       toggles.addEventListener('touchmove', (e) => e.stopPropagation(), { passive: false });
     }
     bindLayerSearch(toggles);
+    applyLayerGrouping(toggles);
     const searchEl = toggles.querySelector('.layer-search') as HTMLElement | null;
 
     collapseBtn?.addEventListener('click', () => {
@@ -7938,8 +7966,8 @@ export class DeckGLMap {
           type: 'fill',
           source: 'country-boundaries',
           paint: {
-            'fill-color': '#ffffff',
-            'fill-opacity': 0.05,
+            'fill-color': '#f59e0b',
+            'fill-opacity': 0.12,
           },
           filter: ['==', ['get', 'ISO3166-1-Alpha-2'], ''],
         });
@@ -7948,9 +7976,9 @@ export class DeckGLMap {
           type: 'line',
           source: 'country-boundaries',
           paint: {
-            'line-color': '#ffffff',
-            'line-width': 1.5,
-            'line-opacity': 0.22,
+            'line-color': '#fbbf24',
+            'line-width': 2.25,
+            'line-opacity': 0.95,
           },
           filter: ['==', ['get', 'ISO3166-1-Alpha-2'], ''],
         });
@@ -7976,7 +8004,7 @@ export class DeckGLMap {
           filter: ['==', ['get', 'ISO3166-1-Alpha-2'], ''],
         });
 
-        if (!this.countryHoverSetup) this.setupCountryHover();
+        if (this.countryHoverMap !== this.maplibreMap) this.setupCountryHover();
         const paintProvider = getMapProvider();
         const paintMapTheme = getMapTheme(paintProvider);
         this.updateCountryLayerPaint(isLightMapTheme(paintMapTheme) ? 'light' : 'dark');
@@ -7986,15 +8014,56 @@ export class DeckGLMap {
       .catch((err) => console.warn('[DeckGLMap] Failed to load country boundaries:', err));
   }
 
+  private countryHoverTooltip: HTMLDivElement | null = null;
+
+  private ensureCountryHoverTooltip(): HTMLDivElement | null {
+    if (this.countryHoverTooltip?.isConnected) return this.countryHoverTooltip;
+    const wrapper = this.container?.querySelector('#deckglMapWrapper') ?? this.container;
+    if (!wrapper) return null;
+    const tip = document.createElement('div');
+    tip.className = 'wm-country-hover-tip';
+    tip.setAttribute('aria-hidden', 'true');
+    tip.hidden = true;
+    wrapper.appendChild(tip);
+    this.countryHoverTooltip = tip;
+    return tip;
+  }
+
+  private moveCountryHoverTooltip(point: maplibregl.Point): void {
+    const tip = this.countryHoverTooltip;
+    if (!tip || tip.hidden) return;
+    const wrapper = tip.parentElement;
+    const maxX = wrapper ? wrapper.clientWidth : window.innerWidth;
+    const maxY = wrapper ? wrapper.clientHeight : window.innerHeight;
+    const x = Math.min(Math.max(point.x, 70), Math.max(maxX - 70, 70));
+    const y = Math.min(Math.max(point.y, 46), Math.max(maxY - 20, 46));
+    tip.style.left = `${Math.round(x)}px`;
+    tip.style.top = `${Math.round(y)}px`;
+    tip.classList.toggle('below', point.y < 56);
+  }
+
+  private showCountryHoverTooltip(name: string, code: string): void {
+    const tip = this.ensureCountryHoverTooltip();
+    if (!tip) return;
+    const label = iso2ToFlagEmoji(code);
+    tip.textContent = label ? `${label} ${name}` : name;
+    tip.hidden = false;
+  }
+
+  private hideCountryHoverTooltip(): void {
+    if (this.countryHoverTooltip) this.countryHoverTooltip.hidden = true;
+  }
+
   private setupCountryHover(): void {
-    if (!this.maplibreMap || this.countryHoverSetup) return;
-    this.countryHoverSetup = true;
+    if (!this.maplibreMap) return;
     const map = this.maplibreMap;
+    this.countryHoverMap = map;
     let hoveredIso2: string | null = null;
 
     const clearHover = () => {
       this.hoveredCountryIso2 = null;
       this.hoveredCountryName = null;
+      this.hideCountryHoverTooltip();
       map.getCanvas().style.cursor = '';
       if (!map.getLayer('country-hover-fill')) return;
       const noMatch = ['==', ['get', 'ISO3166-1-Alpha-2'], ''] as maplibregl.FilterSpecification;
@@ -8006,7 +8075,6 @@ export class DeckGLMap {
     // dominant input-delay surface and queryRenderedFeatures is synchronous, so
     // coalesce to at most one query per frame; the latest pointer position wins.
     const runHoverQuery = (point: maplibregl.Point) => {
-      if (!this.onCountryClick) return;
       try {
         if (!map.getLayer('country-interactive')) return;
         const features = map.queryRenderedFeatures(point, { layers: ['country-interactive'] });
@@ -8021,7 +8089,9 @@ export class DeckGLMap {
           const filter = ['==', ['get', 'ISO3166-1-Alpha-2'], iso2] as maplibregl.FilterSpecification;
           map.setFilter('country-hover-fill', filter);
           map.setFilter('country-hover-border', filter);
-          map.getCanvas().style.cursor = 'pointer';
+          if (name) this.showCountryHoverTooltip(name, iso2);
+          else this.hideCountryHoverTooltip();
+          map.getCanvas().style.cursor = this.onCountryClick ? 'pointer' : 'crosshair';
         } else if (!iso2 && hoveredIso2) {
           hoveredIso2 = null;
           clearHover();
@@ -8034,11 +8104,11 @@ export class DeckGLMap {
     );
     this.hoverQueryThrottle = hoverQueryThrottle;
 
+    // Hover highlight + country name tooltip are ALWAYS active (borders and
+    // name appear when the cursor points at a country); the pointer cursor
+    // and click-to-open behavior additionally depend on onCountryClick.
     map.on('mousemove', (e) => {
-      if (!this.onCountryClick) {
-        hoverQueryThrottle.cancel();
-        return;
-      }
+      this.moveCountryHoverTooltip(e.point);
       hoverQueryThrottle.queue(e.point);
     });
 
@@ -8049,6 +8119,8 @@ export class DeckGLMap {
       if (hoveredIso2) {
         hoveredIso2 = null;
         try { clearHover(); } catch { /* style not done loading */ }
+      } else {
+        this.hideCountryHoverTooltip();
       }
     });
   }
@@ -8132,6 +8204,7 @@ export class DeckGLMap {
     if (this.countryPulseRaf) { cancelAnimationFrame(this.countryPulseRaf); this.countryPulseRaf = null; }
     this.countryGeoJsonLoaded = false;
     map.setStyle(style, { diff: false });
+    this.updateBasemapAttribution(provider, mapTheme);
     map.once('style.load', () => {
       localizeMapLabels(this.maplibreMap);
       this.loadCountryBoundaries();
@@ -8215,10 +8288,16 @@ export class DeckGLMap {
   private updateCountryLayerPaint(theme: 'dark' | 'light'): void {
     if (!this.maplibreMap || !this.countryGeoJsonLoaded) return;
     if (!this.maplibreMap.style || !this.maplibreMap.getLayer('country-hover-fill')) return;
-    const hoverFillOpacity   = theme === 'light' ? 0.08 : 0.05;
-    const hoverBorderOpacity = theme === 'light' ? 0.35 : 0.22;
+    // Hover: bold amber outline + soft amber wash so the hovered country's
+    // border visibly pops on satellite, dark and light basemaps alike.
+    const hoverFillOpacity   = theme === 'light' ? 0.16 : 0.12;
+    const hoverBorderOpacity = 0.95;
+    const hoverBorderWidth   = theme === 'light' ? 2.5 : 2.25;
     const highlightOpacity   = theme === 'light' ? 0.18 : 0.12;
+    this.maplibreMap.setPaintProperty('country-hover-fill',   'fill-color', '#f59e0b');
     this.maplibreMap.setPaintProperty('country-hover-fill',   'fill-opacity', hoverFillOpacity);
+    this.maplibreMap.setPaintProperty('country-hover-border', 'line-color', '#fbbf24');
+    this.maplibreMap.setPaintProperty('country-hover-border', 'line-width', hoverBorderWidth);
     this.maplibreMap.setPaintProperty('country-hover-border', 'line-opacity', hoverBorderOpacity);
     this.maplibreMap.setPaintProperty('country-highlight-fill', 'fill-opacity', highlightOpacity);
     if (this.maplibreMap.getLayer('country-embed-outline')) {
@@ -8234,6 +8313,9 @@ export class DeckGLMap {
     this.stopTradeAnimation();
     this.activeFlightTrails.clear();
     this.clearTrailsBtn = null;
+    this.countryHoverTooltip?.remove();
+    this.countryHoverTooltip = null;
+    this.countryHoverMap = null;
     this._unsubscribeAuthState?.();
     this._unsubscribeAuthState = null;
     this._unsubscribeEntitlement?.();

@@ -743,7 +743,7 @@
         "OLLAMA_API_URL": "e.g. http://127.0.0.1:11434 (Ollama) or http://127.0.0.1:1234/v1 (LM Studio) — OpenAI-compatible endpoint.",
         "OLLAMA_MODEL": "e.g. llama3.1:8b — model tag to use for summarization."
       },
-      "skipSetup": "Pomiń konfigurację — jedna licencja World Monitor odblokowuje wszystko. Dołącz do listy oczekujących, aby uzyskać wczesny dostęp.",
+      "skipSetup": "Pomiń konfigurację — jedna licencja HIGH-HANDS odblokowuje wszystko. Dołącz do listy oczekujących, aby uzyskać wczesny dostęp.",
       "reserveEarlyAccess": "Zarezerwuj wczesny dostęp"
     },
     "countryIntel": {
@@ -850,7 +850,7 @@
           "title": "Potrzebujesz klucza API?"
         }
       },
-      "shellTitle": "Ustawienia World Monitor",
+      "shellTitle": "Ustawienia HIGH-HANDS",
       "shellSearchPlaceholder": "Przeszukaj ustawienia…",
       "shellCancel": "Anuluj",
       "shellSaveClose": "Zapisz i zamknij",
@@ -3516,10 +3516,10 @@
     "copyCoordinates": "Kopiuj współrzędne"
   },
   "shell": {
-    "documentTitle": "World Monitor — Tablica bieżącej analizy globalnej",
+    "documentTitle": "HIGH-HANDS — Tablica bieżącej analizy globalnej",
     "metaDescription": "Platforma analizy globalnej w czasie rzeczywistym. Opisana w WIRED. Używana przez 2M+ użytkowników w 190 krajach. Konflikty, rynki, wojskowość, OSINT w jednym widoku.",
     "offlineTitle": "Jesteś offline",
-    "offlineMessage": "World Monitor wymaga połączenia internetowego do otrzymywania danych wywiadowczych w czasie rzeczywistym.",
+    "offlineMessage": "HIGH-HANDS wymaga połączenia internetowego do otrzymywania danych wywiadowczych w czasie rzeczywistym.",
     "offlineRetry": "Ponów próbę"
   },
   "widgets": {
@@ -3591,7 +3591,7 @@
   },
   "premium": {
     "pro": "PRO",
-    "lockedDesc": "Wymaga klucza licencji World Monitor",
+    "lockedDesc": "Wymaga klucza licencji HIGH-HANDS",
     "signInToUnlock": "Zaloguj się, aby odblokować funkcje premium",
     "signIn": "Zaloguj się, aby odblokować",
     "upgradeDesc": "Przejdź na Pro, aby uzyskać pełny dostęp do analityki premium",

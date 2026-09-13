@@ -40,7 +40,7 @@ export const CANONICAL_ORIGIN = 'https://www.worldmonitor.app/';
  * desktop builds and an Android TV app, which the narrower subtype would
  * misdescribe, and /schemamap.xml already advertises the supertype.
  * `BusinessApplication` rather than the FinanceApplication / SecurityApplication
- * split it replaces: World Monitor is neither a finance app nor a security app.
+ * split it replaces: HIGH-HANDS is neither a finance app nor a security app.
  *
  * This pins the values the product decision turns on. It is deliberately NOT
  * the whole guard — enumerating properties would only freeze the ones that
@@ -53,7 +53,7 @@ export const CANONICAL_ORIGIN = 'https://www.worldmonitor.app/';
 export const SOFTWARE_SHARED_PROPERTIES = {
   '@type': 'SoftwareApplication',
   '@id': SOFTWARE_ID,
-  name: 'World Monitor',
+  name: 'HIGH-HANDS',
   url: CANONICAL_ORIGIN,
   description:
     'Free real-time global intelligence dashboard. Curated news feeds, conflict tracking, market data, shipping chokepoints, satellite passes and cyber signals fused into one live map of the world, with AI analysis layered on top.',
@@ -79,7 +79,7 @@ export const SOFTWARE_SHARED_PROPERTIES = {
 export const WEBSITE_SHARED_PROPERTIES = {
   '@type': 'WebSite',
   '@id': WEBSITE_ID,
-  name: 'World Monitor',
+  name: 'HIGH-HANDS',
   alternateName: 'WorldMonitor',
   url: CANONICAL_ORIGIN,
   description:

@@ -749,7 +749,7 @@
         "OLLAMA_API_URL": "e.g. http://127.0.0.1:11434 (Ollama) or http://127.0.0.1:1234/v1 (LM Studio) — OpenAI-compatible endpoint.",
         "OLLAMA_MODEL": "e.g. llama3.1:8b — model tag to use for summarization."
       },
-      "skipSetup": "تخطَّ الإعداد — ترخيص واحد لـ World Monitor يفتح كل شيء. انضم إلى قائمة الانتظار للحصول على وصول مبكر.",
+      "skipSetup": "تخطَّ الإعداد — ترخيص واحد لـ HIGH-HANDS يفتح كل شيء. انضم إلى قائمة الانتظار للحصول على وصول مبكر.",
       "reserveEarlyAccess": "احجز وصولك المبكر"
     },
     "settingsWindow": {
@@ -3554,10 +3554,10 @@
     "copyCoordinates": "نسخ الإحداثيات"
   },
   "shell": {
-    "documentTitle": "لوحة مراقبة الذكاء العالمي في الوقت الفعلي — World Monitor",
+    "documentTitle": "لوحة مراقبة الذكاء العالمي في الوقت الفعلي — HIGH-HANDS",
     "metaDescription": "منصة ذكاء عالمية في الوقت الفعلي. نُشرت في WIRED. يستخدمها أكثر من مليوني شخص عبر 190 دولة. النزاعات والأسواق والعسكرية وOSINT في عرض واحد.",
     "offlineTitle": "أنت غير متصل",
-    "offlineMessage": "يتطلب World Monitor اتصالاً بالإنترنت للحصول على بيانات الاستخبارات في الوقت الفعلي.",
+    "offlineMessage": "يتطلب HIGH-HANDS اتصالاً بالإنترنت للحصول على بيانات الاستخبارات في الوقت الفعلي.",
     "offlineRetry": "إعادة محاولة"
   },
   "widgets": {
@@ -3595,12 +3595,12 @@
     "phaseError": "خطأ",
     "previewCheckingHeading": "ربط منشئ الأدوات",
     "previewReadyHeading": "صِف الأداة التي تريدها",
-    "previewFetchingHeading": "جلب بيانات World Monitor الحية",
+    "previewFetchingHeading": "جلب بيانات HIGH-HANDS الحية",
     "previewComposingHeading": "تكوين تخطيط الأداة",
     "previewErrorHeading": "المعاينة تحتاج إلى اهتمام",
     "previewCheckingCopy": "نتحقق من مفتاح أداتك وتوفر الخادم الخلفي قبل تفعيل الإنشاء.",
     "previewReadyCopy": "استخدم مثالاً للطلب أو صِف العرض الحي الدقيق الذي تريده. ستُحدَّث المعاينة هنا قبل حفظها.",
-    "previewFetchingCopy": "الوكيل يستدعي نقاط نهاية World Monitor المعتمدة ويشكّل مجموعة البيانات للأداة.",
+    "previewFetchingCopy": "الوكيل يستدعي نقاط نهاية HIGH-HANDS المعتمدة ويشكّل مجموعة البيانات للأداة.",
     "previewComposingCopy": "المعاينة تُرسّل مع أحدث البيانات الحية وأسلوب لوحة التحكم.",
     "previewErrorCopy": "صحّح المشكلة ثم أعد المحاولة. أدواتك الموجودة لم تتأثر.",
     "createInteractive": "إنشاء أداة تفاعلية",
@@ -3629,7 +3629,7 @@
   },
   "premium": {
     "pro": "PRO",
-    "lockedDesc": "يتطلب مفتاح ترخيص World Monitor",
+    "lockedDesc": "يتطلب مفتاح ترخيص HIGH-HANDS",
     "signInToUnlock": "سجل الدخول لفتح المزايا المتقدمة",
     "signIn": "سجل الدخول للفتح",
     "upgradeDesc": "ارقَ إلى Pro للوصول الكامل إلى تحليلات متقدمة",

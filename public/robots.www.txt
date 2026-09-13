@@ -1,4 +1,4 @@
-# World Monitor - protect API routes from crawlers
+# HIGH-HANDS - protect API routes from crawlers
 #
 # Four-tier AI crawler policy (#4952):
 #   1. `User-agent: *` — default rules + Content-Signal usage preferences.

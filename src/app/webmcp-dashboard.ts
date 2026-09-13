@@ -317,7 +317,6 @@ async function openUnifiedSettingsOverlay(
   ctx: AppContext,
   currentVariant: string,
   destination: 'settings' | 'alerts',
-  tab: 'settings' | 'notifications',
 ): Promise<WebMcpNavigationResult> {
   const context = navigationContext(ctx, currentVariant);
   if (ctx.isDestroyed) return APP_DESTROYED_NAV_RESULT(context);
@@ -333,7 +332,7 @@ async function openUnifiedSettingsOverlay(
       context,
     };
   }
-  const opened = await Promise.resolve(ctx.unifiedSettings.open(tab));
+  const opened = await Promise.resolve(ctx.unifiedSettings.open());
   if (ctx.isDestroyed) return APP_DESTROYED_NAV_RESULT(navigationContext(ctx, currentVariant));
   if (opened === false) {
     return {
@@ -352,7 +351,6 @@ async function openUnifiedSettingsOverlay(
     status: 'applied',
     destination,
     overlay: 'open',
-    tab,
     message: destination === 'alerts' ? 'Opened alerts.' : 'Opened settings.',
     context: navigationContext(ctx, currentVariant),
   };
@@ -362,7 +360,7 @@ export async function applyWebMcpOpenSettings(
   ctx: AppContext,
   currentVariant: string,
 ): Promise<WebMcpNavigationResult> {
-  return openUnifiedSettingsOverlay(ctx, currentVariant, 'settings', 'settings');
+  return openUnifiedSettingsOverlay(ctx, currentVariant, 'settings');
 }
 
 export async function applyWebMcpOpenAlerts(
@@ -381,7 +379,8 @@ export async function applyWebMcpOpenAlerts(
       context,
     };
   }
-  return openUnifiedSettingsOverlay(ctx, currentVariant, 'alerts', 'notifications');
+  // Notifications tab removed (account backend): alerts lands on settings.
+  return openUnifiedSettingsOverlay(ctx, currentVariant, 'alerts');
 }
 
 export function listWebMcpMissionPresets(

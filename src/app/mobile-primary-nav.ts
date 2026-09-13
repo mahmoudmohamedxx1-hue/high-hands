@@ -1,9 +1,7 @@
 import type { AppContext } from '@/app/app-context';
 import type { MapView } from '@/components/MapContainer';
 import type { AuthLauncher } from '@/components/AuthLauncher';
-import { AuthHeaderWidget } from '@/components/AuthHeaderWidget';
 import { SITE_VARIANT } from '@/config';
-import { getAuthState, subscribeAuthState } from '@/services/auth-state';
 import { track, trackMapViewChange, trackThemeChanged } from '@/services/analytics';
 import { getCurrentTheme, setTheme, showToast } from '@/utils';
 import { createFocusTrap, type FocusTrap } from '@/utils/focus-trap';
@@ -27,7 +25,7 @@ export class MobilePrimaryNav {
   private regionTrap: FocusTrap | null = null;
   private regionOpenFrame: number | null = null;
   private alertScrollFrame: number | null = null;
-  private authWidget: AuthHeaderWidget | null = null;
+  private authWidget: { destroy(): void } | null = null;
   private unsubscribeAuth: (() => void) | null = null;
   private unsubscribeHistory: (() => void) | null = null;
   private activeTab = 'today';
@@ -47,24 +45,12 @@ export class MobilePrimaryNav {
     });
   }
 
-  setupAuth(modal: AuthLauncher): void {
-    const mobileMount = document.getElementById('mobileAuthWidgetMount');
-    const fallback = document.getElementById('mobileAuthFallback') as HTMLButtonElement | null;
-    const openAuth = () => {
-      this.closeMenu();
-      modal.open();
-    };
-    fallback?.addEventListener('click', openAuth, { signal: this.listeners.signal });
-    if (!mobileMount) return;
-
-    this.authWidget = new AuthHeaderWidget(openAuth);
-    mobileMount.appendChild(this.authWidget.getElement());
-    const renderPending = (pending: boolean) => {
-      mobileMount.hidden = pending;
-      if (fallback) fallback.hidden = !pending;
-    };
-    renderPending(getAuthState().isPending);
-    this.unsubscribeAuth = subscribeAuthState((state) => renderPending(state.isPending));
+  setupAuth(modal: AuthLauncher | null): void {
+    // Self-hosted build: the mobile account block was removed from the
+    // layout, so there is nothing to mount. Kept as a no-op seam so callers
+    // (event-handlers.setupAuthWidget) do not need conditionals.
+    void modal;
+    return;
   }
 
   updateThemeItem(): void {

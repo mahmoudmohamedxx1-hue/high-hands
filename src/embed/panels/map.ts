@@ -51,7 +51,7 @@ export async function mountEmbedMapPanel(
   attribution.href = buildWorldMonitorAttributionUrl(new URL('/dashboard', window.location.origin).toString(), getReferrerHost());
   attribution.target = '_blank';
   attribution.rel = 'noopener noreferrer';
-  attribution.textContent = 'Live map by World Monitor';
+  attribution.textContent = 'Live map by HIGH-HANDS';
   root.appendChild(attribution);
 
   // Resolved once and reused for every re-mint, so an expiring grant does not

@@ -208,19 +208,26 @@ function brotliPrecompressPlugin(): Plugin {
       const outDir = outputOptions.dir;
       if (!outDir) return;
 
-      await Promise.all(Object.keys(bundle).map(async (fileName) => {
+      // Bound concurrency: an unbounded Promise.all over every bundle asset
+      // OOM-kills the build on small-memory machines (all zlib jobs resident
+      // at once). 4 at a time keeps peak RSS flat with negligible wall cost.
+      const BROTLI_CONCURRENCY = 4;
+      const files = Object.keys(bundle).filter((fileName) => {
         const extension = extname(fileName).toLowerCase();
-        if (!BROTLI_EXTENSIONS.has(extension)) return;
+        return BROTLI_EXTENSIONS.has(extension);
+      });
+      for (let i = 0; i < files.length; i += BROTLI_CONCURRENCY) {
+        await Promise.all(files.slice(i, i + BROTLI_CONCURRENCY).map(async (fileName) => {
+          const sourcePath = resolve(outDir, fileName);
+          const compressedPath = `${sourcePath}.br`;
+          const sourceBuffer = await readFile(sourcePath);
+          if (sourceBuffer.length < 1024) return;
 
-        const sourcePath = resolve(outDir, fileName);
-        const compressedPath = `${sourcePath}.br`;
-        const sourceBuffer = await readFile(sourcePath);
-        if (sourceBuffer.length < 1024) return;
-
-        const compressedBuffer = await brotliCompressAsync(sourceBuffer);
-        await mkdir(dirname(compressedPath), { recursive: true });
-        await writeFile(compressedPath, compressedBuffer);
-      }));
+          const compressedBuffer = await brotliCompressAsync(sourceBuffer);
+          await mkdir(dirname(compressedPath), { recursive: true });
+          await writeFile(compressedPath, compressedBuffer);
+        }));
+      }
     },
   };
 }

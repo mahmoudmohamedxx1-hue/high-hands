@@ -14,7 +14,6 @@ import {
   waitForConvexAuthForUser,
 } from './convex-client';
 import { getCurrentClerkUser } from './clerk';
-import { hasAccountEmbedAccess } from '../../shared/embed-access';
 
 export interface EntitlementState {
   planKey: string;
@@ -282,26 +281,29 @@ export function getEntitlementState(): EntitlementState | null {
 
 /**
  * Check whether a specific feature flag is truthy in the current entitlement state.
+ * PRO removed: every feature flag is accessible — return true.
  */
 export function hasFeature(flag: keyof EntitlementState['features']): boolean {
-  if (currentState === null) return false;
-  return Boolean(currentState.features[flag]);
+  void flag;
+  return true;
 }
 
 /**
  * Check the account-level embed grant from both verified auth authorities.
- * Clerk's current PRO role must not wait for the Convex snapshot to hydrate.
+ * PRO removed: always accessible.
  */
 export function hasEmbedAccessForAccount(role: 'free' | 'pro' | undefined): boolean {
-  return hasAccountEmbedAccess(role, currentState, Date.now());
+  void role;
+  return true;
 }
 
 /**
  * Check whether the user's tier meets or exceeds the given minimum.
+ * PRO removed: always entitled.
  */
 export function hasTier(minTier: number): boolean {
-  if (currentState === null) return false;
-  return currentState.features.tier >= minTier;
+  void minTier;
+  return true;
 }
 
 /**
@@ -322,10 +324,10 @@ export function isEntitlementActive(
 
 /**
  * Simple "is this a paying user" check.
- * Returns true if entitlement data exists, plan is not free, and hasn't expired.
+ * PRO removed: everything is accessible — always true.
  */
 export function isEntitled(): boolean {
-  return isEntitlementActive(currentState, Date.now());
+  return true;
 }
 
 /**

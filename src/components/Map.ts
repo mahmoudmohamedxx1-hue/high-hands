@@ -77,6 +77,7 @@ import {
   hasCuratedLayerExplanation,
   isLayerExecutable,
   isSunsetLayer,
+  applyLayerGrouping,
   LAYER_REGISTRY,
   resolveLayerLabel,
 } from '@/config/map-layer-definitions';
@@ -217,6 +218,11 @@ export class MapComponent {
   private aptGroups: import('@/types').APTGroup[] = [];
   private aptGroupsLoaded = false;
   private webcamData: Array<WebcamEntry | WebcamCluster> = [];
+  // Re-runs the SVG picker layer-limit enforcement; set by createLayerToggles.
+  // setLayerReady() deactivates buttons when async layers load empty, so the
+  // limit must be recomputed there too or inactive buttons stay disabled with
+  // stale limit-reached state (only 6 active but 10 disabled).
+  private layerLimitEnforcer: (() => void) | null = null;
   private news: NewsItem[] = [];
   private onTechHubClick?: (hub: TechHubActivity) => void;
   private onGeoHubClick?: (hub: GeoHubActivity) => void;
@@ -654,11 +660,18 @@ export class MapComponent {
       const activeCount = allBtns.filter(b => b.classList.contains('active')).length;
       allBtns.forEach(b => {
         if (!b.classList.contains('active')) {
-          b.disabled = activeCount >= MAX_SVG_LAYERS;
-          b.classList.toggle('limit-reached', activeCount >= MAX_SVG_LAYERS);
+          const limited = activeCount >= MAX_SVG_LAYERS;
+          b.disabled = limited;
+          b.classList.toggle('limit-reached', limited);
+          if (limited) {
+            b.title = `Layer limit reached (${MAX_SVG_LAYERS} max in fallback mode) — disable another layer first`;
+          } else {
+            b.removeAttribute('title');
+          }
         } else {
           b.disabled = false;
           b.classList.remove('limit-reached');
+          b.removeAttribute('title');
         }
       });
     };
@@ -705,7 +718,9 @@ export class MapComponent {
     helpBtn.setAttribute('aria-label', t('components.deckgl.layerGuide'));
     helpBtn.addEventListener('click', () => this.showLayerHelp());
     toggles.appendChild(helpBtn);
+    this.layerLimitEnforcer = enforceLayerLimit;
     enforceLayerLimit();
+    applyLayerGrouping(toggles);
 
     return toggles;
   }
@@ -3759,11 +3774,16 @@ export class MapComponent {
 
     if (cam.webcamId) {
       const link = document.createElement('a');
-      link.href = `https://www.windy.com/webcams/${cam.webcamId}`;
+      // Curated self-hosted ids are `ch:{UC…}` (channel live) — the old windy
+      // link only ever worked for real Windy ids.
+      const chId = /^ch:(UC[\w-]{20,24})$/.exec(cam.webcamId.trim());
+      link.href = chId
+        ? `https://www.youtube.com/channel/${chId[1]}/live`
+        : `https://www.windy.com/webcams/${cam.webcamId}`;
       link.target = '_blank';
       link.rel = 'noopener';
       link.style.cssText = 'display:block;margin-top:4px;color:#00d4ff;font-size:calc(11px * var(--wm-panel-effective-scale, 1));text-decoration:none;';
-      link.textContent = 'Open on Windy \u2197';
+      link.textContent = 'Watch live \u2197';
       tooltip.appendChild(link);
     }
 
@@ -4311,6 +4331,9 @@ export class MapComponent {
     } else {
       btn.classList.remove('active');
     }
+    // Async layers that resolve empty just lost their active state — recompute
+    // the SVG layer limit so previously disabled toggles re-enable.
+    this.layerLimitEnforcer?.();
   }
 
   public onStateChanged(callback: (state: MapState) => void): void {

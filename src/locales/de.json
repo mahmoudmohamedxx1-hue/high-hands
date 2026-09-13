@@ -709,7 +709,7 @@
         "needsKeys": "Konfigurieren Sie API-Schlüssel, um Funktionen freizuschalten",
         "some": "Für einige Funktionen sind API-Schlüssel erforderlich"
       },
-      "skipSetup": "Überspringen Sie das Setup — eine einzige World Monitor-Lizenz schaltet alles frei. Tragen Sie sich in die Warteliste ein, um frühzeitigen Zugang zu erhalten.",
+      "skipSetup": "Überspringen Sie das Setup — eine einzige HIGH-HANDS-Lizenz schaltet alles frei. Tragen Sie sich in die Warteliste ein, um frühzeitigen Zugang zu erhalten.",
       "summary": {
         "desktop": "Desktop-Modus",
         "web": "Webmodus (schreibgeschützt, serververwaltete Anmeldeinformationen)",
@@ -844,7 +844,7 @@
           "submitBtn": "API-Tarife ansehen"
         }
       },
-      "shellTitle": "World Monitor – Einstellungen",
+      "shellTitle": "HIGH-HANDS – Einstellungen",
       "shellSearchPlaceholder": "Einstellungen durchsuchen…",
       "shellCancel": "Abbrechen",
       "shellSaveClose": "Speichern & Schließen",
@@ -2109,7 +2109,7 @@
       "tripDays": "Reisetage"
     },
     "chatAnalyst": {
-      "infoTooltip": "<strong>WM Analyst</strong> KI-Analyst mit Live-Kontext über geopolitische, Markt-, Militär- und Wirtschaftsbereiche. Betrieben durch Claude mit Echtzeitdaten aus aktiven WorldMonitor-Feeds."
+      "infoTooltip": "<strong>HH Analyst</strong> KI-Analyst mit Live-Kontext über geopolitische, Markt-, Militär- und Wirtschaftsbereiche. Betrieben durch Claude mit Echtzeitdaten aus aktiven WorldMonitor-Feeds."
     },
     "cotPositioning": {
       "infoTooltip": "<strong>CFTC COT Positionierung</strong> Commitments of Traders-Bericht: Nettopositionen von Commercials, großen Spekulanten und kleinen Händlern in Rohstoff- und Finanz-Futures. Wöchentlich veröffentlicht (Freitag). Quelle: CFTC."
@@ -3478,10 +3478,10 @@
     "copyCoordinates": "Koordinaten kopieren"
   },
   "shell": {
-    "documentTitle": "World Monitor — Dashboard für globale Echtzeitinformationen",
+    "documentTitle": "HIGH-HANDS — Dashboard für globale Echtzeitinformationen",
     "metaDescription": "Echtzeit-Plattform für globale Informationen. In WIRED vorgestellt. Von über 2 Millionen Menschen in 190 Ländern genutzt. Konflikte, Märkte, Militär, OSINT in einer Ansicht.",
     "offlineTitle": "Sie sind offline",
-    "offlineMessage": "World Monitor benötigt eine Internetverbindung für Echtzeit-Nachrichtendaten.",
+    "offlineMessage": "HIGH-HANDS benötigt eine Internetverbindung für Echtzeit-Nachrichtendaten.",
     "offlineRetry": "Erneut versuchen"
   },
   "widgets": {
@@ -3553,7 +3553,7 @@
   },
   "premium": {
     "pro": "PRO",
-    "lockedDesc": "Erfordert einen World Monitor Lizenzschlüssel",
+    "lockedDesc": "Erfordert einen HIGH-HANDS Lizenzschlüssel",
     "signInToUnlock": "Melden Sie sich an, um Premium-Funktionen freizuschalten",
     "signIn": "Anmelden zum Freischalten",
     "upgradeDesc": "Upgrade auf Pro für vollständigen Zugriff auf Premium-Analysen",

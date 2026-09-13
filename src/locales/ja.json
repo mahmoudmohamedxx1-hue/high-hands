@@ -706,7 +706,7 @@
         "needsKeys": "機能を有効にするためAPIキーを設定してください",
         "some": "一部の機能にAPIキーが必要"
       },
-      "skipSetup": "セットアップをスキップ — World Monitorライセンス1つですべてが利用可能になります。早期アクセスのウェイトリストにご参加ください。",
+      "skipSetup": "セットアップをスキップ — HIGH-HANDSライセンス1つですべてが利用可能になります。早期アクセスのウェイトリストにご参加ください。",
       "summary": {
         "desktop": "デスクトップモード",
         "web": "Webモード（読み取り専用、サーバー管理の認証情報）",
@@ -3462,7 +3462,7 @@
     "documentTitle": "ワールドモニター — リアルタイム グローバルインテリジェンスダッシュボード",
     "metaDescription": "リアルタイムグローバルインテリジェンスプラットフォーム。WIREDで紹介。190カ国2M+ユーザーが利用。紛争、市場、軍事、OSINTを一画面で。",
     "offlineTitle": "オフラインです",
-    "offlineMessage": "World Monitorはリアルタイムインテリジェンスデータのためにインターネット接続が必要です。",
+    "offlineMessage": "HIGH-HANDSはリアルタイムインテリジェンスデータのためにインターネット接続が必要です。",
     "offlineRetry": "再試行"
   },
   "widgets": {
@@ -3534,7 +3534,7 @@
   },
   "premium": {
     "pro": "PRO",
-    "lockedDesc": "World Monitor ライセンスキーが必要です",
+    "lockedDesc": "HIGH-HANDS ライセンスキーが必要です",
     "signInToUnlock": "サインインしてプレミアム機能を利用",
     "signIn": "サインインして利用",
     "upgradeDesc": "Proにアップグレードしてプレミアム分析に完全アクセス",

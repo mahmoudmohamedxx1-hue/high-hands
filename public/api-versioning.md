@@ -1,16 +1,16 @@
 ---
-title: "World Monitor REST API versioning"
+title: "HIGH-HANDS REST API versioning"
 description: "API compatibility, deprecation headers, sunset policy, and migration."
 canonical: "https://www.worldmonitor.app/api-versioning.md"
 ---
 
-# World Monitor REST API versioning and deprecation
+# HIGH-HANDS REST API versioning and deprecation
 
 Last updated: August 29, 2026
 
-Machine-readable versioning, compatibility, and sunset contract for the World Monitor REST API. Human HTML twin: https://www.worldmonitor.app/docs/api-versioning (Simplified Chinese: https://www.worldmonitor.app/docs/zh/api-versioning). OpenAPI bundle: https://www.worldmonitor.app/openapi.yaml (JSON: https://www.worldmonitor.app/openapi.json).
+Machine-readable versioning, compatibility, and sunset contract for the HIGH-HANDS REST API. Human HTML twin: https://www.worldmonitor.app/docs/api-versioning (Simplified Chinese: https://www.worldmonitor.app/docs/zh/api-versioning). OpenAPI bundle: https://www.worldmonitor.app/openapi.yaml (JSON: https://www.worldmonitor.app/openapi.json).
 
-World Monitor versions public REST APIs in the URL:
+HIGH-HANDS versions public REST APIs in the URL:
 
 ```
 https://www.worldmonitor.app/api/<domain>/v<major>/<operation>
@@ -22,7 +22,7 @@ One domain currently deviates from that shape: shipping v2 puts the version befo
 
 ## Compatibility within a major version
 
-Within a published major version, World Monitor may add optional request fields, response fields, operations, and enum values. Existing fields keep their meaning and type. We do not remove or rename operations or fields, make an optional field required, or otherwise introduce an intentionally breaking change without publishing a new major-version path.
+Within a published major version, HIGH-HANDS may add optional request fields, response fields, operations, and enum values. Existing fields keep their meaning and type. We do not remove or rename operations or fields, make an optional field required, or otherwise introduce an intentionally breaking change without publishing a new major-version path.
 
 Clients should ignore response fields and enum values they do not recognize. The bundled OpenAPI specification is the source of truth for the currently published contract.
 
@@ -32,7 +32,7 @@ The public API is JSON over HTTP. On pull requests that touch proto paths, CI ru
 
 ## Deprecation timeline
 
-When World Monitor replaces or retires a public REST version or operation:
+When HIGH-HANDS replaces or retires a public REST version or operation:
 
 1. We publish the replacement and migration guidance in the API documentation and changelog (https://www.worldmonitor.app/docs/changelog).
 2. The deprecated surface remains available for at least **six months** after the public deprecation announcement.
@@ -47,7 +47,7 @@ Nothing is deprecated today. A version number in the path (including `v1`) ident
 
 ### Policy discovery on current (non-deprecated) responses
 
-RFC 9745 allows a `Link` with `rel="deprecation"` without a `Deprecation` header, so agents can find this policy before any surface is retired. Current World Monitor API and homepage responses may include:
+RFC 9745 allows a `Link` with `rel="deprecation"` without a `Deprecation` header, so agents can find this policy before any surface is retired. Current HIGH-HANDS API and homepage responses may include:
 
 ```http
 Link: <https://www.worldmonitor.app/api-versioning.md>; rel="deprecation"; type="text/markdown"

@@ -34,7 +34,7 @@
     var value = (raw || '').trim();
     if (value || (name === 'layers' && raw !== null)) url += '&' + name + '=' + encodeURIComponent(value);
   });
-  iframe.title = 'World Monitor embed';
+  iframe.title = 'HIGH-HANDS embed';
   if (!hasKey) iframe.loading = 'lazy';
   iframe.referrerPolicy = 'strict-origin-when-cross-origin';
   iframe.setAttribute('allowfullscreen', '');

@@ -1,14 +1,14 @@
 ---
-title: "World Monitor SDKs"
+title: "HIGH-HANDS SDKs"
 description: "Official client libraries, installation commands, and supported protocols."
 canonical: "https://www.worldmonitor.app/sdks.md"
 ---
 
-# World Monitor SDKs
+# HIGH-HANDS SDKs
 
 Last updated: July 7, 2026
 
-World Monitor ships official client libraries in four language ecosystems so you can script country briefs, risk scores, market data, and every registered [MCP tool](https://www.worldmonitor.app/mcp-server.md) without writing an HTTP integration. All of them are **zero-dependency**, MCP-first mirrors of the [`worldmonitor` npm CLI](https://www.worldmonitor.app/docs/cli), with a small REST escape hatch for host-relative and self-hosted use.
+HIGH-HANDS ships official client libraries in four language ecosystems so you can script country briefs, risk scores, market data, and every registered [MCP tool](https://www.worldmonitor.app/mcp-server.md) without writing an HTTP integration. All of them are **zero-dependency**, MCP-first mirrors of the [`worldmonitor` npm CLI](https://www.worldmonitor.app/docs/cli), with a small REST escape hatch for host-relative and self-hosted use.
 
 ## Official SDKs
 
@@ -52,8 +52,8 @@ Get an API key at https://www.worldmonitor.app/pro. The full per-language guide 
 
 ## Important query matches
 
-- World Monitor SDK
-- World Monitor Python / Ruby / Go / JavaScript SDK
-- World Monitor client library
+- HIGH-HANDS SDK
+- HIGH-HANDS Python / Ruby / Go / JavaScript SDK
+- HIGH-HANDS client library
 - pip install worldmonitor-sdk
-- Official World Monitor API client libraries
+- Official HIGH-HANDS API client libraries

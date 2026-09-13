@@ -1516,27 +1516,34 @@ canvas,
   bottom: 0;
   left: 0;
   right: 0;
-  height: 8px;
+  /* 14px hit area: comfortably draggable with a finger (44px is the full
+     touch-target ideal, but the handle overlays the map canvas — a taller
+     strip would eat map drag gestures; 14px + touch-action:none is the
+     practical compromise). */
+  height: 14px;
   cursor: ns-resize;
   background: linear-gradient(to bottom, transparent, var(--border));
   z-index: 200;
   display: flex;
   align-items: center;
   justify-content: center;
+  touch-action: none;
 }
 
 .map-resize-handle::after {
   content: '';
-  width: 40px;
-  height: 3px;
+  width: 64px;
+  height: 4px;
   background: var(--text-dim);
   border-radius: 2px;
-  opacity: 0.5;
-  transition: opacity 0.2s;
+  opacity: 0.65;
+  transition: opacity 0.2s, width 0.2s;
 }
 
-.map-resize-handle:hover::after {
+.map-resize-handle:hover::after,
+.map-resize-handle:focus-visible::after {
   opacity: 1;
+  width: 88px;
 }
 
 .map-section.resizing {
@@ -1582,6 +1589,39 @@ canvas,
 }
 
 .map-dim-btn.active {
+  background: var(--green);
+  color: var(--bg);
+}
+
+/* Map size preset control (S / M / L / MAX) — mirrors the 2D/3D dimension
+   toggle so both segmented controls read as one family. */
+.map-size-toggle {
+  display: flex;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-right: 2px;
+}
+
+.map-size-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: calc(11px * var(--wm-panel-effective-scale, 1));
+  font-weight: 600;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+
+.map-size-btn:hover {
+  color: var(--text);
+  background: var(--surface-hover);
+}
+
+.map-size-btn.active {
   background: var(--green);
   color: var(--bg);
 }
@@ -28646,3 +28686,428 @@ body.map-width-resizing {
   align-self: flex-start;
 }
 .pro-preview__reopen:hover, .pro-preview__reopen:focus-visible { opacity: 1; }
+
+/* ==========================================================================
+   Layer picker grouping (self-hosted UI/UX) + sandbox PRO button
+   ========================================================================== */
+
+.layer-group {
+  margin: 2px 0;
+}
+
+.layer-group-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 5px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-primary, #e8e8e8);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-align: left;
+  opacity: 0.9;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.layer-group-header:hover {
+  background: rgba(255, 255, 255, 0.07);
+  opacity: 1;
+}
+
+.layer-group-icon {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.layer-group-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.layer-group-count {
+  flex: none;
+  font-size: 10px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+  color: var(--text-secondary, #aaa);
+}
+
+.layer-group-count.has-active {
+  background: rgba(46, 204, 113, 0.18);
+  color: #2ecc71;
+}
+
+.layer-group-chevron {
+  flex: none;
+  font-size: 9px;
+  transition: transform 0.18s ease;
+}
+
+.layer-group.collapsed .layer-group-chevron {
+  transform: rotate(-90deg);
+}
+
+.layer-group-body {
+  display: block;
+}
+
+.layer-group.collapsed .layer-group-body {
+  display: none;
+}
+
+/* ==========================================================================
+   Live news multi-view grid (self-hosted): up to 4 channels at once
+   ========================================================================== */
+
+.live-news-multiview-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary, #c8c8c8);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.live-news-multiview-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary, #fff);
+}
+
+.live-news-multiview-btn.active {
+  background: rgba(220, 53, 69, 0.2);
+  border-color: rgba(220, 53, 69, 0.6);
+  color: #ff8a95;
+}
+
+.live-news-multiview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 6px;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  padding: 2px;
+}
+
+.multiview-tile {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 180px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+  position: relative;
+}
+
+.multiview-tile-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 3px 8px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.multiview-tile-head > * {
+  pointer-events: auto;
+}
+
+.multiview-tile-name {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.multiview-tile-close {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.multiview-tile-close:hover {
+  background: rgba(220, 53, 69, 0.7);
+}
+
+.multiview-tile-video {
+  flex: 1;
+  min-height: 0;
+  background: #000;
+}
+
+.multiview-tile-offline .multiview-tile-video::after {
+  content: 'STREAM OFFLINE';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: #999;
+  background: #111;
+}
+
+/* Channel tab selected state while in multi-view mode */
+.live-channel-btn.selected {
+  outline: 2px solid rgba(220, 53, 69, 0.65);
+  outline-offset: -2px;
+}
+
+@media (max-width: 640px) {
+  .live-news-multiview {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .multiview-tile {
+    min-height: 120px;
+  }
+}
+
+/* ═══ Map filter bar (self-hosted): country selector + severity chips ═══ */
+.map-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  background: var(--panel-bg, rgba(13, 17, 23, 0.9));
+  min-height: 38px;
+}
+
+.map-country-filter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 180px;
+  min-width: 150px;
+  max-width: 260px;
+}
+
+.map-country-filter-icon {
+  position: absolute;
+  left: 8px;
+  color: var(--text-muted, #8b949e);
+  pointer-events: none;
+}
+
+#countryFilterInput {
+  width: 100%;
+  padding: 5px 26px 5px 26px;
+  font-size: 12px;
+  color: var(--text-primary, #e6edf3);
+  background: var(--input-bg, rgba(110, 118, 129, 0.15));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+#countryFilterInput::placeholder {
+  color: var(--text-muted, #8b949e);
+}
+
+#countryFilterInput:focus {
+  border-color: var(--accent, #f97316);
+}
+
+.map-country-filter-clear {
+  position: absolute;
+  right: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--text-muted, #8b949e);
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.map-country-filter-clear:hover {
+  color: var(--text-primary, #e6edf3);
+  background: rgba(110, 118, 129, 0.25);
+}
+
+.map-severity-filter {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+.map-filter-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted, #8b949e);
+  margin-right: 2px;
+}
+
+.severity-btn {
+  padding: 3px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, #8b949e);
+  background: transparent;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.severity-btn:hover {
+  color: var(--text-primary, #e6edf3);
+  border-color: var(--text-muted, #8b949e);
+}
+
+.severity-btn.active {
+  color: #fff;
+  background: var(--accent, #f97316);
+  border-color: var(--accent, #f97316);
+}
+
+.severity-btn[data-sev="high"].active {
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+.severity-btn[data-sev="medium+"].active {
+  background: #d97706;
+  border-color: #d97706;
+}
+
+/* Basemap style chips (SAT / URBAN / TOPO / DARK / LIGHT) */
+.map-basemap-filter {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.basemap-btn {
+  padding: 3px 9px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, #8b949e);
+  background: transparent;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.basemap-btn:hover {
+  color: var(--text-primary, #e6edf3);
+  border-color: var(--text-muted, #8b949e);
+}
+
+.basemap-btn.active {
+  color: #0b0e13;
+  background: var(--text-primary, #e6edf3);
+  border-color: var(--text-primary, #e6edf3);
+  box-shadow: 0 0 0 1px rgba(230, 237, 243, 0.25);
+}
+
+/* Country hover tooltip: name (+flag) shown while the cursor is over a country */
+.wm-country-hover-tip {
+  position: absolute;
+  z-index: 40;
+  left: 0;
+  top: 0;
+  max-width: 260px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  color: #0b0e13;
+  background: #fbbf24;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  border-radius: 7px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  transform: translate(-50%, calc(-100% - 12px));
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.wm-country-hover-tip.below {
+  transform: translate(-50%, 12px);
+}
+
+@media (max-width: 640px) {
+  .map-basemap-filter {
+    margin-left: 0;
+  }
+  .basemap-btn {
+    padding: 3px 7px;
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 640px) {
+  .map-filter-bar {
+    padding: 5px 8px;
+    gap: 6px;
+  }
+  .map-country-filter {
+    flex-basis: 140px;
+    min-width: 120px;
+  }
+  #countryFilterInput {
+    font-size: 11px;
+  }
+}

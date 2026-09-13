@@ -113,7 +113,7 @@ export async function mountEmbedFearGreed(root: HTMLElement, apiKey: string): Pr
   attribution.href = buildWorldMonitorAttributionUrl(new URL('/dashboard', window.location.origin).toString(), getReferrerHost());
   attribution.target = '_blank';
   attribution.rel = 'noopener noreferrer';
-  attribution.textContent = 'Fear & Greed by World Monitor';
+  attribution.textContent = 'Fear & Greed by HIGH-HANDS';
   wrap.appendChild(attribution);
 
   root.appendChild(wrap);

@@ -23,13 +23,15 @@ import { NUCLEAR_FACILITIES, SPACEPORTS, ECONOMIC_CENTERS, CRITICAL_MINERALS, UN
 import { PIPELINES } from '@/config/pipelines';
 import { t } from '@/services/i18n';
 import { SITE_VARIANT } from '@/config/variant';
-import { getGlobeRenderScale, resolveGlobePixelRatio, resolvePerformanceProfile, subscribeGlobeRenderScaleChange, getGlobeTexture, GLOBE_TEXTURE_URLS, subscribeGlobeTextureChange, getGlobeVisualPreset, subscribeGlobeVisualPresetChange, type GlobeRenderScale, type GlobePerformanceProfile, type GlobeVisualPreset } from '@/services/globe-render-settings';
+import { getGlobeRenderScale, resolveGlobePixelRatio, resolvePerformanceProfile, subscribeGlobeRenderScaleChange, getGlobeTextureForBasemap, GLOBE_TEXTURE_URLS, subscribeGlobeTextureChange, getGlobeVisualPreset, subscribeGlobeVisualPresetChange, type GlobeRenderScale, type GlobePerformanceProfile, type GlobeVisualPreset, type GlobeTexture } from '@/services/globe-render-settings';
+import { getMapProvider, getMapTheme } from '@/config/basemap';
 import {
   getLayerExplanation,
   getLayersForVariant,
   hasCuratedLayerExplanation,
   resolveLayerLabel,
   bindLayerSearch,
+  applyLayerGrouping,
   type MapVariant,
 } from '@/config/map-layer-definitions';
 import { renderLayerExplanationCard } from '@/utils/layer-explanation-card';
@@ -74,7 +76,7 @@ import type { WebcamEntry, WebcamCluster } from '@/generated/client/worldmonitor
 import type { TrafficAnomaly as ProtoTrafficAnomaly, DdosLocationHit } from '@/generated/client/worldmonitor/infrastructure/v1/service_client';
 import type { RadiationObservation } from '@/services/radiation';
 import type { ScenarioVisualState } from '@/config/scenario-templates';
-import { setTrustedHtml, trustedHtml } from '@/utils/dom-utils';
+import { setTrustedHtml, trustedHtml, type TrustedHtml } from '@/utils/dom-utils';
 import { renderPopupSourceLinks } from './map-popup-source-links';
 import {
   applyPremiumLayerPresentation,
@@ -492,6 +494,25 @@ interface GlobeControlsLike {
 // lockstep with the animation.
 const SET_CENTER_ROTATION_MS = 1200;
 
+// Atmosphere tint per globe texture — kept subtle; night/dark get a dimmer
+// halo so a MAP STYLE switch reads clearly on the 3D globe too.
+const GLOBE_STYLE_ATMOSPHERE: Record<GlobeTexture, string> = {
+  'topographic': '#4466cc',
+  'blue-marble': '#4466cc',
+  'night': '#5a4630',
+  'dark': '#28344f',
+  'day': '#a8c4e0',
+};
+
+// Attribution per globe texture (imagery/data providers behind each style).
+const GLOBE_TEXTURE_ATTRIBUTION: Record<GlobeTexture, TrustedHtml> = {
+  'topographic': trustedHtml('© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> © <a href="https://www.naturalearthdata.com" target="_blank" rel="noopener">Natural Earth</a>', 'globe texture attribution'),
+  'blue-marble': trustedHtml('© <a href="https://visibleearth.nasa.gov" target="_blank" rel="noopener">NASA Visible Earth</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>', 'globe texture attribution'),
+  'night': trustedHtml('© <a href="https://earthobservatory.nasa.gov/features/NightLights" target="_blank" rel="noopener">NASA Earth at Night</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>', 'globe texture attribution'),
+  'dark': trustedHtml('© <a href="https://www.naturalearthdata.com" target="_blank" rel="noopener">Natural Earth</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>', 'globe texture attribution'),
+  'day': trustedHtml('© <a href="https://www.naturalearthdata.com" target="_blank" rel="noopener">Natural Earth</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>', 'globe texture attribution'),
+};
+
 export class GlobeMap {
   private container: HTMLElement;
   private globe: GlobeInstance | null = null;
@@ -499,6 +520,10 @@ export class GlobeMap {
   private unsubscribeGlobeQuality: (() => void) | null = null;
   private unsubscribeGlobeTexture: (() => void) | null = null;
   private unsubscribeVisualPreset: (() => void) | null = null;
+  /** LISTENS for basemap-style chip changes (SAT/URBAN/TOPO/DARK/LIGHT) so the
+   *  3D globe follows the same MAP STYLE selection as the 2D renderer. */
+  private boundMapThemeChange: (() => void) | null = null;
+  private attributionEl: HTMLElement | null = null;
   private premiumLayerGate: PremiumLayerGate | null = null;
   private pendingPremiumLayerChanges = new Set<keyof MapLayers>();
   private savedDefaultMaterial: any = null;
@@ -707,11 +732,14 @@ export class GlobeMap {
     const initW = this.container.clientWidth || window.innerWidth;
     const initH = this.container.clientHeight || window.innerHeight;
 
-    const initialTexture = getGlobeTexture();
+    // 3D globe follows the same MAP STYLE chips as the 2D renderer: derive
+    // the texture from the persisted basemap provider/theme prefs (SAT →
+    // blue-marble, URBAN → night, TOPO → topographic, DARK → dark, LIGHT → day).
+    const initialTexture = getGlobeTextureForBasemap(getMapProvider(), getMapTheme(getMapProvider()));
     globe
       .globeImageUrl(GLOBE_TEXTURE_URLS[initialTexture])
       .backgroundImageUrl('')
-      .atmosphereColor('#4466cc')
+      .atmosphereColor(GLOBE_STYLE_ATMOSPHERE[initialTexture])
       .atmosphereAltitude(0.18)
       .width(initW)
       .height(initH)
@@ -768,8 +796,9 @@ export class GlobeMap {
     // Globe attribution (texture + OpenStreetMap data)
     const attribution = document.createElement('div');
     attribution.className = 'map-attribution';
-    setTrustedHtml(attribution, trustedHtml('© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> © <a href="https://www.naturalearthdata.com" target="_blank" rel="noopener">Natural Earth</a>', "legacy direct innerHTML migration"));
+    setTrustedHtml(attribution, GLOBE_TEXTURE_ATTRIBUTION[initialTexture]);
     this.container.appendChild(attribution);
+    this.attributionEl = attribution;
 
     // Upgrade material to MeshStandardMaterial + add scene enhancements
     // Save default material for classic preset restoration
@@ -785,10 +814,20 @@ export class GlobeMap {
       this.applyVisualPreset(preset);
     });
 
-    // Subscribe to texture changes (kept as-is)
+    // Subscribe to texture changes (kept as-is) — Settings → Globe texture.
     this.unsubscribeGlobeTexture = subscribeGlobeTextureChange((texture) => {
-      if (this.globe) this.globe.globeImageUrl(GLOBE_TEXTURE_URLS[texture]);
+      this.applyGlobeTexture(texture);
     });
+
+    // MAP STYLE chips (SAT/URBAN/TOPO/DARK/LIGHT) restyle the 3D globe live:
+    // the chips persist provider/theme prefs and dispatch 'map-theme-changed'
+    // (the same event DeckGLMap listens to). Swap texture + atmosphere so the
+    // globe matches the selected style without a renderer reload.
+    this.boundMapThemeChange = () => {
+      const provider = getMapProvider();
+      this.applyGlobeTexture(getGlobeTextureForBasemap(provider, getMapTheme(provider)));
+    };
+    window.addEventListener('map-theme-changed', this.boundMapThemeChange);
 
     // Pause auto-rotate on user interaction; resume after 60 s idle (like Sentinel)
     const pauseAutoRotate = () => {
@@ -1772,16 +1811,21 @@ export class GlobeMap {
       wrapper.appendChild(previewDiv);
 
       const link = document.createElement('a');
-      link.href = `https://www.windy.com/webcams/${encodeURIComponent(d.webcamId)}`;
+      // Curated self-hosted ids are `ch:{UC…}` (channel live) — the old windy
+      // link only ever worked for real Windy ids.
+      const chId = /^ch:(UC[\w-]{20,24})$/.exec(String(d.webcamId).trim());
+      link.href = chId
+        ? `https://www.youtube.com/channel/${chId[1]}/live`
+        : `https://www.windy.com/webcams/${encodeURIComponent(d.webcamId)}`;
       link.target = '_blank';
       link.rel = 'noopener';
       link.style.cssText = 'display:block;color:#00d4ff;font-size:calc(11px * var(--wm-panel-effective-scale, 1));text-decoration:none;';
-      link.textContent = 'Open on Windy \u2197';
+      link.textContent = 'Watch live \u2197';
       wrapper.appendChild(link);
 
       const attribution = document.createElement('div');
       attribution.style.cssText = 'opacity:.4;font-size:calc(9px * var(--wm-panel-effective-scale, 1));margin-top:4px;';
-      attribution.textContent = 'Powered by Windy';
+      attribution.textContent = chId ? 'Live on YouTube' : 'Powered by Windy';
       wrapper.appendChild(attribution);
 
       import('@/services/webcams').then(({ fetchWebcamImage }) => {
@@ -1968,6 +2012,18 @@ export class GlobeMap {
     });
   }
 
+  /** Swap the globe's MAP STYLE in place — imagery, atmosphere tint and the
+   *  attribution line. Driven by the basemap chips ('map-theme-changed') and
+   *  by Settings → Globe texture, so the 3D view follows the 2D selection. */
+  private applyGlobeTexture(texture: GlobeTexture): void {
+    if (!this.globe) return;
+    this.globe.globeImageUrl(GLOBE_TEXTURE_URLS[texture]);
+    this.globe.atmosphereColor(GLOBE_STYLE_ATMOSPHERE[texture]);
+    if (this.attributionEl) {
+      setTrustedHtml(this.attributionEl, GLOBE_TEXTURE_ATTRIBUTION[texture]);
+    }
+  }
+
   private zoomInGlobe(): void {
     if (!this.globe) return;
     const pov = this.globe.pointOfView();
@@ -2103,6 +2159,7 @@ export class GlobeMap {
     this.enforceLayerLimit();
 
     bindLayerSearch(el);
+    applyLayerGrouping(el);
     const searchEl = el.querySelector('.layer-search') as HTMLElement | null;
 
     const collapseBtn = el.querySelector('.toggle-collapse');
@@ -4030,6 +4087,11 @@ export class GlobeMap {
     this.unsubscribeGlobeQuality = null;
     this.unsubscribeGlobeTexture?.();
     this.unsubscribeGlobeTexture = null;
+    if (this.boundMapThemeChange) {
+      window.removeEventListener('map-theme-changed', this.boundMapThemeChange);
+      this.boundMapThemeChange = null;
+    }
+    this.attributionEl = null;
     this.unsubscribeVisualPreset?.();
     this.unsubscribeVisualPreset = null;
     this.premiumLayerGate?.destroy();

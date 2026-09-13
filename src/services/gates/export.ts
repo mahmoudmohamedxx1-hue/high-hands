@@ -17,11 +17,8 @@
 import type { AuthSession } from '../auth-state';
 import { getSubscription } from '../billing';
 import { deriveBillingUxState } from '../billing-state';
-import { getEntitlementState } from '../entitlements';
 import { PanelGateReason } from '../panel-gating';
-import { getSecretState } from '../runtime-config';
 import {
-  isExportGateActive,
   resolveAvailableExportFormats,
   resolveExportGate,
   resolveTabCap,
@@ -56,21 +53,17 @@ export function exportLockToGateReason(reason: ExportGateLockReason): PanelGateR
  * this file has ever needed the raw inputs.
  */
 function readExportGateInputs(authState: AuthSession): ExportGateInputs {
-  const entitlement = getEntitlementState();
+  // PRO removed: data export and dashboard tabs are uncapped for everyone.
+  // Reporting a "desktop key present" entitlement makes the pure resolver
+  // unlock exports, expose every format, and never cap dashboard tabs.
+  void authState;
   return {
-    gateActive: isExportGateActive(),
-    desktopKeyPresent: getSecretState('WORLDMONITOR_API_KEY').present,
-    authPending: authState.isPending,
-    signedIn: Boolean(authState.user),
-    features: entitlement
-      ? {
-          tier: entitlement.features.tier,
-          dataExport: entitlement.features.dataExport,
-          exportFormats: entitlement.features.exportFormats,
-          maxDashboards: entitlement.features.maxDashboards,
-        }
-      : null,
-    billingState: deriveBillingUxState(getSubscription(), entitlement, Date.now()),
+    gateActive: false,
+    desktopKeyPresent: true,
+    authPending: false,
+    signedIn: false,
+    features: null,
+    billingState: deriveBillingUxState(getSubscription(), null, Date.now()),
   };
 }
 

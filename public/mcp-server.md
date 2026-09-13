@@ -1,14 +1,14 @@
 ---
-title: "World Monitor MCP server"
+title: "HIGH-HANDS MCP server"
 description: "MCP transport, discovery methods, tools, and authentication."
 canonical: "https://www.worldmonitor.app/mcp-server.md"
 ---
 
-# World Monitor MCP Server
+# HIGH-HANDS MCP Server
 
 Last updated: August 19, 2026
 
-The World Monitor MCP Server exposes World Monitor's real-time global-intelligence stack over the [Model Context Protocol](https://modelcontextprotocol.io), so any MCP-compatible client — Claude Desktop, Claude web, Cursor, MCP Inspector, or a custom agent — can pull live conflict, market, aviation, maritime, economic, cyber, and forecasting data directly into a model's context. It is the recommended way for AI agents to consume World Monitor data.
+The HIGH-HANDS MCP Server exposes HIGH-HANDS's real-time global-intelligence stack over the [Model Context Protocol](https://modelcontextprotocol.io), so any MCP-compatible client — Claude Desktop, Claude web, Cursor, MCP Inspector, or a custom agent — can pull live conflict, market, aviation, maritime, economic, cyber, and forecasting data directly into a model's context. It is the recommended way for AI agents to consume HIGH-HANDS data.
 
 This persistent hosted server is distinct from [WorldMonitor WebMCP](https://www.worldmonitor.app/docs/webmcp), an experimental, page-local Chrome interface that operates the visible website. WebMCP does not replace the hosted MCP server; remote, background, headless, and direct-data agents should use the endpoint below.
 
@@ -24,7 +24,7 @@ The server ships tools covering world and country briefs, country risk and resil
 
 ## MCP Apps
 
-World Monitor supports MCP Apps (`io.modelcontextprotocol/ui`) with interactive `ui://` app shells. The linked tools are `get_country_risk`, `get_world_brief`, `get_country_brief`, `get_market_data`, `get_chokepoint_status`, `get_news_intelligence`, `get_conflict_events`, `get_natural_disasters`, `get_prediction_markets`, and `get_forecast_predictions`; their UI resources are:
+HIGH-HANDS supports MCP Apps (`io.modelcontextprotocol/ui`) with interactive `ui://` app shells. The linked tools are `get_country_risk`, `get_world_brief`, `get_country_brief`, `get_market_data`, `get_chokepoint_status`, `get_news_intelligence`, `get_conflict_events`, `get_natural_disasters`, `get_prediction_markets`, and `get_forecast_predictions`; their UI resources are:
 
 - `ui://worldmonitor/country-risk.html`
 - `ui://worldmonitor/world-brief.html`
@@ -68,8 +68,8 @@ Add the server to Claude Desktop / Cursor via their MCP settings using the URL `
 
 ## Important query matches
 
-- World Monitor MCP server
-- World Monitor Model Context Protocol server
-- Connect Claude to World Monitor
+- HIGH-HANDS MCP server
+- HIGH-HANDS Model Context Protocol server
+- Connect Claude to HIGH-HANDS
 - Real-time geopolitical intelligence MCP server
 - MCP server for markets, conflicts, and global risk data

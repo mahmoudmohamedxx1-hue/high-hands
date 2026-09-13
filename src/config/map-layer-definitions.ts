@@ -759,3 +759,277 @@ export function bindLayerSearch(container: HTMLElement): void {
     });
   });
 }
+
+/**
+ * ---------------------------------------------------------------------------
+ * Layer picker grouping (self-hosted UI/UX improvement).
+ *
+ * The upstream picker renders one long, flat list of layer rows. This section
+ * groups those rows under collapsible category headers with active/total
+ * counts, so a 30-layer list becomes ~10 scannable groups.
+ *
+ * The implementation is deliberately DOM-only: `applyLayerGrouping()` MOVES
+ * existing `.layer-toggle-row` nodes into group bodies (all listeners survive
+ * a move), and every renderer's querySelector contracts (`.layer-toggle[data-
+ * layer=…]` etc.) keep working because rows stay inside the same root. It is
+ * idempotent and safe to call at any point after rows exist.
+ */
+
+export interface LayerGroupDef {
+  label: string;
+  icon: string;
+  keys: Array<keyof MapLayers>;
+}
+
+/** Category buckets for the layer picker (order = display order). */
+export const LAYER_GROUPS: LayerGroupDef[] = [
+  {
+    label: 'Conflict & Security',
+    icon: '⚔️',
+    keys: ['conflicts', 'ucdpEvents', 'hotspots', 'iranAttacks', 'protests', 'displacement', 'sanctions', 'military'],
+  },
+  {
+    label: 'Strategic Assets',
+    icon: '🎯',
+    keys: ['bases', 'nuclear', 'irradiators', 'radiationWatch', 'spaceports', 'satellites'],
+  },
+  {
+    label: 'Economy & Trade',
+    icon: '📈',
+    keys: ['economic', 'stockExchanges', 'financialCenters', 'centralBanks', 'commodityHubs', 'gulfInvestments', 'minerals'],
+  },
+  {
+    label: 'Energy & Resources',
+    icon: '⛽',
+    keys: ['pipelines', 'storageFacilities', 'fuelShortages', 'liveTankers', 'miningSites', 'processingPlants', 'commodityPorts', 'renewableInstallations'],
+  },
+  {
+    label: 'Infrastructure & Connectivity',
+    icon: '🏗️',
+    keys: ['cables', 'datacenters', 'outages', 'cloudRegions'],
+  },
+  {
+    label: 'Transport & Shipping',
+    icon: '🚢',
+    keys: ['ais', 'tradeRoutes', 'flights', 'waterways', 'gpsJamming'],
+  },
+  {
+    label: 'Tech Ecosystem',
+    icon: '💻',
+    keys: ['startupHubs', 'techHQs', 'accelerators', 'techEvents'],
+  },
+  {
+    label: 'Natural & Climate',
+    icon: '🌪️',
+    keys: ['natural', 'fires', 'climate', 'weather', 'diseaseOutbreaks'],
+  },
+  {
+    label: 'Risk & Resilience',
+    icon: '🛡️',
+    keys: ['ciiChoropleth', 'resilienceScore', 'cyberThreats'],
+  },
+  {
+    label: 'Regional & Context',
+    icon: '🗺️',
+    keys: ['canadaRoads', 'canadaAlerts', 'dayNight', 'webcams'],
+  },
+  {
+    label: 'Good News',
+    icon: '☀️',
+    keys: ['positiveEvents', 'kindness', 'happiness', 'speciesRecovery'],
+  },
+];
+
+const GROUP_COLLAPSE_KEY = 'wm-layer-group-collapse';
+
+function readCollapsedGroups(): Set<string> {
+  try {
+    const raw = window.localStorage.getItem(GROUP_COLLAPSE_KEY);
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw) as string[];
+    return new Set(Array.isArray(parsed) ? parsed : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function persistCollapsedGroups(collapsed: Set<string>): void {
+  try {
+    window.localStorage.setItem(GROUP_COLLAPSE_KEY, JSON.stringify([...collapsed]));
+  } catch {
+    /* storage unavailable — collapse state just won't persist */
+  }
+}
+
+/** Module-level cache so collapse state survives renderer rebuilds in-session. */
+let collapsedGroups: Set<string> | null = null;
+
+function getCollapsedGroups(): Set<string> {
+  if (collapsedGroups === null) collapsedGroups = readCollapsedGroups();
+  return collapsedGroups;
+}
+
+function isRowActive(row: HTMLElement): boolean {
+  const input = row.querySelector<HTMLInputElement>('input[type="checkbox"]');
+  if (input) return input.checked;
+  const btn = row.querySelector<HTMLElement>('.layer-toggle');
+  return Boolean(btn?.classList.contains('active'));
+}
+
+function rowKey(row: HTMLElement): string {
+  return row.dataset.layer || row.getAttribute('data-layer') || '';
+}
+
+/**
+ * Group the flat `.layer-toggle-row` list under collapsible headers with
+ * active/total counts. Works for the deck/globe pickers (rows inside
+ * `.toggle-list`) and the SVG/mobile picker (rows as direct children of
+ * `#layerToggles`, with `.layer-help-btn` left in place at the end).
+ */
+export function applyLayerGrouping(togglesEl: HTMLElement): void {
+  if (!togglesEl || togglesEl.dataset.layerGrouped === '1') return;
+
+  const list = togglesEl.querySelector<HTMLElement>('.toggle-list') ?? togglesEl;
+  const rows = Array.from(list.children).filter(
+    child => child instanceof HTMLElement && child.classList.contains('layer-toggle-row'),
+  ) as HTMLElement[];
+  if (rows.length < 4) return; // too few rows to benefit from grouping
+
+  togglesEl.dataset.layerGrouped = '1';
+  // First run = nothing persisted AND no in-session state yet: collapse
+  // groups with no active layers for a compact default. After that, respect
+  // the user's stored collapse choices.
+  const isFirstRun =
+    collapsedGroups === null && window.localStorage.getItem(GROUP_COLLAPSE_KEY) === null;
+  const collapsed = getCollapsedGroups();
+
+  // Anchor: first non-row child (e.g. the SVG picker's help button) stays
+  // visually after the groups; everything else is rows.
+  const anchor = Array.from(list.children).find(
+    child => !(child instanceof HTMLElement && child.classList.contains('layer-toggle-row')),
+  );
+
+  const assigned = new Set<string>();
+  const groupEls: Array<{ el: HTMLElement; body: HTMLElement; keys: Set<string> }> = [];
+
+  for (const group of LAYER_GROUPS) {
+    const groupRows = rows.filter(row => group.keys.includes(rowKey(row) as keyof MapLayers));
+    if (!groupRows.length) continue;
+    groupRows.forEach(row => assigned.add(rowKey(row)));
+
+    const groupId = group.label.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+    const el = document.createElement('div');
+    el.className = 'layer-group';
+    el.dataset.group = groupId;
+
+    const header = document.createElement('button');
+    header.type = 'button';
+    header.className = 'layer-group-header';
+    header.setAttribute('aria-expanded', 'true');
+
+    const icon = document.createElement('span');
+    icon.className = 'layer-group-icon';
+    icon.textContent = group.icon;
+
+    const label = document.createElement('span');
+    label.className = 'layer-group-label';
+    label.textContent = group.label;
+
+    const count = document.createElement('span');
+    count.className = 'layer-group-count';
+
+    const chevron = document.createElement('span');
+    chevron.className = 'layer-group-chevron';
+    chevron.textContent = '▾';
+
+    header.append(icon, label, count, chevron);
+
+    const body = document.createElement('div');
+    body.className = 'layer-group-body';
+    groupRows.forEach(row => body.appendChild(row)); // MOVE keeps listeners
+
+    el.append(header, body);
+
+    // Groups with no active layers start collapsed (compact default).
+    const anyActive = groupRows.some(isRowActive);
+    if (anyActive) {
+      collapsed.delete(groupId);
+    } else if (isFirstRun) {
+      collapsed.add(groupId);
+    }
+    el.classList.toggle('collapsed', collapsed.has(groupId));
+    header.setAttribute('aria-expanded', collapsed.has(groupId) ? 'false' : 'true');
+
+    header.addEventListener('click', () => {
+      const nowCollapsed = !el.classList.contains('collapsed');
+      el.classList.toggle('collapsed', nowCollapsed);
+      header.setAttribute('aria-expanded', nowCollapsed ? 'false' : 'true');
+      if (nowCollapsed) collapsed.add(groupId);
+      else collapsed.delete(groupId);
+      persistCollapsedGroups(collapsed);
+    });
+
+    if (anchor) list.insertBefore(el, anchor);
+    else list.appendChild(el);
+
+    groupEls.push({ el, body, keys: new Set(groupRows.map(rowKey)) });
+  }
+
+  // Rows not covered by any group stay as direct children before the anchor.
+  const unassigned = rows.filter(row => !assigned.has(rowKey(row)));
+  if (unassigned.length && anchor) {
+    for (const row of unassigned) list.insertBefore(row, anchor);
+  }
+
+  const refreshCounts = (): void => {
+    for (const { el, body } of groupEls) {
+      const groupRows = Array.from(body.children).filter(
+        child => child instanceof HTMLElement && child.classList.contains('layer-toggle-row'),
+      ) as HTMLElement[];
+      const active = groupRows.filter(isRowActive).length;
+      const count = el.querySelector<HTMLElement>('.layer-group-count');
+      if (count) {
+        count.textContent = `${active}/${groupRows.length}`;
+        count.classList.toggle('has-active', active > 0);
+      }
+      // Search awareness: hide groups whose every row is display:none.
+      const anyVisible = groupRows.some(row => row.style.display !== 'none' && !row.hasAttribute('data-layer-hidden'));
+      const searching = Boolean(togglesEl.querySelector<HTMLInputElement>('.layer-search')?.value.trim());
+      el.style.display = searching && !anyVisible ? 'none' : '';
+    }
+  };
+
+  refreshCounts();
+
+  // Count refresh on any row change (deck/globe fire `change`; SVG buttons fire
+  // `click` and flip their `active` class before this bubbling listener runs).
+  list.addEventListener('change', refreshCounts);
+  list.addEventListener('click', refreshCounts);
+
+  // Keep groups in sync with the (already-bound) layer search input.
+  const searchInput = togglesEl.querySelector<HTMLInputElement>('.layer-search');
+  searchInput?.addEventListener('input', () => {
+    // Runs after bindLayerSearch's own listener (registered earlier), so row
+    // display states are already updated when we re-check visibility.
+    requestAnimationFrame(refreshCounts);
+  });
+}
+
+/** Re-run grouping bookkeeping (counts/visibility) without re-grouping. */
+export function refreshLayerGrouping(togglesEl: HTMLElement | null): void {
+  if (!togglesEl || togglesEl.dataset.layerGrouped !== '1') return;
+  const list = togglesEl.querySelector<HTMLElement>('.toggle-list') ?? togglesEl;
+  for (const groupEl of Array.from(list.querySelectorAll<HTMLElement>('.layer-group'))) {
+    const groupRows = Array.from(groupEl.querySelectorAll<HTMLElement>('.layer-toggle-row'));
+    const active = groupRows.filter(isRowActive).length;
+    const count = groupEl.querySelector<HTMLElement>('.layer-group-count');
+    if (count) {
+      count.textContent = `${active}/${groupRows.length}`;
+      count.classList.toggle('has-active', active > 0);
+    }
+    const anyVisible = groupRows.some(row => row.style.display !== 'none');
+    const searching = Boolean(togglesEl.querySelector<HTMLInputElement>('.layer-search')?.value.trim());
+    groupEl.style.display = searching && !anyVisible ? 'none' : '';
+  }
+}

@@ -343,7 +343,7 @@
         "OLLAMA_API_URL": "e.g. http://127.0.0.1:11434 (Ollama) or http://127.0.0.1:1234/v1 (LM Studio) — OpenAI-compatible endpoint.",
         "OLLAMA_MODEL": "e.g. llama3.1:8b — model tag to use for summarization."
       },
-      "skipSetup": "Sla de configuratie over — een enkele World Monitor-licentie ontgrendelt alles. Meld u aan voor de wachtlijst voor vroege toegang.",
+      "skipSetup": "Sla de configuratie over — een enkele HIGH-HANDS-licentie ontgrendelt alles. Meld u aan voor de wachtlijst voor vroege toegang.",
       "reserveEarlyAccess": "Reserveer Vroege Toegang"
     },
     "countryIntel": {
@@ -464,7 +464,7 @@
           "submitBtn": "API-abonnementen bekijken"
         }
       },
-      "shellTitle": "World Monitor-instellingen",
+      "shellTitle": "HIGH-HANDS-instellingen",
       "shellSearchPlaceholder": "Instellingen doorzoeken...",
       "shellCancel": "Annuleren",
       "shellSaveClose": "Opslaan & Sluiten",
@@ -3478,10 +3478,10 @@
     "copyCoordinates": "Coördinaten kopiëren"
   },
   "shell": {
-    "documentTitle": "World Monitor — Real-Time Global Intelligence Dashboard",
+    "documentTitle": "HIGH-HANDS — Real-Time Global Intelligence Dashboard",
     "metaDescription": "Real-time global intelligence platform. Featured in WIRED. Used by 2M+ people across 190 countries. Conflicts, markets, military, OSINT in one view.",
     "offlineTitle": "Je bent offline",
-    "offlineMessage": "World Monitor heeft een internetverbinding nodig voor real-time inlichtingengegevens.",
+    "offlineMessage": "HIGH-HANDS heeft een internetverbinding nodig voor real-time inlichtingengegevens.",
     "offlineRetry": "Opnieuw proberen"
   },
   "widgets": {
@@ -3553,7 +3553,7 @@
   },
   "premium": {
     "pro": "PRO",
-    "lockedDesc": "Vereist een World Monitor-licentiesleutel",
+    "lockedDesc": "Vereist een HIGH-HANDS-licentiesleutel",
     "signInToUnlock": "Meld u aan om premium-functies te ontgrendelen",
     "signIn": "Aanmelden om te ontgrendelen",
     "upgradeDesc": "Upgrade naar Pro voor volledige toegang tot premium-analyses",

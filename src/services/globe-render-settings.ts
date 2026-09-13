@@ -1,5 +1,5 @@
 export type GlobeRenderScale = 'auto' | '1' | '1.5' | '2' | '3';
-export type GlobeTexture = 'topographic' | 'blue-marble';
+export type GlobeTexture = 'topographic' | 'blue-marble' | 'night' | 'dark' | 'day';
 
 const STORAGE_KEY = 'wm-globe-render-scale';
 const EVENT_NAME = 'wm-globe-render-scale-changed';
@@ -82,12 +82,39 @@ export const GLOBE_TEXTURE_OPTIONS: { value: GlobeTexture; label: string }[] = [
 export const GLOBE_TEXTURE_URLS: Record<GlobeTexture, string> = {
   'topographic': '/textures/earth-topo-bathy.jpg',
   'blue-marble': '/textures/earth-blue-marble.jpg',
+  'night': '/textures/earth-night.jpg',
+  'dark': '/textures/earth-dark.jpg',
+  'day': '/textures/earth-day.jpg',
 };
+
+const ALL_TEXTURES: readonly GlobeTexture[] = ['topographic', 'blue-marble', 'night', 'dark', 'day'];
+
+/**
+ * Maps the 2D basemap style (the SAT / URBAN / TOPO / DARK / LIGHT chips in
+ * the map filter bar, persisted as provider + theme prefs) onto the globe
+ * texture used in 3D mode, so both renderers follow the same MAP STYLE
+ * selection:
+ *   SAT  (esri/satellite)  → blue-marble (NASA satellite imagery)
+ *   URBAN(esri/streets)    → night       (city lights — urban centres)
+ *   TOPO (esri/topo)       → topographic (terrain / bathymetry)
+ *   DARK (carto dark-matter) → dark      (dark-styled world map)
+ *   LIGHT(carto positron)  → day         (light Natural Earth look)
+ */
+export function getGlobeTextureForBasemap(provider: string, theme: string): GlobeTexture {
+  if (provider === 'esri') {
+    if (theme === 'streets') return 'night';
+    if (theme === 'topo') return 'topographic';
+    return 'blue-marble';
+  }
+  if (theme === 'dark' || theme === 'dark-matter' || theme === 'dark_attr') return 'dark';
+  if (theme === 'positron' || theme === 'voyager' || theme === 'light') return 'day';
+  return 'day';
+}
 
 export function getGlobeTexture(): GlobeTexture {
   try {
     const raw = localStorage.getItem(TEXTURE_STORAGE_KEY);
-    if (raw === 'topographic' || raw === 'blue-marble') return raw;
+    if (raw && (ALL_TEXTURES as readonly string[]).includes(raw)) return raw as GlobeTexture;
   } catch { /* ignore */ }
   return 'topographic';
 }

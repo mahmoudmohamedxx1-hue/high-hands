@@ -19,8 +19,6 @@ import { deriveBillingUxState, getBillingGateOverride, getReactivationHref } fro
 import { getEntitlementState } from './entitlements';
 import { openExternalUrl } from './external-navigation';
 import type { ClientEntitlementBelief } from './premium-denial';
-import { getSecretState } from './runtime-config';
-import { isProUser } from './widget-store';
 
 export enum PanelGateReason {
   NONE = 'none',           // show content (pro user, or desktop with API key, or non-premium panel)
@@ -53,10 +51,9 @@ export enum PanelGateReason {
  * signals that aren't already covered by isProUser.
  */
 export function hasPremiumAccess(authState?: AuthSession): boolean {
-  if (getSecretState('WORLDMONITOR_API_KEY').present) return true;
-  if (isProUser()) return true;
-  if (authState?.user?.role === 'pro') return true;
-  return false;
+  // PRO removed: every feature is accessible to everyone, always.
+  void authState;
+  return true;
 }
 
 /**
@@ -81,15 +78,10 @@ export function getPanelGateReason(
   authState: AuthSession,
   isPremium: boolean,
 ): PanelGateReason {
-  // Non-premium panels are never gated
-  if (!isPremium) return PanelGateReason.NONE;
-
-  // API key, tester key, or Clerk Pro: always unlocked
-  if (hasPremiumAccess(authState)) return PanelGateReason.NONE;
-
-  // Web gating based on Clerk auth state
-  if (!authState.user) return PanelGateReason.ANONYMOUS;
-  return PanelGateReason.FREE_TIER;
+  // PRO removed: nothing is ever gated.
+  void authState;
+  void isPremium;
+  return PanelGateReason.NONE;
 }
 
 /**

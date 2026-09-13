@@ -37,14 +37,7 @@ export class CustomWidgetPanel extends Panel {
       }));
     });
 
-    if (this.spec.tier === 'pro') {
-      const badge = h('span', { className: 'widget-pro-badge' }, t('widgets.proBadge'));
-      if (closeBtn) {
-        this.header.insertBefore(badge, closeBtn);
-      } else {
-        this.header.appendChild(badge);
-      }
-    }
+    // PRO badge removed: every widget feature is accessible — no tier labels.
 
     if (closeBtn) {
       this.header.insertBefore(chatBtn, closeBtn);

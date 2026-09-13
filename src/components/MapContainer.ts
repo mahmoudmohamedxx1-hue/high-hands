@@ -73,6 +73,18 @@ export type { ScenarioVisualState, ScenarioResult };
 
 export type TimeRange = '1h' | '6h' | '24h' | '48h' | '7d' | 'all';
 export type MapView = 'global' | 'america' | 'mena' | 'eu' | 'asia' | 'latam' | 'africa' | 'oceania';
+/** Severity filter applied across map data layers ('all' = no filtering). */
+export type SeverityFilter = 'all' | 'medium+' | 'high';
+
+/** Numeric rank: high=3, medium=2, low/unknown=1. */
+function severityRank(level: 'high' | 'medium' | 'low' | 'unknown'): number {
+  return level === 'high' ? 3 : level === 'medium' ? 2 : 1;
+}
+
+function filterBySeverity<T>(items: readonly T[], minLevel: 'high' | 'medium', extract: (item: T) => 'high' | 'medium' | 'low' | 'unknown'): T[] {
+  const minRank = minLevel === 'high' ? 3 : 2;
+  return items.filter((item) => severityRank(extract(item)) >= minRank);
+}
 
 type PendingCenter = { lat: number; lon: number; zoom?: number; actionToken?: number };
 type PendingViewportAction =
@@ -219,6 +231,9 @@ export class MapContainer {
   private cachedWeatherAlerts: WeatherAlert[] | null = null;
   private cachedCanadaRoads: CanadaRoadRecord[] | null = null;
   private cachedCanadaAlerts: CanadaAlert[] | null = null;
+  // Self-hosted map data severity filter ('all' by default). Cached raw arrays
+  // are re-applied through this filter when it changes.
+  private severityFilter: SeverityFilter = 'all';
   private cachedOutages: InternetOutage[] | null = null;
   private cachedAisDisruptions: AisDisruptionEvent[] | null = null;
   private cachedAisDensity: AisDensityZone[] | null = null;
@@ -306,13 +321,11 @@ export class MapContainer {
       // an empty/black render surface instead of a usable map.
       const gl2 = canvas.getContext('webgl2');
       if (!gl2) return false;
-      const debugInfo = gl2.getExtension('WEBGL_debug_renderer_info');
-      if (debugInfo) {
-        const renderer = String(gl2.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) ?? '').toLowerCase();
-        if (renderer.includes('swiftshader') || renderer.includes('llvmpipe') || renderer.includes('softpipe') || renderer.includes('software rasterizer')) {
-          return false;
-        }
-      }
+      // Self-host tweak: modern SwiftShader/llvmpipe software rasterizers
+      // render MapLibre fine (just slower), and rejecting them strands VM /
+      // headless / remote-desktop users on the static SVG map with no
+      // satellite basemap, style chips, or country hover. Software GL is
+      // therefore allowed; only a missing WebGL2 context falls back to SVG.
       return true;
     } catch {
       return false;
@@ -994,6 +1007,68 @@ export class MapContainer {
     return this.svgMap?.getTimeRange() ?? this.initialState.timeRange;
   }
 
+  // ─── Severity filter (self-hosted) ───────────────────────────────────────────
+
+  public getSeverityFilter(): SeverityFilter {
+    return this.severityFilter;
+  }
+
+  public setSeverityFilter(level: SeverityFilter): void {
+    if (this.severityFilter === level) return;
+    this.severityFilter = level;
+    // Re-apply every cached dataset through the new filter. Each setter caches
+    // the RAW array first (they receive the raw cached value again here) and
+    // then delegates the filtered copy to the active renderer.
+    if (this.cachedEarthquakes) this.setEarthquakes(this.cachedEarthquakes);
+    if (this.cachedConflictEvents) this.setConflictEvents(this.cachedConflictEvents);
+    if (this.cachedWeatherAlerts) this.setWeatherAlerts(this.cachedWeatherAlerts);
+    if (this.cachedOutages) this.setOutages(this.cachedOutages);
+    if (this.cachedAisDisruptions) this.setAisData(this.cachedAisDisruptions, this.cachedAisDensity ?? []);
+    if (this.cachedFires) this.setFires(this.cachedFires);
+  }
+
+  /** Earthquakes: magnitude ≥5.5 high, ≥4.0 medium. */
+  private filterEarthquakesBySeverity(earthquakes: readonly Earthquake[]): Earthquake[] {
+    if (this.severityFilter === 'all') return [...earthquakes];
+    const min = this.severityFilter === 'high' ? 'high' : 'medium';
+    return filterBySeverity(earthquakes, min, (eq) => (eq.magnitude >= 5.5 ? 'high' : eq.magnitude >= 4 ? 'medium' : 'low'));
+  }
+
+  /** Conflicts: fatalities ≥10 high, ≥1 medium. */
+  private filterConflictsBySeverity(events: readonly AcledConflictEvent[]): AcledConflictEvent[] {
+    if (this.severityFilter === 'all') return [...events];
+    const min = this.severityFilter === 'high' ? 'high' : 'medium';
+    return filterBySeverity(events, min, (ev) => (ev.fatalities >= 10 ? 'high' : ev.fatalities >= 1 ? 'medium' : 'low'));
+  }
+
+  /** Weather alerts: Extreme/Severe high, Moderate medium. */
+  private filterWeatherBySeverity(alerts: readonly WeatherAlert[]): WeatherAlert[] {
+    if (this.severityFilter === 'all') return [...alerts];
+    const min = this.severityFilter === 'high' ? 'high' : 'medium';
+    return filterBySeverity(alerts, min, (a) => (a.severity === 'Extreme' || a.severity === 'Severe' ? 'high' : a.severity === 'Moderate' ? 'medium' : 'low'));
+  }
+
+  /** Outages: total high, major medium. */
+  private filterOutagesBySeverity(outages: readonly InternetOutage[]): InternetOutage[] {
+    if (this.severityFilter === 'all') return [...outages];
+    const min = this.severityFilter === 'high' ? 'high' : 'medium';
+    return filterBySeverity(outages, min, (o) => (o.severity === 'total' ? 'high' : o.severity === 'major' ? 'medium' : 'low'));
+  }
+
+  /** AIS disruptions: high/elevated/low map to high/medium/low. */
+  private filterAisBySeverity(disruptions: readonly AisDisruptionEvent[]): AisDisruptionEvent[] {
+    if (this.severityFilter === 'all') return [...disruptions];
+    const min = this.severityFilter === 'high' ? 'high' : 'medium';
+    return filterBySeverity(disruptions, min, (d) => (d.severity === 'high' ? 'high' : d.severity === 'elevated' ? 'medium' : 'low'));
+  }
+
+  /** Fires: FIRMS brightness ≥450K high, ≥350K medium. */
+  private filterFiresBySeverity(fires: readonly FireMarker[]): FireMarker[] {
+    if (this.severityFilter === 'all') return [...fires];
+    const min = this.severityFilter === 'high' ? 'high' : 'medium';
+    return filterBySeverity(fires, min, (f) => (f.brightness >= 450 ? 'high' : f.brightness >= 350 ? 'medium' : 'low'));
+  }
+
   public setLayers(layers: MapLayers, options: { bypassEntitlementSanitization?: boolean } = {}): void {
     // Strip resilience on non-DeckGL, then locked premium layers for settled free users (#6045).
     // Wait for isProTierResolved so Pro users don't lose resilienceScore during Clerk/Convex boot.
@@ -1023,14 +1098,16 @@ export class MapContainer {
 
   public setEarthquakes(earthquakes: Earthquake[]): void {
     this.cachedEarthquakes = earthquakes;
-    if (this.useGlobe) { this.globeMap?.setEarthquakes(earthquakes); return; }
-    if (this.useDeckGL) { this.deckGLMap?.setEarthquakes(earthquakes); } else { this.svgMap?.setEarthquakes(earthquakes); }
+    const filtered = this.filterEarthquakesBySeverity(earthquakes);
+    if (this.useGlobe) { this.globeMap?.setEarthquakes(filtered); return; }
+    if (this.useDeckGL) { this.deckGLMap?.setEarthquakes(filtered); } else { this.svgMap?.setEarthquakes(filtered); }
   }
 
   public setConflictEvents(events: AcledConflictEvent[]): void {
     this.cachedConflictEvents = events;
+    const filtered = this.filterConflictsBySeverity(events);
     if (!this.useGlobe && !this.useDeckGL) {
-      this.svgMap?.setConflictEvents(events);
+      this.svgMap?.setConflictEvents(filtered);
     }
   }
 
@@ -1049,8 +1126,9 @@ export class MapContainer {
 
   public setWeatherAlerts(alerts: WeatherAlert[]): void {
     this.cachedWeatherAlerts = alerts;
-    if (this.useGlobe) { this.globeMap?.setWeatherAlerts(alerts); return; }
-    if (this.useDeckGL) { this.deckGLMap?.setWeatherAlerts(alerts); } else { this.svgMap?.setWeatherAlerts(alerts); }
+    const filtered = this.filterWeatherBySeverity(alerts);
+    if (this.useGlobe) { this.globeMap?.setWeatherAlerts(filtered); return; }
+    if (this.useDeckGL) { this.deckGLMap?.setWeatherAlerts(filtered); } else { this.svgMap?.setWeatherAlerts(filtered); }
   }
 
   public setCanadaRoads(records: CanadaRoadRecord[]): void {
@@ -1064,8 +1142,9 @@ export class MapContainer {
 
   public setOutages(outages: InternetOutage[]): void {
     this.cachedOutages = outages;
-    if (this.useGlobe) { this.globeMap?.setOutages(outages); return; }
-    if (this.useDeckGL) { this.deckGLMap?.setOutages(outages); } else { this.svgMap?.setOutages(outages); }
+    const filtered = this.filterOutagesBySeverity(outages);
+    if (this.useGlobe) { this.globeMap?.setOutages(filtered); return; }
+    if (this.useDeckGL) { this.deckGLMap?.setOutages(filtered); } else { this.svgMap?.setOutages(filtered); }
   }
 
   public setTrafficAnomalies(anomalies: ProtoTrafficAnomaly[]): void {
@@ -1083,11 +1162,12 @@ export class MapContainer {
   public setAisData(disruptions: AisDisruptionEvent[], density: AisDensityZone[]): void {
     this.cachedAisDisruptions = disruptions;
     this.cachedAisDensity = density;
-    if (this.useGlobe) { this.globeMap?.setAisData(disruptions, density); return; }
+    const filtered = this.filterAisBySeverity(disruptions);
+    if (this.useGlobe) { this.globeMap?.setAisData(filtered, density); return; }
     if (this.useDeckGL) {
-      this.deckGLMap?.setAisData(disruptions, density);
+      this.deckGLMap?.setAisData(filtered, density);
     } else {
-      this.svgMap?.setAisData(disruptions, density);
+      this.svgMap?.setAisData(filtered, density);
     }
   }
 
@@ -1114,6 +1194,7 @@ export class MapContainer {
 
   public setProtests(events: SocialUnrestEvent[]): void {
     this.cachedProtests = events;
+    // SocialUnrestEvent carries no severity scale — unfiltered.
     if (this.useGlobe) { this.globeMap?.setProtests(events); return; }
     if (this.useDeckGL) {
       this.deckGLMap?.setProtests(events);
@@ -1163,11 +1244,12 @@ export class MapContainer {
 
   public setFires(fires: FireMarker[]): void {
     this.cachedFires = fires;
-    if (this.useGlobe) { this.globeMap?.setFires(fires); return; }
+    const filtered = this.filterFiresBySeverity(fires);
+    if (this.useGlobe) { this.globeMap?.setFires(filtered); return; }
     if (this.useDeckGL) {
-      this.deckGLMap?.setFires(fires);
+      this.deckGLMap?.setFires(filtered);
     } else {
-      this.svgMap?.setFires(fires);
+      this.svgMap?.setFires(filtered);
     }
   }
 

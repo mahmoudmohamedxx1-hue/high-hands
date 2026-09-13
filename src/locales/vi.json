@@ -706,7 +706,7 @@
         "needsKeys": "Cấu hình khóa API để mở khóa tính năng",
         "some": "Một số tính năng cần khóa API"
       },
-      "skipSetup": "Bỏ qua cài đặt — một giấy phép World Monitor mở khóa tất cả. Tham gia danh sách chờ để truy cập sớm.",
+      "skipSetup": "Bỏ qua cài đặt — một giấy phép HIGH-HANDS mở khóa tất cả. Tham gia danh sách chờ để truy cập sớm.",
       "summary": {
         "desktop": "Chế độ desktop",
         "web": "Chế độ web (chỉ đọc, thông tin xác thực do máy chủ quản lý)",
@@ -771,7 +771,7 @@
         "status": "Trạng thái",
         "duration": "Thời lượng"
       },
-      "shellTitle": "Cài đặt World Monitor",
+      "shellTitle": "Cài đặt HIGH-HANDS",
       "shellSearchPlaceholder": "Tìm kiếm cài đặt...",
       "shellCancel": "Hủy",
       "shellSaveClose": "Lưu & Đóng",
@@ -3459,10 +3459,10 @@
     "copyCoordinates": "Sao chép tọa độ"
   },
   "shell": {
-    "documentTitle": "World Monitor — Bảng điều khiển tình báo toàn cầu theo thời gian thực",
+    "documentTitle": "HIGH-HANDS — Bảng điều khiển tình báo toàn cầu theo thời gian thực",
     "metaDescription": "Nền tảng tình báo toàn cầu theo thời gian thực. Được giới thiệu trên WIRED. Sử dụng bởi 2M+ người dùng trên 190 quốc gia. Xung đột, thị trường, quân sự, OSINT trong một giao diện.",
     "offlineTitle": "Bạn Đang Ngoài Kết Nối",
-    "offlineMessage": "World Monitor cần kết nối internet để cập nhật dữ liệu tình báo real-time.",
+    "offlineMessage": "HIGH-HANDS cần kết nối internet để cập nhật dữ liệu tình báo real-time.",
     "offlineRetry": "Thử Lại"
   },
   "widgets": {
@@ -3534,7 +3534,7 @@
   },
   "premium": {
     "pro": "PRO",
-    "lockedDesc": "Yêu cầu khóa giấy phép World Monitor",
+    "lockedDesc": "Yêu cầu khóa giấy phép HIGH-HANDS",
     "signInToUnlock": "Đăng nhập để mở khóa các tính năng cao cấp",
     "signIn": "Đăng nhập để mở khóa",
     "upgradeDesc": "Nâng cấp lên Pro để có quyền truy cập đầy đủ vào phân tích cao cấp",

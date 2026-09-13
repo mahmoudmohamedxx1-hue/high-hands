@@ -18,7 +18,7 @@ export type CartoTheme = 'dark-matter' | 'voyager' | 'positron';
 export const FALLBACK_DARK_STYLE = 'https://tiles.openfreemap.org/styles/dark';
 export const FALLBACK_LIGHT_STYLE = 'https://tiles.openfreemap.org/styles/positron';
 
-export type MapProvider = 'auto' | 'pmtiles' | 'openfreemap' | 'carto';
+export type MapProvider = 'auto' | 'pmtiles' | 'openfreemap' | 'carto' | 'esri';
 
 const STORAGE_KEY = 'wm-map-provider';
 const THEME_STORAGE_PREFIX = 'wm-map-theme:';
@@ -47,6 +47,7 @@ export const MAP_PROVIDER_OPTIONS: { value: MapProvider; label: string }[] = (()
     opts.push({ value: 'auto', label: 'Auto (PMTiles → OpenFreeMap fallback)' });
     opts.push({ value: 'pmtiles', label: 'PMTiles (self-hosted)' });
   }
+  opts.push({ value: 'esri', label: 'Satellite (ESRI World Imagery)' });
   opts.push({ value: 'openfreemap', label: 'OpenFreeMap' });
   opts.push({ value: 'carto', label: 'CARTO' });
   return opts;
@@ -63,6 +64,11 @@ const PMTILES_THEMES: { value: string; label: string }[] = [
 export const MAP_THEME_OPTIONS: Record<MapProvider, { value: string; label: string }[]> = {
   pmtiles: PMTILES_THEMES,
   auto: PMTILES_THEMES,
+  esri: [
+    { value: 'satellite', label: 'Satellite (real imagery)' },
+    { value: 'streets', label: 'Streets (urban detail)' },
+    { value: 'topo', label: 'Topographic (terrain)' },
+  ],
   openfreemap: [
     { value: 'dark', label: 'Dark' },
     { value: 'positron', label: 'Positron (light)' },
@@ -77,6 +83,7 @@ export const MAP_THEME_OPTIONS: Record<MapProvider, { value: string; label: stri
 const DEFAULT_THEME: Record<MapProvider, string> = {
   pmtiles: 'black',
   auto: 'black',
+  esri: 'satellite',
   openfreemap: 'dark',
   carto: 'dark-matter',
 };
@@ -85,11 +92,13 @@ export function getMapProvider(): MapProvider {
   const stored = readStorageValue(STORAGE_KEY) as MapProvider | null;
   if (stored) {
     if (stored === 'pmtiles' || stored === 'auto') {
-      return hasTilesUrl ? stored : 'openfreemap';
+      return hasTilesUrl ? stored : 'esri';
     }
     return stored;
   }
-  return hasTilesUrl ? 'auto' : 'openfreemap';
+  // Self-hosted default: real satellite imagery. Users can switch to a
+  // vector style from Settings → Preferences at any time.
+  return 'esri';
 }
 
 export function setMapProvider(provider: MapProvider): void {
@@ -110,7 +119,7 @@ export function setMapTheme(provider: MapProvider, theme: string): void {
 }
 
 export function isLightMapTheme(mapTheme: string): boolean {
-  return ['light', 'white', 'positron', 'voyager'].includes(mapTheme);
+  return ['light', 'white', 'positron', 'voyager', 'streets', 'topo'].includes(mapTheme);
 }
 
 export function asPMTilesTheme(mapTheme: string): PMTilesTheme {

@@ -528,7 +528,11 @@ if (capturedContentAttribution) {
   trackContentHandoff();
 }
 void initAnalytics();
-initVercelAnalytics();
+// Vercel Analytics injects /_vercel/insights/script.js, which only exists on
+// Vercel deployments — on self-hosted it 404s and pollutes the console.
+if (typeof window !== 'undefined' && /(?:^|\.)vercel\.app$/.test(window.location.hostname)) {
+  initVercelAnalytics();
+}
 initDebugBearRum();
 
 // Initialize dynamic meta tags for sharing

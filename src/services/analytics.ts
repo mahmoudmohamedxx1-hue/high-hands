@@ -118,6 +118,12 @@ const EVENTS = {
   'country-selected': true,
   'country-brief-opened': true,
   'map-layer-toggle': true,
+  // Self-hosted map filter bar
+  'country-filter-focus': true,
+  'map-severity-filter': true,
+  'map-basemap-style': true,
+  // Map size preset control (S/M/L/MAX)
+  'map-size-preset': true,
   // Panels
   'panel-toggle': true,
   // Settings

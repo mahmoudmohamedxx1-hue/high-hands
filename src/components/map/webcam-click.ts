@@ -56,6 +56,14 @@ export function resolveWebcamStreamUrl(
   if (fromImage) return fromImage;
   const id = webcam.webcamId?.trim();
   if (!id) return null;
+  // Self-hosted curated catalog: `ch:{channelId}` opens the channel's live
+  // stream; legacy `yt:{videoId}` opens the video.
+  if (id.startsWith('ch:') && id.length > 3) {
+    return `https://www.youtube.com/channel/${encodeURIComponent(id.slice(3))}/live`;
+  }
+  if (id.startsWith('yt:') && id.length > 3) {
+    return `https://www.youtube.com/watch?v=${encodeURIComponent(id.slice(3))}`;
+  }
   return `https://www.windy.com/webcams/${encodeURIComponent(id)}`;
 }
 
