@@ -99,7 +99,7 @@ These subscription licenses cover the hosted Service and its outputs. They are s
 
 ```json
 {
-  "product": "HIGH-HANDS",
+  "product": "World Monitor",
   "lifecycle": "launched",
   "url": "https://www.worldmonitor.app/",
   "pricing_url": "https://www.worldmonitor.app/pro#pricing",
