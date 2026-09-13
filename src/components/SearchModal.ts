@@ -497,7 +497,7 @@ export class SearchModal {
         <div class="search-sheet">
           <div class="search-sheet-handle"></div>
           <div class="search-mobile-ident">
-            <span>WM // COMMAND DECK</span>
+            <span>HH // COMMAND DECK</span>
             <span class="search-index-state"><i></i> LIVE</span>
           </div>
           <div class="search-sheet-header">
@@ -539,7 +539,7 @@ export class SearchModal {
           <div class="search-command-topline">
             <div class="search-command-ident">
               <span class="search-command-mark" aria-hidden="true"><i></i></span>
-              <span>WM // INTELLIGENCE COMMAND DECK</span>
+              <span>HH // INTELLIGENCE COMMAND DECK</span>
               <span class="search-index-state"><i></i> INDEX ONLINE</span>
             </div>
             <div class="search-command-metrics" aria-label="Search index status">

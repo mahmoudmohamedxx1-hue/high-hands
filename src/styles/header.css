@@ -97,3 +97,12 @@ html.wm-pro-banner-reserved .pro-banner-slot {
 #authWidgetMount:empty {
   visibility: hidden;
 }
+
+/* HIGH-HANDS (sandbox-pro): PRO is permanently removed in this build, so
+   #proBannerSlot is never filled. An empty slot must not reserve layout
+   space (html.wm-pro-banner-reserved) nor intercept pointer events over
+   the map controls — collapse it entirely instead. */
+.pro-banner-slot:empty,
+html.wm-pro-banner-reserved .pro-banner-slot:empty {
+  display: none;
+}
