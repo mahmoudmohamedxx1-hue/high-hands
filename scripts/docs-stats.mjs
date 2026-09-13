@@ -29,8 +29,17 @@ const rootOf = () => rootOverride ?? ROOT;
 const read = (p) => readFileSync(join(rootOf(), p), 'utf8');
 const dirsIn = (p) =>
   readdirSync(join(rootOf(), p), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
-const filesIn = (p) =>
-  readdirSync(join(rootOf(), p), { withFileTypes: true }).filter((e) => e.isFile()).map((e) => e.name);
+// HIGH-HANDS fork: this repo deliberately ships without .github/workflows/
+// (CI definitions — see the import commit), so a missing directory counts
+// as zero files instead of crashing inventory facts during npm postinstall.
+const filesIn = (p) => {
+  try {
+    return readdirSync(join(rootOf(), p), { withFileTypes: true }).filter((e) => e.isFile()).map((e) => e.name);
+  } catch (error) {
+    if (error && (error.code === 'ENOENT' || error.code === 'ENOTDIR')) return [];
+    throw error;
+  }
+};
 const entriesIn = (p) => readdirSync(join(rootOf(), p), { withFileTypes: true }).map((e) => e.name);
 const parseJson = (p) => JSON.parse(read(p));
 
