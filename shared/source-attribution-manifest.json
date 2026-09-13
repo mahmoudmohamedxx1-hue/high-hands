@@ -20,6 +20,9 @@
           "path": "src/components/LiveNewsPanel.ts"
         },
         {
+          "path": "src/components/LiveWebcamsPanel.ts"
+        },
+        {
           "path": "src/services/runtime.ts"
         }
       ]
@@ -45,15 +48,10 @@
       "host": "247preview.foxnews.com",
       "provider": "247preview.foxnews.com",
       "kind": "feed",
-      "observed": true,
+      "observed": false,
       "license": "Excluded: live-video playback transport; channel/provider terms apply separately",
       "attribution": "Excluded from the external-provider count: presentation-only HLS stream, not an ingested dataset.",
-      "status": "excluded",
-      "references": [
-        {
-          "path": "src/components/LiveNewsPanel.ts"
-        }
-      ]
+      "status": "excluded"
     },
     {
       "host": "36kr.com",
@@ -149,15 +147,10 @@
       "host": "abc-iview-mediapackagestreams-2.akamaized.net",
       "provider": "abc-iview-mediapackagestreams-2.akamaized.net",
       "kind": "feed",
-      "observed": true,
+      "observed": false,
       "license": "Excluded: live-video playback transport; channel/provider terms apply separately",
       "attribution": "Excluded from the external-provider count: presentation-only HLS stream, not an ingested dataset.",
-      "status": "excluded",
-      "references": [
-        {
-          "path": "src/components/LiveNewsPanel.ts"
-        }
-      ]
+      "status": "excluded"
     },
     {
       "host": "abplivetv.pc.cdn.bitgravity.com",
@@ -1433,9 +1426,6 @@
           "path": "src/app/desktop-updater.ts"
         },
         {
-          "path": "src/components/UnifiedSettings.ts"
-        },
-        {
           "path": "src/mcp-grant-main.ts"
         },
         {
@@ -1733,15 +1723,10 @@
       "host": "av.alarabiya.net",
       "provider": "av.alarabiya.net",
       "kind": "feed",
-      "observed": true,
+      "observed": false,
       "license": "Excluded: live-video playback transport; channel/provider terms apply separately",
       "attribution": "Excluded from the external-provider count: presentation-only HLS stream, not an ingested dataset.",
-      "status": "excluded",
-      "references": [
-        {
-          "path": "src/components/LiveNewsPanel.ts"
-        }
-      ]
+      "status": "excluded"
     },
     {
       "host": "ayibopost.com",
@@ -2105,15 +2090,10 @@
       "host": "cbcnewshd-f.akamaihd.net",
       "provider": "cbcnewshd-f.akamaihd.net",
       "kind": "feed",
-      "observed": true,
+      "observed": false,
       "license": "Excluded: live-video playback transport; channel/provider terms apply separately",
       "attribution": "Excluded from the external-provider count: presentation-only HLS stream, not an ingested dataset.",
-      "status": "excluded",
-      "references": [
-        {
-          "path": "src/components/LiveNewsPanel.ts"
-        }
-      ]
+      "status": "excluded"
     },
     {
       "host": "cbinsights.com",
@@ -2133,15 +2113,10 @@
       "host": "cbsn-us.cbsnstream.cbsnews.com",
       "provider": "cbsn-us.cbsnstream.cbsnews.com",
       "kind": "feed",
-      "observed": true,
+      "observed": false,
       "license": "Excluded: live-video playback transport; channel/provider terms apply separately",
       "attribution": "Excluded from the external-provider count: presentation-only HLS stream, not an ingested dataset.",
-      "status": "excluded",
-      "references": [
-        {
-          "path": "src/components/LiveNewsPanel.ts"
-        }
-      ]
+      "status": "excluded"
     },
     {
       "host": "cdc.gov",
@@ -2741,15 +2716,10 @@
       "host": "dai2.xumo.com",
       "provider": "dai2.xumo.com",
       "kind": "feed",
-      "observed": true,
+      "observed": false,
       "license": "Excluded: live-video playback transport; channel/provider terms apply separately",
       "attribution": "Excluded from the external-provider count: presentation-only HLS stream, not an ingested dataset.",
-      "status": "excluded",
-      "references": [
-        {
-          "path": "src/components/LiveNewsPanel.ts"
-        }
-      ]
+      "status": "excluded"
     },
     {
       "host": "dailytrust.com",
@@ -3321,6 +3291,9 @@
         },
         {
           "path": "scripts/seed-earthquakes.mjs"
+        },
+        {
+          "path": "server/worldmonitor/seismology/v1/list-earthquakes.ts"
         }
       ]
     },
@@ -5078,15 +5051,10 @@
       "host": "indiatodaylive.akamaized.net",
       "provider": "indiatodaylive.akamaized.net",
       "kind": "feed",
-      "observed": true,
+      "observed": false,
       "license": "Excluded: live-video playback transport; channel/provider terms apply separately",
       "attribution": "Excluded from the external-provider count: presentation-only HLS stream, not an ingested dataset.",
-      "status": "excluded",
-      "references": [
-        {
-          "path": "src/components/LiveNewsPanel.ts"
-        }
-      ]
+      "status": "excluded"
     },
     {
       "host": "insideclimatenews.org",
@@ -5408,15 +5376,10 @@
       "host": "kan11.media.kan.org.il",
       "provider": "kan11.media.kan.org.il",
       "kind": "feed",
-      "observed": true,
+      "observed": false,
       "license": "Excluded: live-video playback transport; channel/provider terms apply separately",
       "attribution": "Excluded from the external-provider count: presentation-only HLS stream, not an ingested dataset.",
-      "status": "excluded",
-      "references": [
-        {
-          "path": "src/components/LiveNewsPanel.ts"
-        }
-      ]
+      "status": "excluded"
     },
     {
       "host": "kathimerini.gr",
@@ -5595,15 +5558,10 @@
       "host": "linear901-oo-hls0-prd-gtm.delivery.skycdp.com",
       "provider": "linear901-oo-hls0-prd-gtm.delivery.skycdp.com",
       "kind": "feed",
-      "observed": true,
+      "observed": false,
       "license": "Excluded: live-video playback transport; channel/provider terms apply separately",
       "attribution": "Excluded from the external-provider count: presentation-only HLS stream, not an ingested dataset.",
-      "status": "excluded",
-      "references": [
-        {
-          "path": "src/components/LiveNewsPanel.ts"
-        }
-      ]
+      "status": "excluded"
     },
     {
       "host": "linearstatus.com",
@@ -5651,15 +5609,10 @@
       "host": "live-hls-web-aja.getaj.net",
       "provider": "live-hls-web-aja.getaj.net",
       "kind": "feed",
-      "observed": true,
+      "observed": false,
       "license": "Excluded: live-video playback transport; channel/provider terms apply separately",
       "attribution": "Excluded from the external-provider count: presentation-only HLS stream, not an ingested dataset.",
-      "status": "excluded",
-      "references": [
-        {
-          "path": "src/components/LiveNewsPanel.ts"
-        }
-      ]
+      "status": "excluded"
     },
     {
       "host": "live-hls-web-ajb.getaj.net",
@@ -5693,15 +5646,10 @@
       "host": "live-stream.skynewsarabia.com",
       "provider": "live-stream.skynewsarabia.com",
       "kind": "feed",
-      "observed": true,
+      "observed": false,
       "license": "Excluded: live-video playback transport; channel/provider terms apply separately",
       "attribution": "Excluded from the external-provider count: presentation-only HLS stream, not an ingested dataset.",
-      "status": "excluded",
-      "references": [
-        {
-          "path": "src/components/LiveNewsPanel.ts"
-        }
-      ]
+      "status": "excluded"
     },
     {
       "host": "live.alarabiya.net",
@@ -5738,15 +5686,10 @@
       "host": "liveedge-arisenews.visioncdn.com",
       "provider": "liveedge-arisenews.visioncdn.com",
       "kind": "feed",
-      "observed": true,
+      "observed": false,
       "license": "Excluded: live-video playback transport; channel/provider terms apply separately",
       "attribution": "Excluded from the external-provider count: presentation-only HLS stream, not an ingested dataset.",
-      "status": "excluded",
-      "references": [
-        {
-          "path": "src/components/LiveNewsPanel.ts"
-        }
-      ]
+      "status": "excluded"
     },
     {
       "host": "livenewschat.eu",
@@ -5766,15 +5709,10 @@
       "host": "lnc-abc-news.tubi.video",
       "provider": "lnc-abc-news.tubi.video",
       "kind": "feed",
-      "observed": true,
+      "observed": false,
       "license": "Excluded: live-video playback transport; channel/provider terms apply separately",
       "attribution": "Excluded from the external-provider count: presentation-only HLS stream, not an ingested dataset.",
-      "status": "excluded",
-      "references": [
-        {
-          "path": "src/components/LiveNewsPanel.ts"
-        }
-      ]
+      "status": "excluded"
     },
     {
       "host": "lobste.rs",
@@ -5813,6 +5751,9 @@
         },
         {
           "path": "src/components/LiveNewsPanel.ts"
+        },
+        {
+          "path": "src/components/LiveWebcamsPanel.ts"
         },
         {
           "path": "src/services/desktop-runtime.ts"
@@ -6300,15 +6241,10 @@
       "host": "ndtvindiaelemarchana.akamaized.net",
       "provider": "ndtvindiaelemarchana.akamaized.net",
       "kind": "feed",
-      "observed": true,
+      "observed": false,
       "license": "Excluded: live-video playback transport; channel/provider terms apply separately",
       "attribution": "Excluded from the external-provider count: presentation-only HLS stream, not an ingested dataset.",
-      "status": "excluded",
-      "references": [
-        {
-          "path": "src/components/LiveNewsPanel.ts"
-        }
-      ]
+      "status": "excluded"
     },
     {
       "host": "news.cgtn.com",
@@ -6537,15 +6473,10 @@
       "host": "nhkwlive-ojp.akamaized.net",
       "provider": "nhkwlive-ojp.akamaized.net",
       "kind": "feed",
-      "observed": true,
+      "observed": false,
       "license": "Excluded: live-video playback transport; channel/provider terms apply separately",
       "attribution": "Excluded from the external-provider count: presentation-only HLS stream, not an ingested dataset.",
-      "status": "excluded",
-      "references": [
-        {
-          "path": "src/components/LiveNewsPanel.ts"
-        }
-      ]
+      "status": "excluded"
     },
     {
       "host": "noaadata.apps.nsidc.org",
@@ -8802,15 +8733,10 @@
       "host": "tagesschau.akamaized.net",
       "provider": "tagesschau.akamaized.net",
       "kind": "feed",
-      "observed": true,
+      "observed": false,
       "license": "Excluded: live-video playback transport; channel/provider terms apply separately",
       "attribution": "Excluded from the external-provider count: presentation-only HLS stream, not an ingested dataset.",
-      "status": "excluded",
-      "references": [
-        {
-          "path": "src/components/LiveNewsPanel.ts"
-        }
-      ]
+      "status": "excluded"
     },
     {
       "host": "taipeitimes.com",
@@ -9546,29 +9472,19 @@
       "host": "turnerlive.warnermediacdn.com",
       "provider": "turnerlive.warnermediacdn.com",
       "kind": "feed",
-      "observed": true,
+      "observed": false,
       "license": "Excluded: live-video playback transport; channel/provider terms apply separately",
       "attribution": "Excluded from the external-provider count: presentation-only HLS stream, not an ingested dataset.",
-      "status": "excluded",
-      "references": [
-        {
-          "path": "src/components/LiveNewsPanel.ts"
-        }
-      ]
+      "status": "excluded"
     },
     {
       "host": "tv-trtworld.medya.trt.com.tr",
       "provider": "tv-trtworld.medya.trt.com.tr",
       "kind": "feed",
-      "observed": true,
+      "observed": false,
       "license": "Excluded: live-video playback transport; channel/provider terms apply separately",
       "attribution": "Excluded from the external-provider count: presentation-only HLS stream, not an ingested dataset.",
-      "status": "excluded",
-      "references": [
-        {
-          "path": "src/components/LiveNewsPanel.ts"
-        }
-      ]
+      "status": "excluded"
     },
     {
       "host": "tvn24.pl",
@@ -9882,15 +9798,10 @@
       "host": "vs-hls-push-uk.live.fastly.md.bbci.co.uk",
       "provider": "vs-hls-push-uk.live.fastly.md.bbci.co.uk",
       "kind": "feed",
-      "observed": true,
+      "observed": false,
       "license": "Excluded: live-video playback transport; channel/provider terms apply separately",
       "attribution": "Excluded from the external-provider count: presentation-only HLS stream, not an ingested dataset.",
-      "status": "excluded",
-      "references": [
-        {
-          "path": "src/components/LiveNewsPanel.ts"
-        }
-      ]
+      "status": "excluded"
     },
     {
       "host": "vsquare.org",
@@ -10466,6 +10377,9 @@
       "status": "terms-review",
       "references": [
         {
+          "path": "src/components/LiveNewsPanel.ts"
+        },
+        {
           "path": "src/config/feeds.ts"
         }
       ]
@@ -10498,6 +10412,9 @@
       "references": [
         {
           "path": "server/worldmonitor/news/v1/_feeds.ts"
+        },
+        {
+          "path": "src/components/LiveNewsPanel.ts"
         },
         {
           "path": "src/config/feeds.ts"
@@ -10769,6 +10686,20 @@
       "references": [
         {
           "path": "scripts/seo-indexnow-submit.mjs"
+        }
+      ]
+    },
+    {
+      "host": "www.bloomberg.com",
+      "provider": "www.bloomberg.com",
+      "kind": "feed",
+      "observed": true,
+      "license": "Excluded: live-video playback transport; channel/provider terms apply separately",
+      "attribution": "Excluded from the external-provider count: presentation-only HLS stream, not an ingested dataset.",
+      "status": "excluded",
+      "references": [
+        {
+          "path": "src/components/LiveNewsPanel.ts"
         }
       ]
     },
@@ -11531,6 +11462,9 @@
           "path": "server/worldmonitor/news/v1/_feeds.ts"
         },
         {
+          "path": "src/components/LiveNewsPanel.ts"
+        },
+        {
           "path": "src/config/feeds.ts"
         },
         {
@@ -11671,6 +11605,9 @@
       "references": [
         {
           "path": "server/worldmonitor/news/v1/_feeds.ts"
+        },
+        {
+          "path": "src/components/LiveNewsPanel.ts"
         },
         {
           "path": "src/config/feeds.ts"

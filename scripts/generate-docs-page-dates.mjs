@@ -39,9 +39,38 @@ function listDocFiles() {
 }
 
 function latestCommitDates() {
-  const isShallow = () => execFileSync('git', ['rev-parse', '--is-shallow-repository'], {
-    cwd: ROOT, encoding: 'utf8',
-  }).trim() === 'true';
+  const generatedPath = join(ROOT, OUTPUT);
+  const useCommittedDates = () => {
+    if (!existsSync(generatedPath)) return null;
+    const dates = new Map();
+    const source = readFileSync(generatedPath, 'utf8');
+    for (const match of source.matchAll(/\x20{2}("(?:[^"\\]|\\.)*"): ("\\d{4}-\\d{2}-\\d{2}"),/g)) {
+      dates.set(JSON.parse(match[1]), JSON.parse(match[2]));
+    }
+    return dates.size > 0 ? dates : null;
+  };
+  // Vercel deployments do not guarantee a usable .git directory. The
+  // generated manifest is committed, so use it before probing git there.
+  if (process.env.VERCEL || process.env.CI) {
+    const committedDates = useCommittedDates();
+    if (committedDates) return committedDates;
+  }
+  let gitAvailable = true;
+  const isShallow = () => {
+    try {
+      return execFileSync('git', ['rev-parse', '--is-shallow-repository'], {
+        cwd: ROOT, encoding: 'utf8',
+      }).trim() === 'true';
+    } catch (error) {
+      gitAvailable = false;
+      if (process.env.VERCEL || process.env.CI) return false;
+      throw error;
+    }
+  };
+  if (!gitAvailable && (process.env.VERCEL || process.env.CI)) {
+    const committedDates = useCommittedDates();
+    if (committedDates) return committedDates;
+  }
   if (isShallow() && FETCH_HISTORY) {
     const sha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim();
     const remotes = execFileSync('git', ['remote'], { cwd: ROOT, encoding: 'utf8' }).trim().split('\n');
