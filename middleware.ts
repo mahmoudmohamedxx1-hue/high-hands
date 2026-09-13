@@ -1,0 +1,466 @@
+import { isKnownPublicPagePath, originNotFoundResponse } from './src/config/agent-not-found';
+import {
+  DOCS_UPSTREAM_ORIGIN,
+  DOCS_UPSTREAM_TIMEOUT_MS,
+  isDocsFullDocumentRequest,
+  isDocsHtmlDocumentPath,
+  rewriteDocsLocaleHtml,
+  shouldTransformDocsUpstreamHtml,
+} from './src/config/docs-locale-seo';
+import { getRootlessDocsDestination } from './src/config/docs-root-redirects';
+import agentRequestPolicy from './shared/agent-request-policy.json';
+
+const AGENT_UA = new RegExp(`(?:^|[^a-z0-9-])(?:${agentRequestPolicy.userAgents.join('|')})(?:$|[^a-z0-9-])`, 'i');
+
+const BOT_UA =
+  /bot|crawl|spider|slurp|archiver|wget|curl\/|python-requests|scrapy|httpclient|go-http|java\/|libwww|perl|ruby|php\/|ahrefsbot|semrushbot|mj12bot|dotbot|baiduspider|yandexbot|sogou|bytespider|petalbot|gptbot|claudebot|ccbot/i;
+
+const SOCIAL_PREVIEW_UA =
+  /twitterbot|facebookexternalhit|linkedinbot|slackbot|telegrambot|whatsapp|discordbot|redditbot/i;
+
+const SOCIAL_PREVIEW_PATHS = new Set(['/api/story', '/api/og-story']);
+const LEGACY_DASHBOARD_ROOT_QUERY_KEYS = ['lat', 'lon', 'zoom', 'view', 'timeRange', 'layers'] as const;
+const UNBOUNDED_DASHBOARD_ROOT_QUERY_KEYS = ['lat', 'lon', 'zoom'] as const;
+
+// Paths that bypass bot/script UA filtering below. Each must carry its own
+// auth (API key, shared secret, or intentionally-public semantics) because
+// this list disables the middleware's generic bot gate.
+// - /api/version, /api/health: intentionally public, monitoring-friendly.
+// - /api/seed-contract-probe: requires RELAY_SHARED_SECRET header; called by
+//   UptimeRobot + ops curl. Was blocked by the curl/bot UA regex before this
+//   exception landed (Vercel log 2026-04-15: "Middleware 403 Forbidden" on
+//   /api/seed-contract-probe).
+// - /api/internal/brief-why-matters: requires RELAY_SHARED_SECRET Bearer
+//   (subtle-crypto HMAC timing-safe compare in server/_shared/internal-auth.ts).
+//   Called from the Railway digest-notifications cron whose fetch() uses the
+//   Node undici default UA, which is short enough to trip the "no UA or
+//   suspiciously short" 403 below (Railway log 2026-04-21 post-#3248 merge:
+//   every cron call returned 403 and silently fell back to legacy Gemini).
+// - /api/llms.txt: static, intentionally-public agent-discovery document
+//   (the section-level llms.txt for the developer/API surface, served from
+//   public/api/llms.txt). It MUST bypass the bot gate — AI crawlers (ClaudeBot,
+//   GPTBot, PerplexityBot, CCBot, …) are the entire audience for an llms.txt,
+//   yet every one of those UAs matches BOT_UA and would otherwise 403.
+// - /api/product-catalog: public read-only pricing catalog (Redis-cached,
+//   keyless, advertised as service-meta in /.well-known/api-catalog). Agents
+//   evaluating the product are a primary audience; an agent-journey run (#4854)
+//   got 403 here and concluded the endpoint didn't exist.
+// - /api/download.md: curated static markdown twin of GET /api/download.
+//   Kept on the exact allowlist so a future glob refactor cannot drop the
+//   sampled URL. All other GET/HEAD /api/**/*.md twins bypass via
+//   isPublicApiMarkdownTwin() below — the protocol is site-wide .md twins,
+//   not one sampled path.
+const PUBLIC_API_PATHS = new Set([
+  '/api/version',
+  '/api/health',
+  '/api/seed-contract-probe',
+  '/api/internal/brief-why-matters',
+  '/api/llms.txt',
+  '/api/product-catalog',
+  '/api/download.md',
+]);
+
+function isPublicApiMarkdownTwin(pathname: string, method: string): boolean {
+  if (method !== 'GET' && method !== 'HEAD') return false;
+  if (!pathname.startsWith('/api/') || !pathname.endsWith('.md')) return false;
+  if (pathname.includes('..') || pathname.includes('//')) return false;
+  return pathname.length > '/api/.md'.length;
+}
+
+const SOCIAL_IMAGE_UA =
+  /Slack-ImgProxy|Slackbot|twitterbot|facebookexternalhit|linkedinbot|telegrambot|whatsapp|discordbot|redditbot/i;
+
+// Must match the exact route shape enforced by
+// api/brief/carousel/[userId]/[issueDate]/[page].ts:
+//   /api/brief/carousel/<userId>/YYYY-MM-DD-HHMM/<0|1|2>
+// The issueDate segment is a per-run slot (date + HHMM in the user's
+// tz) so same-day digests produce distinct carousel URLs.
+// pageFromIndex() in brief-carousel-render.ts accepts only 0/1/2, so
+// the trailing segment is tightly bounded.
+const BRIEF_CAROUSEL_PATH_RE =
+  /^\/api\/brief\/carousel\/[^/]+\/\d{4}-\d{2}-\d{2}-\d{4}\/[0-2]\/?$/;
+
+const VARIANT_HOST_MAP: Record<string, string> = {
+  'tech.worldmonitor.app': 'tech',
+  'finance.worldmonitor.app': 'finance',
+  'commodity.worldmonitor.app': 'commodity',
+  'happy.worldmonitor.app': 'happy',
+  'energy.worldmonitor.app': 'energy',
+};
+
+function normalizeHost(raw: string): string {
+  return raw.toLowerCase().replace(/:\d+$/, '');
+}
+
+function hasLegacyDashboardRootState(searchParams: URLSearchParams): boolean {
+  return LEGACY_DASHBOARD_ROOT_QUERY_KEYS.some((key) => searchParams.has(key));
+}
+
+function hasUnboundedDashboardRootState(searchParams: URLSearchParams): boolean {
+  return UNBOUNDED_DASHBOARD_ROOT_QUERY_KEYS.some((key) => searchParams.has(key));
+}
+
+function clientAcceptsSse(request: Request): boolean {
+  const accept = request.headers.get('accept') ?? '';
+  return accept.split(',').some((entry) => {
+    const [type, ...params] = entry.split(';').map((part) => part.trim().toLowerCase());
+    if (type !== 'text/event-stream') return false;
+    const qParam = params.find((part) => part.startsWith('q='));
+    if (!qParam) return true;
+    const q = Number(qParam.slice(2));
+    return Number.isFinite(q) && q > 0;
+  });
+}
+
+/** Query keys that create duplicate index entries without changing document identity. */
+const INDEX_NOISE_QUERY_KEYS = new Set([
+  'ref',
+  'wm_referral',
+  'utm_source',
+  'utm_medium',
+  'utm_campaign',
+  'utm_content',
+  'utm_term',
+]);
+
+/**
+ * The one URL a crawler should be spending its budget on for this request, or
+ * null when it already asked for it.
+ *
+ * Two collapses, applied together so a URL carrying both costs one hop:
+ *
+ *  - Index-noise query keys (`ref`, `wm_referral`, `utm_*`) are dropped. They
+ *    change nothing about document identity (#7380).
+ *  - A legacy root deep link (`/?lat=…&zoom=…&layers=…`) becomes the
+ *    param-free `/dashboard`. That query is map state, and any lat/lon/zoom/
+ *    layer combination is a distinct URL, so forwarding it into the redirect
+ *    published an unbounded redirect space: Search Console's "Page with
+ *    redirect" bucket grew 199 -> 1,271 in three months, 301 of the exported
+ *    URLs being map states (#7660). `/dashboard` is already the rel=canonical
+ *    for every one of them, so a crawler loses nothing by going straight there.
+ *    Note this collapse reaches www only: Vercel applies vercel.json
+ *    `redirects` before middleware, and the variant hosts have their own
+ *    `/` -> `/dashboard` host redirect, so on those hosts robots.variant.txt
+ *    is what keeps a crawler off the space (probed against production).
+ *
+ * Humans are deliberately excluded from the second collapse — the params are
+ * what makes a shared or bookmarked legacy link open the view it encodes, and
+ * they still reach `/dashboard` with the state intact below. That split is why
+ * the redirect built from this must carry `Vary: User-Agent` and no-store.
+ *
+ * The caller gates this on BOT_UA, which is broader than "search crawler" — it
+ * also matches generic HTTP clients (curl, python-requests, wget). Accepted:
+ * map state only renders in a JS-executing browser, so a script fetching
+ * `/?lat=…` receives the same SPA shell either way, and the user-triggered
+ * assistant agents (ChatGPT-User, Claude-User, Perplexity-User) do not match
+ * BOT_UA at all — they take the human branch and keep the state.
+ */
+function crawlerCanonicalUrl(url: URL): URL | null {
+  let changed = false;
+  const next = new URL(url);
+  for (const key of [...next.searchParams.keys()]) {
+    if (INDEX_NOISE_QUERY_KEYS.has(key) || key.toLowerCase().startsWith('utm_')) {
+      next.searchParams.delete(key);
+      changed = true;
+    }
+  }
+  if (next.pathname === '/' && hasUnboundedDashboardRootState(next.searchParams)) {
+    next.pathname = '/dashboard';
+    for (const key of LEGACY_DASHBOARD_ROOT_QUERY_KEYS) {
+      next.searchParams.delete(key);
+    }
+    changed = true;
+  }
+  return changed ? next : null;
+}
+/**
+ * Headers for a 308 whose Location was chosen by User-Agent.
+ *
+ * `Cache-Control` alone is not enough at this edge: vercel.json gives `/` a
+ * `CDN-Cache-Control` / `Vercel-CDN-Cache-Control` of `public, s-maxage=600`,
+ * and those take priority over `Cache-Control` for the shared cache — so the
+ * CDN could store one User-Agent's Location and replay it to the other for ten
+ * minutes, silently undoing the split. Every layer that could store this
+ * response has to be told not to, and `Vary` alone cannot protect a sibling
+ * response that omitted it (RFC 9111).
+ */
+function uaConditionedRedirectHeaders(location: URL): Record<string, string> {
+  return {
+    Location: location.toString(),
+    Vary: 'User-Agent',
+    'Cache-Control': 'private, no-store',
+    'CDN-Cache-Control': 'no-store',
+    'Vercel-CDN-Cache-Control': 'no-store',
+  };
+}
+
+export default function middleware(request: Request) {
+  const url = new URL(request.url);
+  const ua = request.headers.get('user-agent') ?? '';
+  const path = url.pathname;
+  const host = normalizeHost(request.headers.get('host') ?? url.hostname);
+
+  // Bots indexing ?ref= / utm_* dashboard URLs as distinct pages (#7380), and
+  // map-state deep links as an unbounded redirect space (#7660). Humans still
+  // receive both so referral-capture, analytics, and shared map views keep
+  // working; crawlers are 308'd to the clean canonical document URL.
+  if (
+    (request.method === 'GET' || request.method === 'HEAD') &&
+    !path.startsWith('/api/') &&
+    BOT_UA.test(ua)
+  ) {
+    const cleaned = crawlerCanonicalUrl(url);
+    if (cleaned) {
+      // Built by hand rather than via Response.redirect() so the response can
+      // carry Vary + no-store. This redirect is decided by User-Agent; a 308
+      // is cacheable by default (RFC 9110 §15.4.9). Without those headers a
+      // crawler can warm the tagged URL and a shared edge cache can replay
+      // the clean Location to a human, stripping `ref` before referral capture
+      // or dropping the map state out of a shared link (#7660).
+      return new Response(null, { status: 308, headers: uaConditionedRedirectHeaders(cleaned) });
+    }
+  }
+
+  // Human path for the same legacy root deep links. Crawlers never reach here
+  // — crawlerCanonicalUrl() above already sent them to the param-free
+  // /dashboard — so this branch keeps the query string, which is the whole
+  // point of a shared or bookmarked map link.
+  //
+  // Built by hand rather than via Response.redirect() so it can carry Vary. The
+  // same request URL now yields two different Locations depending on the
+  // User-Agent, and a 308 is cacheable by default (RFC 9110 §15.4.9): a shared
+  // cache that stored this one without Vary would replay `/dashboard?<map
+  // state>` to the crawler the branch above exists to keep off that URL. This
+  // is the rule docs/solutions/integration-issues/mcp-crawler-get-and-method-
+  // aware-canonical-redirects.md states: cacheable(response) implies Vary
+  // covers every header the branch read.
+  if (path === '/' && hasLegacyDashboardRootState(url.searchParams)) {
+    const dashboardUrl = new URL(request.url);
+    dashboardUrl.pathname = '/dashboard';
+    return new Response(null, { status: 308, headers: uaConditionedRedirectHeaders(dashboardUrl) });
+  }
+
+  if (
+    path === '/' &&
+    (host === 'www.worldmonitor.app' || host === 'worldmonitor.app') &&
+    (request.method === 'GET' || request.method === 'HEAD') &&
+    url.searchParams.get('mode') !== 'agent' &&
+    AGENT_UA.test(ua)
+  ) {
+    return new Response(null, {
+      headers: {
+        'x-middleware-rewrite': new URL('/home.md', url).toString(),
+        'Content-Type': 'text/markdown; charset=utf-8',
+        Vary: 'User-Agent',
+        'Cache-Control': 'private, no-store',
+        'CDN-Cache-Control': 'no-store',
+        'Vercel-CDN-Cache-Control': 'no-store',
+      },
+    });
+  }
+
+  if (request.method === 'GET' || request.method === 'HEAD') {
+    const docsDestination = getRootlessDocsDestination(path);
+    if (docsDestination) {
+      const canonicalUrl = new URL(docsDestination);
+      canonicalUrl.search = url.search;
+      return Response.redirect(canonicalUrl.toString(), 308);
+    }
+
+    // Mintlify rewrite cannot set zh-Hans <html lang> or reciprocal hreflang
+    // for /docs/zh/* (issue #7378). Proxy full-document HTML only — leave RSC
+    // flights and static assets on the direct Mintlify rewrite.
+    if (isDocsHtmlDocumentPath(path) && isDocsFullDocumentRequest(request)) {
+      return proxyDocsLocaleHtml(request, url);
+    }
+
+    // Real HTTP 404 for unknown pages. Agents get markdown (orank
+    // `agent-friendly-404`); browsers that send Accept: text/html get HTML.
+    // A rewrite to a static file would 200. Files with extensions skip this
+    // matcher and fall through to public/404.html.
+    if (!isKnownPublicPagePath(path)) {
+      return originNotFoundResponse(path, request);
+    }
+  }
+
+  // Variant subdomain MCP discovery canonicalization. The MCP endpoint's
+  // canonical URL is apex (`https://worldmonitor.app/mcp`), and the Cloudflare
+  // apex→www redirect explicitly exempts `/mcp` so POST JSON-RPC calls aren't
+  // converted to GET. Variant subdomains would otherwise serve the same `/mcp`
+  // content as the apex, fragmenting discovery signals; redirect plain GET/HEAD
+  // requests to the apex canonical. GETs that carry MCP transport headers
+  // (`Last-Event-ID` or `Accept: text/event-stream`) are NOT redirected — they
+  // are protocol operations (SSE stream open or replay) and must reach the same
+  // host/instance that handled the POST handshake. POST/OPTIONS/etc. are also
+  // NOT redirected; they continue to the `/api/mcp` rewrite unchanged.
+  if (
+    path === '/mcp' &&
+    (request.method === 'GET' || request.method === 'HEAD') &&
+    VARIANT_HOST_MAP[host] &&
+    !request.headers.get('last-event-id') &&
+    !clientAcceptsSse(request)
+  ) {
+    // Built by hand rather than via Response.redirect() so the response can
+    // carry Vary. This redirect is decided by Accept and Last-Event-ID, and a
+    // 308 is cacheable by default (RFC 9110 §15.4.9) — without Vary a shared
+    // cache could store it and replay it to the SSE stream-open GET that must
+    // reach this host's transport instead.
+    return new Response(null, {
+      status: 308,
+      headers: {
+        Location: 'https://worldmonitor.app/mcp',
+        Vary: 'Accept, Last-Event-ID',
+        'Cache-Control': 'public, max-age=3600',
+      },
+    });
+  }
+
+  // Only apply bot filtering to /api/* paths.
+  //
+  // /favico/* is deliberately NOT gated: it serves public static brand
+  // assets (favicons, app icons, the email logo) that must be retrievable
+  // by ANY client — browsers, email clients and their image proxies, link
+  // unfurlers, preview scrapers. Bot-gating it broke the logo in
+  // transactional emails when a client/proxy fetched with a script-like UA
+  // (the same reason Cloudflare's "Block API Bots" rule was narrowed to
+  // /api/* only). /favico/* is also removed from the matcher below so the
+  // middleware never runs on it.
+  if (!path.startsWith('/api/')) {
+    return;
+  }
+
+  // Allow social preview/image bots on OG image assets.
+  //
+  // Image-returning API routes that don't end in `.png` also need
+  // an explicit carve-out — otherwise server-side fetches from
+  // Slack / Telegram / Discord / LinkedIn / WhatsApp / Facebook /
+  // Twitter / Reddit all trip the BOT_UA gate below. Telegram
+  // surfaces it as error 400 "WEBPAGE_CURL_FAILED" on sendMediaGroup;
+  // the others silently drop the preview image.
+  //
+  // Only the brief carousel route shape is allowlisted — a strict
+  // regex (same shape enforced by the handler) prevents a future
+  // /api/brief/carousel/admin or similar sibling from accidentally
+  // inheriting this bypass. HMAC token in the URL is the real auth;
+  // this allowlist is defence-in-depth for any well-shaped request
+  // whose UA happens to be in SOCIAL_IMAGE_UA.
+  if (
+    path.endsWith('.png') ||
+    BRIEF_CAROUSEL_PATH_RE.test(path)
+  ) {
+    if (SOCIAL_IMAGE_UA.test(ua)) {
+      return;
+    }
+  }
+
+  // Allow social preview bots on exact OG routes only
+  if (SOCIAL_PREVIEW_UA.test(ua) && SOCIAL_PREVIEW_PATHS.has(path)) {
+    return;
+  }
+
+  // Public endpoints bypass all bot filtering
+  if (PUBLIC_API_PATHS.has(path) || isPublicApiMarkdownTwin(path, request.method)) {
+    return;
+  }
+
+  // Authenticated Pro API clients bypass UA filtering. This is a cheap
+  // edge heuristic, not auth — real validation (SHA-256 hash vs Convex
+  // userApiKeys + entitlement) happens in server/gateway.ts. To keep the
+  // bot-UA shield meaningful, require the `wm_` prefix plus 40–64 lowercase
+  // hex chars. User keys are 40 hex chars; enterprise keys may be longer.
+  // A random scraper would still have to guess this format, and spoofed-but-
+  // well-shaped keys still 401 at the gateway.
+  const WM_KEY_SHAPE = /^wm_[a-f0-9]{40,64}$/;
+  const apiKey =
+    request.headers.get('x-worldmonitor-key') ??
+    request.headers.get('x-api-key') ??
+    '';
+  if (WM_KEY_SHAPE.test(apiKey)) {
+    return;
+  }
+
+  if (BOT_UA.test(ua) || !ua || ua.length < 10) {
+    return Response.json(agentRequestPolicy.blockedResponse, {
+      status: 403,
+      headers: {
+        'Cache-Control': 'no-store',
+        'CDN-Cache-Control': 'no-store',
+        'X-Content-Type-Options': 'nosniff',
+      },
+    });
+  }
+}
+
+async function proxyDocsLocaleHtml(request: Request, url: URL): Promise<Response> {
+  const upstreamUrl = `${DOCS_UPSTREAM_ORIGIN}${url.pathname}${url.search}`;
+  const forwardHeaders = new Headers();
+  for (const name of ['accept', 'accept-language', 'user-agent', 'if-none-match', 'if-modified-since']) {
+    const value = request.headers.get(name);
+    if (value) forwardHeaders.set(name, value);
+  }
+  if (!forwardHeaders.has('user-agent')) {
+    forwardHeaders.set('user-agent', 'WorldMonitorDocsLocaleProxy/1.0');
+  }
+
+  let upstream: Response;
+  let html: string;
+  try {
+    upstream = await fetch(upstreamUrl, {
+      method: request.method,
+      headers: forwardHeaders,
+      redirect: 'manual',
+      signal: AbortSignal.timeout(DOCS_UPSTREAM_TIMEOUT_MS),
+    });
+
+    // Pass through redirects / not-modified without rewriting.
+    if (upstream.status >= 300 && upstream.status < 400) {
+      return upstream;
+    }
+    if (upstream.status === 304 || request.method === 'HEAD') {
+      return upstream;
+    }
+
+    const contentType = upstream.headers.get('content-type');
+    if (!shouldTransformDocsUpstreamHtml(url.pathname, contentType)) {
+      return upstream;
+    }
+
+    html = await upstream.text();
+  } catch {
+    return new Response('Docs upstream unavailable', { status: 502 });
+  }
+
+  const rewritten = rewriteDocsLocaleHtml(html, url.pathname);
+  const headers = new Headers(upstream.headers);
+  // Fetch already decoded the body; hop-by-hop / recomputed framing must not
+  // be forwarded onto the rewritten string response (Mintlify serves br).
+  for (const name of ['content-encoding', 'content-length', 'transfer-encoding', 'connection']) {
+    headers.delete(name);
+  }
+  headers.set('x-wm-docs-locale-seo', '1');
+  // Ensure shared caches vary on the headers that select this proxy path.
+  const vary = headers.get('vary');
+  const varyParts = new Set(
+    (vary ? vary.split(',') : [])
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .map((part) => part.toLowerCase()),
+  );
+  varyParts.add('accept');
+  varyParts.add('rsc');
+  headers.set('vary', [...varyParts].join(', '));
+
+  return new Response(rewritten, {
+    status: upstream.status,
+    statusText: upstream.statusText,
+    headers,
+  });
+}
+
+export const config = {
+  matcher: [
+    '/mcp',
+    '/api/:path*',
+    '/((?!api(?:/|$)|mcp(?:/|$)|.*\\.[^/]+$).*)',
+  ],
+};
