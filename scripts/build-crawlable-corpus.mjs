@@ -103,6 +103,18 @@ const OBSERVATION_PERIOD_RE = /^\d{4}-\d{2}(-\d{2})?$/;
 // either without the other reopens the gap, and a guard in
 // tests/crawlable-corpus.test.mjs asserts they still agree.
 export const MAX_LIVE_PULSE_SNAPSHOT_AGE_DAYS = 10;
+
+// HIGH-HANDS fork: this repo is deployed without .github/workflows (the
+// refresh cron was stripped when the repo was pushed with a PAT that lacks
+// the `workflow` scope), so nothing ever re-runs the freeze automatically.
+// The ceiling therefore degrades to a build WARNING by default — see
+// resolveLatestLivePulseSnapshotPath — instead of reding every deploy once
+// the committed snapshot ages out. WM_LIVE_PULSE_STRICT=1 restores the
+// upstream hard failure for CI freshness enforcement.
+export function maxLivePulseSnapshotAgeDays() {
+  const parsed = Number(process.env.WM_LIVE_PULSE_MAX_AGE_DAYS);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : MAX_LIVE_PULSE_SNAPSHOT_AGE_DAYS;
+}
 const COUNTRY_NAMES_PATH = 'shared/country-names.json';
 const COUNTRY_REGIONS_PATH = 'shared/iso2-to-region.json';
 const MICROSTATE_TERRITORIES_PATH = 'server/worldmonitor/resilience/v1/cohorts/microstate-territories.json';
@@ -377,10 +389,22 @@ export function resolveLatestLivePulseSnapshotPath(rootDir = DEFAULT_ROOT) {
   const ageDays = Number.isFinite(capturedAtMs)
     ? (Date.now() - capturedAtMs) / 86_400_000
     : Number.POSITIVE_INFINITY;
-  if (ageDays > MAX_LIVE_PULSE_SNAPSHOT_AGE_DAYS) {
-    throw new Error(
-      `${relativePath} is ${Math.round(ageDays)} days old (max ${MAX_LIVE_PULSE_SNAPSHOT_AGE_DAYS}); `
-      + 'run `npm run freeze:crawlable-live-pulse` to republish current values',
+  const maxAgeDays = maxLivePulseSnapshotAgeDays();
+  if (ageDays > maxAgeDays) {
+    const message =
+      `${relativePath} is ${Math.round(ageDays)} days old (max ${maxAgeDays}); `
+      + 'run `npm run freeze:crawlable-live-pulse` to republish current values';
+    // HIGH-HANDS fork: with no Actions cron on this repo, an aging snapshot
+    // must not red every deploy (it broke `npm run build:full` on Vercel).
+    // Warn and publish the newest committed snapshot instead — pages remain
+    // truthful because dateModified and the rendered as-of dates are pinned
+    // to the snapshot's capturedAt. WM_LIVE_PULSE_STRICT=1 restores the
+    // upstream throw for environments that DO enforce the refresh cadence.
+    if (process.env.WM_LIVE_PULSE_STRICT === '1') {
+      throw new Error(message);
+    }
+    console.warn(
+      `[build-crawlable-corpus] WARNING: ${message} — publishing the latest committed snapshot anyway.`,
     );
   }
   return relativePath;
