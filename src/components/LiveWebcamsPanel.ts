@@ -1,5 +1,6 @@
 import { Panel } from './Panel';
 import { IDLE_PAUSE_MS, STORAGE_KEYS } from '@/config';
+import { WEBCAM_FEEDS, type WebcamFeed, type WebcamRegion } from '@/config/webcam-feeds';
 import { isDesktopRuntime, getLocalApiPort } from '@/services/runtime';
 import { escapeHtml } from '@/utils/sanitize';
 import { t } from '../services/i18n';
@@ -12,58 +13,33 @@ import { setTrustedHtml, trustedHtml } from '@/utils/dom-utils';
 import { isAllowedWebcamEmbedMessageOrigin } from './_live-webcams-origin';
 
 
-type WebcamRegion = 'middle-east' | 'europe' | 'asia' | 'americas' | 'space';
+type RegionFilter = 'all' | WebcamRegion;
 
-interface WebcamFeed {
-  id: string;
-  city: string;
-  country: string;
-  region: WebcamRegion;
-  channelHandle: string;
-  // Stable YouTube channel id — the embed uses /embed/live_stream?channel= so
-  // YouTube resolves the channel's CURRENT live stream per request from the
-  // viewer's IP. Immune to stale/dead video ids and datacenter-IP scraping junk.
-  channelId: string;
+interface WebcamFeedWithMeta extends WebcamFeed {
+  verifiedLabel?: string;
 }
 
-// Channel ids verified via canonical link + og:title cross-check (Sep 2026).
-const WEBCAM_FEEDS: WebcamFeed[] = [
-  // Middle East
-  { id: 'jerusalem', city: 'Jerusalem (i24)', country: 'Israel', region: 'middle-east', channelHandle: '@i24NEWS', channelId: 'UCvHDpsWKADrDia0c99X37vg' },
-  { id: 'middle-east', city: 'Middle East', country: 'Multi', region: 'middle-east', channelHandle: '@AlJazeeraEnglish', channelId: 'UCNye-wNBqNL5ZzHSJj3l8Bg' },
-  { id: 'mecca', city: 'Mecca', country: 'Saudi Arabia', region: 'middle-east', channelHandle: '@QuranTV', channelId: 'UCos52azQNBgW63_9uDJoPDA' },
-  { id: 'beirut-mtv', city: 'Beirut & Levant', country: 'Lebanon', region: 'middle-east', channelHandle: '@WorldConflictLive247', channelId: 'UC2SO-5oK1SE4IqNXh4oqq1A' },
-  // Europe
-  { id: 'kyiv', city: 'Amsterdam', country: 'Netherlands', region: 'europe', channelHandle: '@AmsterdamLive', channelId: 'UCCbkDvw6wI4Z5VX3BhSuw7w' },
-  { id: 'berlin-dw', city: 'Berlin (DW)', country: 'Germany', region: 'europe', channelHandle: '@DWNews', channelId: 'UCknLrEdhRCp1aegoMqRaCZg' },
-  { id: 'paris', city: 'Paris (F24)', country: 'France', region: 'europe', channelHandle: '@FRANCE24', channelId: 'UCQfwfsi5VrQ8yKZ-UWmAEFg' },
-  { id: 'london', city: 'London (Sky)', country: 'UK', region: 'europe', channelHandle: '@SkyNews', channelId: 'UCoMdktPbSTixAyNGwb-UYkQ' },
-  // Americas
-  { id: 'washington', city: 'Washington DC', country: 'USA', region: 'americas', channelHandle: '@cspan', channelId: 'UCb--64Gl51jIEVE-GLDAVTg' },
-  { id: 'new-york', city: 'New York', country: 'USA', region: 'americas', channelHandle: '@EarthCam', channelId: 'UC6qrG3W8SMK0jior2olka3g' },
-  { id: 'miami', city: 'Miami Surf', country: 'USA', region: 'americas', channelHandle: '@surfline', channelId: 'UC4i3-yfVazfuqwoz71T79Sw' },
-  // Asia-Pacific — Taipei first (strait hotspot), then Tokyo, Seoul
-  { id: 'taipei', city: 'Taipei', country: 'Taiwan', region: 'asia', channelHandle: '@JackyWuTaipei', channelId: 'UCmmxf8r3US6KJnhMKBG8DEw' },
-  { id: 'shanghai', city: 'World Cams', country: 'Multi', region: 'asia', channelHandle: '@SkylineWebcams', channelId: 'UC2WMV4vCYurHdHPd9pCqYSg' },
-  { id: 'tokyo', city: 'Tokyo (Kabukicho)', country: 'Japan', region: 'asia', channelHandle: '@KabukichoLive', channelId: 'UChKERpE7Um0Uq1btm_a9g5A' },
-  { id: 'seoul', city: 'Seoul', country: 'South Korea', region: 'asia', channelHandle: '@SeoulVibes', channelId: 'UC2j9YVeDkez-niRM85BsvsA' },
-  { id: 'sydney', city: 'Sydney', country: 'Australia', region: 'asia', channelHandle: '@WebcamSydney', channelId: 'UCLav_kTu9PmAEChvGyrPbhQ' },
-  // Space
-  { id: 'iss-earth', city: 'ISS Earth View', country: 'Space', region: 'space', channelHandle: '@ISSLiveStream', channelId: 'UCGoxeUWHR00E0gjibgjK38w' },
-  { id: 'nasa-live', city: 'NASA TV', country: 'Space', region: 'space', channelHandle: '@NASA', channelId: 'UCLA_DiR1FfKNvjuUpBHmylQ' },
-  { id: 'space-x', city: 'Sen Space', country: 'Space', region: 'space', channelHandle: '@Sen', channelId: 'UCkvW_7kp9LJrztmgA4q4bJQ' },
-];
-
 const MAX_GRID_CELLS = 4;
+const FEED_LIST_MAX_HEIGHT = 264;
 
 // Eco mode pauses streams after inactivity to save CPU/bandwidth.
 const ECO_IDLE_PAUSE_MS = IDLE_PAUSE_MS;
 const IDLE_ACTIVITY_EVENTS = ['mousedown', 'keydown', 'scroll', 'touchstart', 'mousemove'] as const;
 
 type ViewMode = 'grid' | 'single';
-type RegionFilter = 'all' | WebcamRegion;
 
-const ALL_REGIONS: RegionFilter[] = ['all', 'middle-east', 'europe', 'americas', 'asia', 'space'];
+const ALL_REGIONS: RegionFilter[] = ['all', 'middle-east', 'africa', 'europe', 'americas', 'asia', 'oceania', 'space'];
+
+const REGION_LABELS: Record<RegionFilter, string> = {
+  'all': 'ALL',
+  'middle-east': 'MIDEAST',
+  'africa': 'AFRICA',
+  'europe': 'EUROPE',
+  'americas': 'AMERICAS',
+  'asia': 'ASIA',
+  'oceania': 'OCEANIA',
+  'space': 'SPACE',
+};
 
 interface WebcamPrefs {
   regionFilter: RegionFilter;
@@ -99,6 +75,7 @@ export class LiveWebcamsPanel extends Panel {
   private viewMode: ViewMode = 'grid';
   private regionFilter: RegionFilter = 'all';
   private activeFeed: WebcamFeed = WEBCAM_FEEDS[0]!;
+  private searchQuery = '';
   private toolbar: HTMLElement | null = null;
   private iframes: HTMLIFrameElement[] = [];
   private iframeTrackers = new Map<HTMLIFrameElement, WebcamIframeTracker>();
@@ -205,19 +182,21 @@ export class LiveWebcamsPanel extends Panel {
     });
   }
 
-  private get filteredFeeds(): WebcamFeed[] {
-    if (this.regionFilter === 'all') return WEBCAM_FEEDS;
-    return WEBCAM_FEEDS.filter(f => f.region === this.regionFilter);
+  private get filteredFeeds(): WebcamFeedWithMeta[] {
+    let feeds: WebcamFeed[] = this.regionFilter === 'all'
+      ? WEBCAM_FEEDS
+      : WEBCAM_FEEDS.filter(f => f.region === this.regionFilter);
+    const q = this.searchQuery.trim().toLowerCase();
+    if (q) {
+      feeds = feeds.filter(f =>
+        f.city.toLowerCase().includes(q)
+        || f.country.toLowerCase().includes(q)
+        || f.channelHandle.toLowerCase().includes(q));
+    }
+    return feeds;
   }
 
-  private static readonly ALL_GRID_IDS = ['jerusalem', 'middle-east', 'kyiv', 'washington'];
-
   private get gridFeeds(): WebcamFeed[] {
-    if (this.regionFilter === 'all') {
-      return LiveWebcamsPanel.ALL_GRID_IDS
-        .map(id => WEBCAM_FEEDS.find(f => f.id === id)!)
-        .filter(Boolean);
-    }
     return this.filteredFeeds.slice(0, MAX_GRID_CELLS);
   }
 
@@ -226,22 +205,14 @@ export class LiveWebcamsPanel extends Panel {
     this.toolbar.className = 'webcam-toolbar';
 
     const regionGroup = document.createElement('div');
-    regionGroup.className = 'webcam-toolbar-group';
+    regionGroup.className = 'webcam-toolbar-group webcam-region-group';
 
-    const regions: { key: RegionFilter; label: string }[] = [
-      { key: 'all', label: t('components.webcams.regions.all') },
-      { key: 'middle-east', label: t('components.webcams.regions.mideast') },
-      { key: 'europe', label: t('components.webcams.regions.europe') },
-      { key: 'americas', label: t('components.webcams.regions.americas') },
-      { key: 'asia', label: t('components.webcams.regions.asia') },
-      { key: 'space', label: t('components.webcams.regions.space') },
-    ];
-
-    regions.forEach(({ key, label }) => {
+    ALL_REGIONS.forEach((key) => {
       const btn = document.createElement('button');
       btn.className = `webcam-region-btn${key === this.regionFilter ? ' active' : ''}`;
       btn.dataset.region = key;
-      btn.textContent = label;
+      const labelKey = key === 'all' ? 'components.webcams.regions.all' : `components.webcams.regions.${key === 'middle-east' ? 'mideast' : key}`;
+      btn.textContent = t(labelKey) || REGION_LABELS[key];
       btn.addEventListener('click', () => this.setRegionFilter(key));
       regionGroup.appendChild(btn);
     });
@@ -272,9 +243,60 @@ export class LiveWebcamsPanel extends Panel {
     viewGroup.appendChild(gridBtn);
     viewGroup.appendChild(singleBtn);
 
+    // Search row: filter the global catalog by city / country / handle.
+    const searchRow = document.createElement('div');
+    searchRow.className = 'webcam-toolbar-search';
+
+    const searchInput = document.createElement('input');
+    searchInput.type = 'search';
+    searchInput.className = 'webcam-search-input';
+    searchInput.placeholder = t('components.webcams.searchPlaceholder') || 'Search city or country…';
+    searchInput.setAttribute('aria-label', 'Search webcams');
+    searchInput.autocomplete = 'off';
+    searchInput.spellcheck = false;
+    searchInput.addEventListener('input', () => {
+      this.searchQuery = searchInput.value;
+      this.updateFeedList();
+    });
+    searchInput.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      if (e.key === 'Enter') {
+        const first = this.filteredFeeds[0];
+        if (first && first.id !== this.activeFeed.id) {
+          this.switchToFeed(first, 'search');
+        }
+      }
+    });
+
+    const countBadge = document.createElement('span');
+    countBadge.className = 'webcam-feed-count';
+    countBadge.textContent = `${WEBCAM_FEEDS.length}`;
+
+    searchRow.appendChild(searchInput);
+    searchRow.appendChild(countBadge);
+
     this.toolbar.appendChild(regionGroup);
     this.toolbar.appendChild(viewGroup);
+    this.toolbar.appendChild(searchRow);
     this.element.insertBefore(this.toolbar, this.content);
+  }
+
+  private updateFeedList(): void {
+    const feeds = this.filteredFeeds;
+    const countBadge = this.toolbar?.querySelector('.webcam-feed-count');
+    if (countBadge) {
+      countBadge.textContent = `${feeds.length}/${WEBCAM_FEEDS.length}`;
+    }
+    const list = this.content.querySelector('.webcam-feed-list');
+    if (list instanceof HTMLElement) {
+      this.renderFeedListItems(list);
+      if (feeds.length === 0) {
+        const empty = this.content.querySelector('.webcam-list-empty');
+        if (empty instanceof HTMLElement) empty.style.display = '';
+      } else {
+        this.content.querySelector('.webcam-list-empty')?.remove();
+      }
+    }
   }
 
   private setRegionFilter(filter: RegionFilter): void {
@@ -287,7 +309,7 @@ export class LiveWebcamsPanel extends Panel {
     // Region change swaps the entire feed set — stop the current wall and start fresh from previews.
     this.clearActivePlayback();
     const feeds = this.filteredFeeds;
-    if (feeds.length > 0 && !feeds.includes(this.activeFeed)) {
+    if (feeds.length > 0 && !feeds.includes(this.activeFeed as WebcamFeedWithMeta)) {
       this.activeFeed = feeds[0]!;
     }
     this.savePrefs();
@@ -308,6 +330,19 @@ export class LiveWebcamsPanel extends Panel {
     });
     // In always-on, let startAlwaysOnPlayback own the render so the wall isn't built then immediately rebuilt.
     if (!this.startAlwaysOnPlayback()) {
+      this.render();
+    }
+  }
+
+  private switchToFeed(feed: WebcamFeed, source: 'list' | 'search'): void {
+    // Single view shows one feed at a time — switching keeps playing if a stream was active.
+    const wasPlaying = this.activeIframeFeedIds.size > 0;
+    this.activeIframeFeedIds.clear();
+    this.activeFeed = feed;
+    this.savePrefs();
+    if ((this.alwaysOn || wasPlaying) && this.isVisible && !document.hidden) {
+      this.playFeed(feed, source === 'list' ? 'single' : 'search');
+    } else {
       this.render();
     }
   }
@@ -391,7 +426,7 @@ export class LiveWebcamsPanel extends Panel {
     tracker.timeout = setTimeout(() => this.markIframeBlocked(iframe), this.EMBED_READY_TIMEOUT_MS);
   }
 
-  private playFeed(feed: WebcamFeed, source: 'grid' | 'single' | 'settings'): void {
+  private playFeed(feed: WebcamFeed, source: 'grid' | 'single' | 'search' | 'settings'): void {
     if (source !== 'settings') {
       trackWebcamSelected(feed.id, feed.city, source);
     }
@@ -422,7 +457,7 @@ export class LiveWebcamsPanel extends Panel {
     this.trackIframe(iframe, feed, cell);
     const label = document.createElement('div');
     label.className = 'webcam-cell-label';
-    setTrustedHtml(label, trustedHtml(`<span class="webcam-live-dot"></span><span class="webcam-city">${escapeHtml(feed.city.toUpperCase())}</span>`, "legacy direct innerHTML migration"));
+    setTrustedHtml(label, trustedHtml(`<span class="webcam-live-dot"></span><span class="webcam-city">${escapeHtml(`${feed.city.toUpperCase()} · ${feed.country}`)}</span>`, "legacy direct innerHTML migration"));
     cell.appendChild(label);
     return true;
   }
@@ -514,7 +549,7 @@ export class LiveWebcamsPanel extends Panel {
 
     const meta = document.createElement('div');
     meta.className = 'webcam-preview-meta';
-    meta.textContent = `${feed.country} · ${feed.region.replace('-', ' ')}`;
+    meta.textContent = feed.country;
 
     const playBtn = document.createElement('button');
     playBtn.type = 'button';
@@ -662,6 +697,7 @@ export class LiveWebcamsPanel extends Panel {
     } else {
       this.renderSingle();
     }
+    this.updateFeedList();
   }
 
   private renderGrid(): void {
@@ -691,7 +727,7 @@ export class LiveWebcamsPanel extends Panel {
 
         const label = document.createElement('div');
         label.className = 'webcam-cell-label';
-        setTrustedHtml(label, trustedHtml(`<span class="webcam-live-dot"></span><span class="webcam-city">${escapeHtml(feed.city.toUpperCase())}</span>`, "legacy direct innerHTML migration"));
+        setTrustedHtml(label, trustedHtml(`<span class="webcam-live-dot"></span><span class="webcam-city">${escapeHtml(`${feed.city.toUpperCase()} · ${feed.country}`)}</span>`, "legacy direct innerHTML migration"));
         cell.appendChild(label);
       } else {
         this.renderPreviewTile(cell, feed, 'grid');
@@ -700,7 +736,59 @@ export class LiveWebcamsPanel extends Panel {
       grid.appendChild(cell);
     });
 
+    if (feeds.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'webcam-list-empty';
+      empty.textContent = t('components.webcams.noResults') || 'No webcams match your search';
+      grid.appendChild(empty);
+    }
+
     this.content.appendChild(grid);
+  }
+
+  /** Build the scrollable, country-grouped feed list body (shared by render + search updates). */
+  private renderFeedListItems(list: HTMLElement): void {
+    setTrustedHtml(list, trustedHtml('', "legacy direct innerHTML migration"));
+    const feeds = this.filteredFeeds;
+
+    if (feeds.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'webcam-list-empty';
+      empty.textContent = t('components.webcams.noResults') || 'No webcams match your search';
+      list.appendChild(empty);
+      return;
+    }
+
+    let currentCountry = '';
+    for (const feed of feeds) {
+      if (feed.country !== currentCountry) {
+        currentCountry = feed.country;
+        const header = document.createElement('div');
+        header.className = 'webcam-feed-country';
+        header.textContent = currentCountry;
+        list.appendChild(header);
+      }
+      const row = document.createElement('button');
+      row.type = 'button';
+      row.className = `webcam-feed-item${feed.id === this.activeFeed.id ? ' active' : ''}`;
+      row.dataset.feedId = feed.id;
+
+      const dot = document.createElement('span');
+      dot.className = 'webcam-live-dot';
+      const city = document.createElement('span');
+      city.className = 'webcam-feed-item-city';
+      city.textContent = feed.city;
+      const country = document.createElement('span');
+      country.className = 'webcam-feed-item-country';
+      country.textContent = feed.country;
+
+      row.append(dot, city, country);
+      row.addEventListener('click', () => {
+        if (feed.id === this.activeFeed.id) return;
+        this.switchToFeed(feed, 'list');
+      });
+      list.appendChild(row);
+    }
   }
 
   private renderSingle(): void {
@@ -719,39 +807,16 @@ export class LiveWebcamsPanel extends Panel {
       this.renderPreviewTile(wrapper, this.activeFeed, 'single');
     }
 
-    const switcher = document.createElement('div');
-    switcher.className = 'webcam-switcher';
-
-    if (!this.forceSingleView) {
-      const backBtn = document.createElement('button');
-      backBtn.className = 'webcam-feed-btn webcam-back-btn';
-      setTrustedHtml(backBtn, trustedHtml('<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg> Grid', "legacy direct innerHTML migration"));
-      backBtn.addEventListener('click', () => this.setViewMode('grid'));
-      switcher.appendChild(backBtn);
-    }
-
-    this.filteredFeeds.forEach(feed => {
-      const btn = document.createElement('button');
-      btn.className = `webcam-feed-btn${feed.id === this.activeFeed.id ? ' active' : ''}`;
-      btn.textContent = feed.city;
-      btn.addEventListener('click', () => {
-        if (feed.id === this.activeFeed.id) return;
-        // Single view shows one feed at a time — switching keeps playing if a stream was active.
-        const wasPlaying = this.activeIframeFeedIds.size > 0;
-        this.activeIframeFeedIds.clear();
-        this.activeFeed = feed;
-        this.savePrefs();
-        if ((this.alwaysOn || wasPlaying) && this.isVisible && !document.hidden) {
-          this.playFeed(feed, 'single');
-        } else {
-          this.render();
-        }
-      });
-      switcher.appendChild(btn);
-    });
+    // Scrollable, country-grouped feed list replacing the old flat switcher row.
+    const list = document.createElement('div');
+    list.className = 'webcam-feed-list';
+    list.setAttribute('role', 'listbox');
+    list.setAttribute('aria-label', 'Webcam feeds');
+    list.style.maxHeight = `${FEED_LIST_MAX_HEIGHT}px`;
+    this.renderFeedListItems(list);
 
     this.content.appendChild(wrapper);
-    this.content.appendChild(switcher);
+    this.content.appendChild(list);
   }
 
   private destroyIframes(): void {

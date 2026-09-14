@@ -927,12 +927,16 @@
       "pausedIdle": "Webcams paused — move mouse to resume",
       "play": "Play",
       "previewStatus": "Live preview",
+      "searchPlaceholder": "Search city or country…",
+      "noResults": "No webcams match your search",
       "regions": {
         "all": "ALL",
         "mideast": "MIDEAST",
+        "africa": "AFRICA",
         "europe": "EUROPE",
         "americas": "AMERICAS",
         "asia": "ASIA",
+        "oceania": "OCEANIA",
         "space": "SPACE"
       }
     },

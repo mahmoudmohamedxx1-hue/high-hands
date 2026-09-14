@@ -3847,6 +3847,153 @@ body.live-news-fullscreen-active .panels-grid > *:not(.live-news-fullscreen) {
   background: var(--darken-heavy);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+/* Global catalog toolbar: region chips + view toggle on row 1, search on row 2 */
+.webcam-region-group {
+  flex-wrap: wrap;
+}
+
+.webcam-toolbar-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 0 2px;
+  flex: 1 1 100%;
+  order: 3;
+}
+
+.webcam-search-input {
+  flex: 1;
+  min-width: 0;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: calc(11px * var(--wm-panel-effective-scale, 1));
+  padding: 5px 9px;
+  border-radius: 2px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.webcam-search-input::placeholder {
+  color: var(--text-dim);
+}
+
+.webcam-search-input:focus {
+  border-color: var(--text-dim);
+}
+
+.webcam-search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  filter: invert(0.6);
+  cursor: pointer;
+}
+
+.webcam-feed-count {
+  color: var(--text-dim);
+  font-size: calc(10px * var(--wm-panel-effective-scale, 1));
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* Scrollable country-grouped feed list (single view) */
+.webcam-feed-list {
+  overflow-y: auto;
+  border-top: 1px solid var(--border);
+  background: var(--darken-heavy);
+  flex-shrink: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-dim) transparent;
+}
+
+.webcam-feed-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.webcam-feed-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.webcam-feed-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+}
+
+.webcam-feed-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.webcam-feed-country {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--darken-heavy);
+  padding: 5px 10px 3px;
+  font-size: calc(9px * var(--wm-panel-effective-scale, 1));
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+}
+
+.webcam-feed-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--text-dim);
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+}
+
+.webcam-feed-item:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.webcam-feed-item:focus-visible {
+  outline: 1px solid var(--text-dim);
+  outline-offset: -1px;
+}
+
+.webcam-feed-item.active {
+  color: var(--text);
+  background: rgba(239, 68, 68, 0.1);
+  box-shadow: inset 2px 0 0 var(--red-strong);
+}
+
+.webcam-feed-item-city {
+  font-size: calc(11px * var(--wm-panel-effective-scale, 1));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.webcam-feed-item-country {
+  margin-left: auto;
+  font-size: calc(9px * var(--wm-panel-effective-scale, 1));
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.webcam-list-empty {
+  padding: 16px 12px;
+  color: var(--text-dim);
+  font-size: calc(11px * var(--wm-panel-effective-scale, 1));
+  text-align: center;
 }
 
 .webcam-toolbar-group {
