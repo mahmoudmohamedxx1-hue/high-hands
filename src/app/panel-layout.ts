@@ -241,12 +241,19 @@ export const VARIANT_SWITCHER_DASHBOARD_URLS = {
   happy: 'https://happy.worldmonitor.app/dashboard',
 } as const;
 
+/**
+ * HIGH-HANDS fork: all six variants are served by THIS single origin, so the
+ * switcher never navigates to the upstream SaaS properties. Every option
+ * stages a local variant switch (see event-handlers.navigateToVariant), and
+ * the anchor href stays a same-page '#' — a no-op if the handler is bypassed
+ * (middle-click / JS failure) rather than a trip off-site.
+ */
 export function variantSwitcherHref(
-  targetVariant: keyof typeof VARIANT_SWITCHER_DASHBOARD_URLS,
-  currentVariant: string,
-  isLocal: boolean,
+  _targetVariant: keyof typeof VARIANT_SWITCHER_DASHBOARD_URLS,
+  _currentVariant: string,
+  _isLocal: boolean,
 ): string {
-  return isLocal || currentVariant === targetVariant ? '#' : VARIANT_SWITCHER_DASHBOARD_URLS[targetVariant];
+  return '#';
 }
 
 // TEMPORARY MIRROR of each panel constructor's footprint (`defaultRowSpan` /

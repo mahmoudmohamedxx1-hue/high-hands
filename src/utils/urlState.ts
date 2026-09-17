@@ -39,6 +39,28 @@ const LAYER_KEYS: (keyof MapLayers)[] = [
   'satellites',
   'ciiChoropleth',
   'resilienceScore',
+  // Complete round-trip coverage for every user-togglable layer (these were
+  // previously serialized nowhere, so shared links silently dropped them):
+  'webcams',
+  'dayNight',
+  'diseaseOutbreaks',
+  'stockExchanges',
+  'financialCenters',
+  'centralBanks',
+  'commodityHubs',
+  'gulfInvestments',
+  'positiveEvents',
+  'kindness',
+  'happiness',
+  'speciesRecovery',
+  'renewableInstallations',
+  'miningSites',
+  'processingPlants',
+  'commodityPorts',
+  'radiationWatch',
+  'storageFacilities',
+  'fuelShortages',
+  'liveTankers',
 ];
 
 const TIME_RANGES: TimeRange[] = ['1h', '6h', '24h', '48h', '7d', 'all'];

@@ -60,7 +60,6 @@ import type { MapContainer } from './MapContainer';
 import { dedupeHeadlines } from './CountryDeepDivePanel-news-utils';
 import { decodeHtmlEntities } from '@/utils/html-entities';
 import { renderFollowButton } from '@/utils/follow-button';
-import { renderNotifyCountryLink } from '@/utils/notify-country-link';
 import { exportCountryEvidenceMarkdown } from '@/utils/export';
 import type { CountryEvidenceBundleInput } from '@/utils/export';
 import { ciiBandForLevel } from './CountryDeepDivePanel-cii';
@@ -2766,20 +2765,15 @@ export class CountryDeepDivePanel implements CountryBriefPanel {
     setTrustedHtml(followHost, trustedHtml(handle.html, "legacy direct innerHTML migration"));
     this.followButtonTeardown = handle.attach(followHost);
 
-    // U8 (degraded path) — "Notify me about this country" sub-action.
-    // Visible only when the user is currently following this country.
-    // The schema PR for `alertRules.countries` has NOT merged, so the
-    // click just opens the existing notifications settings tab — no
-    // pre-fill. See plan U8 R9 + the TODO inside notify-country-link.ts
-    // for the future pre-fill injection point.
+    // "Notify me about this country" sub-action REMOVED: the notifications
+    // backend it promised (alertRules.countries schema) does not exist in
+    // this build, so the link was a dead end that opened a generic settings
+    // tab. The follow button alone is honest. If the alert-rule backend
+    // lands upstream, re-mount via renderNotifyCountryLink here.
     const notifyHost = this.el('span', 'cdp-notify-link-host');
     notifyHost.dataset.country = code;
-    const notifyHandle = renderNotifyCountryLink({
-      countryCode: code,
-      countryName: country,
-    });
-    setTrustedHtml(notifyHost, trustedHtml(notifyHandle.html, "legacy direct innerHTML migration"));
-    this.notifyLinkTeardown = notifyHandle.attach(notifyHost);
+    notifyHost.style.display = 'none';
+    this.notifyLinkTeardown = null;
 
     left.append(flag, titleWrap, followHost, notifyHost);
 

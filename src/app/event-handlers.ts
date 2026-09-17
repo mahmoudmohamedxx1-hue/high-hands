@@ -57,7 +57,6 @@ import {
   INTEL_SOURCES,
 } from '@/config';
 import { resolveNewsCategories, enabledNewsCategoryKeys } from '@/config/feed-resolution';
-import { VARIANT_META } from '@/config/variant-meta';
 import { isDesktopRuntime } from '@/services/runtime';
 import {
   getMissionPresetsForVariant,
@@ -1916,29 +1915,19 @@ export class EventHandlerManager implements AppModule {
 
   private async navigateToVariant(
     variant: string,
-    options: { href?: string; isLocalDev: boolean },
+    _options: { href?: string; isLocalDev: boolean },
   ): Promise<'reload' | 'assign' | 'blocked'> {
     trackVariantSwitch(SITE_VARIANT, variant);
     await this.exitFullscreenForNavigation();
 
-    if (this.ctx.isDesktopApp || options.isLocalDev) {
-      if (stageVariantSelection(SITE_VARIANT, variant, writeStorageValue)) {
-        window.location.reload();
-        return 'reload';
-      }
-      return 'blocked';
+    // HIGH-HANDS fork: this origin serves every variant, so switching is
+    // ALWAYS the staged-local reload (the desktop-app path). The upstream
+    // SaaS subdomain navigation is intentionally unreachable here.
+    if (stageVariantSelection(SITE_VARIANT, variant, writeStorageValue)) {
+      window.location.reload();
+      return 'reload';
     }
-
-    const target = options.href || VARIANT_META[variant]?.url;
-    if (!target) return 'blocked';
-    try {
-      const parsed = new URL(target, window.location.href);
-      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return 'blocked';
-      window.location.href = parsed.toString();
-      return 'assign';
-    } catch {
-      return 'blocked';
-    }
+    return 'blocked';
   }
 
   public async navigateToVisibleVariant(

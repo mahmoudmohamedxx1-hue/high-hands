@@ -256,7 +256,13 @@ export class LiveWebcamsPanel extends Panel {
     searchInput.spellcheck = false;
     searchInput.addEventListener('input', () => {
       this.searchQuery = searchInput.value;
-      this.updateFeedList();
+      // Grid mode slices its tiles from filteredFeeds at render time, so a
+      // query must re-render the grid (single view just refreshes the list).
+      if (this.viewMode === 'grid') {
+        this.render();
+      } else {
+        this.updateFeedList();
+      }
     });
     searchInput.addEventListener('keydown', (e) => {
       e.stopPropagation();

@@ -32,8 +32,12 @@ export const SITE_VARIANT: string = (() => {
   if (typeof window === 'undefined') return buildVariant;
 
   const isTauri = '__TAURI_INTERNALS__' in window || '__TAURI__' in window;
+  // HIGH-HANDS fork: this deployment is a single origin serving all variants
+  // (the upstream SaaS subdomains do not exist here), so a stored variant
+  // selection is honored on every hostname — not just Tauri/localhost. The
+  // header switcher stages the key and reloads, exactly like the desktop app.
+  const stored = loadStoredVariant();
   if (isTauri) {
-    const stored = loadStoredVariant();
     if (isSiteVariant(stored)) return stored;
     return buildVariant;
   }
@@ -48,11 +52,7 @@ export const SITE_VARIANT: string = (() => {
   if (h.startsWith('commodity.')) return 'commodity';
   if (h.startsWith('energy.')) return 'energy';
 
-  if (h === 'localhost' || h === '127.0.0.1') {
-    const stored = loadStoredVariant();
-    if (isSiteVariant(stored)) return stored;
-    return buildVariant;
-  }
+  if (isSiteVariant(stored)) return stored;
 
   return 'full';
 })();

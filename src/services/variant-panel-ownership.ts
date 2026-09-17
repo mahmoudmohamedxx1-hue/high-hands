@@ -112,6 +112,11 @@ interface ApplyVariantPanelLayoutTransitionOptions {
  * Transfer ownership of cross-variant disables and persist them before the
  * applied-layout marker advances. A crash can therefore retry the reset; it
  * can never claim an unapplied layout is current.
+ *
+ * Round-trip safety: panels disabled here carry a `variantDisabled` marker
+ * (mirroring `proGated`). When a later switch returns to a variant whose
+ * default set includes such a panel, it is re-enabled from that variant's
+ * defaults — while panels the USER hid (no marker) stay hidden everywhere.
  */
 export function applyVariantPanelLayoutTransition(
   options: ApplyVariantPanelLayoutTransitionOptions,
@@ -123,6 +128,19 @@ export function applyVariantPanelLayoutTransition(
   for (const [key, config] of Object.entries(next)) {
     if (!options.variantPanelKeys.has(key) && !options.isDynamicPanel(key)) {
       userSetPanelEnabled(config, false);
+      config.variantDisabled = true;
+    }
+  }
+  // Restore panels a PREVIOUS variant switch disabled, now that they belong
+  // to the active variant again. User-hidden panels carry no marker and are
+  // left alone.
+  for (const [key, config] of Object.entries(next)) {
+    if (config.variantDisabled && options.variantPanelKeys.has(key)) {
+      const def = options.getDefaultPanel(key);
+      if (def.enabled !== false) {
+        config.enabled = def.enabled ?? true;
+      }
+      delete config.variantDisabled;
     }
   }
   for (const key of options.variantPanelKeys) {
