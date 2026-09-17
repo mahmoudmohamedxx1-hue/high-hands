@@ -3517,7 +3517,7 @@
   },
   "shell": {
     "documentTitle": "HIGH-HANDS — Tablica bieżącej analizy globalnej",
-    "metaDescription": "Platforma analizy globalnej w czasie rzeczywistym. Opisana w WIRED. Używana przez 2M+ użytkowników w 190 krajach. Konflikty, rynki, wojskowość, OSINT w jednym widoku.",
+    "metaDescription": "HIGH-HANDS — self-hosted real-time global intelligence dashboard. Live conflicts, markets, military movement, webcams and OSINT in one view.",
     "offlineTitle": "Jesteś offline",
     "offlineMessage": "HIGH-HANDS wymaga połączenia internetowego do otrzymywania danych wywiadowczych w czasie rzeczywistym.",
     "offlineRetry": "Ponów próbę"

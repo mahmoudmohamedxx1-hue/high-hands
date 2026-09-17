@@ -3460,7 +3460,7 @@
   },
   "shell": {
     "documentTitle": "ワールドモニター — リアルタイム グローバルインテリジェンスダッシュボード",
-    "metaDescription": "リアルタイムグローバルインテリジェンスプラットフォーム。WIREDで紹介。190カ国2M+ユーザーが利用。紛争、市場、軍事、OSINTを一画面で。",
+    "metaDescription": "HIGH-HANDS — self-hosted real-time global intelligence dashboard. Live conflicts, markets, military movement, webcams and OSINT in one view.",
     "offlineTitle": "オフラインです",
     "offlineMessage": "HIGH-HANDSはリアルタイムインテリジェンスデータのためにインターネット接続が必要です。",
     "offlineRetry": "再試行"

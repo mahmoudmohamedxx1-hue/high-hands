@@ -3479,7 +3479,7 @@
   },
   "shell": {
     "documentTitle": "HIGH-HANDS — Gerçek Zamanlı Küresel İstihbarat Paneli",
-    "metaDescription": "Gerçek zamanlı küresel istihbarat platformu. WIRED'de yer aldı. 190 ülkede 2M+ kişi tarafından kullanılıyor. Çatışmalar, piyasalar, askeri, OSINT tek görünümde.",
+    "metaDescription": "HIGH-HANDS — self-hosted real-time global intelligence dashboard. Live conflicts, markets, military movement, webcams and OSINT in one view.",
     "offlineTitle": "Çevrimdışısınız",
     "offlineMessage": "HIGH-HANDS, gerçek zamanlı istihbarat verileri için internet bağlantısı gerektirir.",
     "offlineRetry": "Yeniden Dene"

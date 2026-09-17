@@ -3498,7 +3498,7 @@
   },
   "shell": {
     "documentTitle": "HIGH-HANDS — Tabloul de Bord al Inteligenței Globale în Timp Real",
-    "metaDescription": "Platformă de inteligență globală în timp real. Prezentată în WIRED. Utilizată de 2M+ persoane din 190 de țări. Conflicte, piețe, militare, OSINT într-o singură vizualizare.",
+    "metaDescription": "HIGH-HANDS — self-hosted real-time global intelligence dashboard. Live conflicts, markets, military movement, webcams and OSINT in one view.",
     "offlineTitle": "Sunteți Offline",
     "offlineMessage": "HIGH-HANDS necesită o conexiune la internet pentru date de informații în timp real.",
     "offlineRetry": "Încercați din nou"

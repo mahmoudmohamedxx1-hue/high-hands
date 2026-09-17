@@ -974,7 +974,12 @@ function hasUsedPowerFeature(): boolean {
 
 /** Strict counterpart for markerless cohort suppression; storage failure retries. */
 function hasUsedPowerFeatureStrict(): boolean {
-  return loadWidgetsStrict().length > 0;
+  // Corrupt storage must not crash the activation flow — treat as unused.
+  try {
+    return loadWidgetsStrict().length > 0;
+  } catch {
+    return false;
+  }
 }
 
 /** Platform capabilities from the live push runtime (drives the alerts-step gate). */

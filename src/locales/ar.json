@@ -3555,7 +3555,7 @@
   },
   "shell": {
     "documentTitle": "لوحة مراقبة الذكاء العالمي في الوقت الفعلي — HIGH-HANDS",
-    "metaDescription": "منصة ذكاء عالمية في الوقت الفعلي. نُشرت في WIRED. يستخدمها أكثر من مليوني شخص عبر 190 دولة. النزاعات والأسواق والعسكرية وOSINT في عرض واحد.",
+    "metaDescription": "HIGH-HANDS — self-hosted real-time global intelligence dashboard. Live conflicts, markets, military movement, webcams and OSINT in one view.",
     "offlineTitle": "أنت غير متصل",
     "offlineMessage": "يتطلب HIGH-HANDS اتصالاً بالإنترنت للحصول على بيانات الاستخبارات في الوقت الفعلي.",
     "offlineRetry": "إعادة محاولة"

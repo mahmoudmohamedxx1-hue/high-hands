@@ -1835,6 +1835,8 @@ export class GlobeMap {
           if (img.thumbnailUrl) {
             const imgEl = document.createElement('img');
             imgEl.src = img.thumbnailUrl;
+            imgEl.alt = `$d.title live webcam preview`;
+            imgEl.referrerPolicy = 'no-referrer';
             imgEl.style.cssText = 'width:200px;border-radius:4px;margin-bottom:4px;';
             imgEl.loading = 'lazy';
             previewDiv.appendChild(imgEl);

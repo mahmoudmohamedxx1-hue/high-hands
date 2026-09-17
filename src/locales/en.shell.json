@@ -1,7 +1,7 @@
 {
   "shell": {
     "documentTitle": "HIGH-HANDS — Real-Time Global Intelligence Dashboard",
-    "metaDescription": "Real-time global intelligence platform. Featured in WIRED. Used by 2M+ people across 190 countries. Conflicts, markets, military, OSINT in one view.",
+    "metaDescription": "HIGH-HANDS — self-hosted real-time global intelligence dashboard. Live conflicts, markets, military movement, webcams and OSINT in one view.",
     "offlineTitle": "You're Offline",
     "offlineMessage": "HIGH-HANDS requires an internet connection for real-time intelligence data.",
     "offlineRetry": "Retry"
@@ -565,7 +565,7 @@
       "infoTooltip": "<strong>CFTC COT Positioning</strong> Commitments of Traders report: net positioning of commercials, large speculators, and small traders across commodity and financial futures. Published weekly (Friday). Source: CFTC."
     },
     "counters": {
-      "infoTooltip": "<strong>Live Counters</strong> Real-time extrapolated counters for global metrics: military spending, natural disasters, disease burden, and more. Figures are statistical estimates based on annual data rates."
+      "infoTooltip": "<strong>Live Counters</strong> Extrapolated live counters: births, trees planted, vaccines administered, university graduates, books published, and renewable capacity added. Figures are statistical estimates based on annual data rates."
     },
     "crypto": {
       "infoTooltip": "<strong>Crypto</strong> Live prices, 24h changes, and volume for major cryptocurrencies. Data sourced from CoinGecko."

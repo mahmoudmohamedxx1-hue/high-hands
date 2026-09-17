@@ -151,7 +151,31 @@ async function checkServiceStatus(service: ServiceDef): Promise<ServiceStatus> {
     }
 
     if (service.customParser === 'aws') {
-      return withStatus('SERVICE_OPERATIONAL_STATUS_OPERATIONAL', 'Status page reachable', latencyMs);
+      // Parse the machine-readable AWS status feed instead of claiming
+      // "operational" merely because the HTML page loaded.
+      try {
+        const feedRes = await fetch('https://status.aws.amazon.com/data.json', {
+          signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+        });
+        if (!feedRes.ok) {
+          return withStatus('SERVICE_OPERATIONAL_STATUS_UNSPECIFIED', `Status feed HTTP ${feedRes.status}`, latencyMs);
+        }
+        // The feed is UTF-16 (BOM) — decode accordingly.
+        const buf = await feedRes.arrayBuffer();
+        const bytes = new Uint8Array(buf.slice(0, 2));
+        const decoder = new TextDecoder(bytes[0] === 0xff && bytes[1] === 0xfe ? 'utf-16le' : 'utf-8');
+        const feed = JSON.parse(decoder.decode(buf)) as Array<{ event_type?: string }>;
+        const events = Array.isArray(feed) ? feed.filter(Boolean) : [];
+        // "current" entries that are actual issues (the feed also carries
+        // informational/resolved event types).
+        const issues = events.filter((e) => /ISSUE|OUTAGE|DISRUPTION/i.test(String(e?.event_type ?? '')));
+        if (issues.length > 0) {
+          return withStatus('SERVICE_OPERATIONAL_STATUS_DEGRADED', `${issues.length} active event(s)`, latencyMs);
+        }
+        return withStatus('SERVICE_OPERATIONAL_STATUS_OPERATIONAL', 'No active events (AWS status feed)', latencyMs);
+      } catch {
+        return withStatus('SERVICE_OPERATIONAL_STATUS_UNSPECIFIED', 'Status feed unreadable', latencyMs);
+      }
     }
 
     if (service.customParser === 'rss') {

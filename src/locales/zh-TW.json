@@ -3460,7 +3460,7 @@
   },
   "shell": {
     "documentTitle": "HIGH-HANDS — 即時全球情報儀表板",
-    "metaDescription": "即時全球情報平臺。刊登於 WIRED。全球 190 個國家 200 萬+ 使用者使用。衝突、市場、軍事、OSINT 資訊一覽無遺。",
+    "metaDescription": "HIGH-HANDS — self-hosted real-time global intelligence dashboard. Live conflicts, markets, military movement, webcams and OSINT in one view.",
     "offlineTitle": "您已離線",
     "offlineMessage": "HIGH-HANDS 需要網際網路連線來獲取即時情報資料。",
     "offlineRetry": "重試"

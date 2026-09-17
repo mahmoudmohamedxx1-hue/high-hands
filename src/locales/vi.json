@@ -3460,7 +3460,7 @@
   },
   "shell": {
     "documentTitle": "HIGH-HANDS — Bảng điều khiển tình báo toàn cầu theo thời gian thực",
-    "metaDescription": "Nền tảng tình báo toàn cầu theo thời gian thực. Được giới thiệu trên WIRED. Sử dụng bởi 2M+ người dùng trên 190 quốc gia. Xung đột, thị trường, quân sự, OSINT trong một giao diện.",
+    "metaDescription": "HIGH-HANDS — self-hosted real-time global intelligence dashboard. Live conflicts, markets, military movement, webcams and OSINT in one view.",
     "offlineTitle": "Bạn Đang Ngoài Kết Nối",
     "offlineMessage": "HIGH-HANDS cần kết nối internet để cập nhật dữ liệu tình báo real-time.",
     "offlineRetry": "Thử Lại"

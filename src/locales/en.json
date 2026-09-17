@@ -1,7 +1,7 @@
 {
   "shell": {
     "documentTitle": "HIGH-HANDS — Real-Time Global Intelligence Dashboard",
-    "metaDescription": "Real-time global intelligence platform. Featured in WIRED. Used by 2M+ people across 190 countries. Conflicts, markets, military, OSINT in one view.",
+    "metaDescription": "HIGH-HANDS — self-hosted real-time global intelligence dashboard. Live conflicts, markets, military movement, webcams and OSINT in one view.",
     "offlineTitle": "You're Offline",
     "offlineMessage": "HIGH-HANDS requires an internet connection for real-time intelligence data.",
     "offlineRetry": "Retry"
@@ -2329,7 +2329,7 @@
       "infoTooltip": "<strong>Gold Intelligence</strong> Gold spot price, gold/silver ratio, gold vs platinum premium, cross-currency XAU prices (EUR, GBP, JPY, CNY, INR, CHF), and CFTC managed money positioning. Sources: Yahoo Finance, CFTC COT."
     },
     "counters": {
-      "infoTooltip": "<strong>Live Counters</strong> Real-time extrapolated counters for global metrics: military spending, natural disasters, disease burden, and more. Figures are statistical estimates based on annual data rates."
+      "infoTooltip": "<strong>Live Counters</strong> Extrapolated live counters: births, trees planted, vaccines administered, university graduates, books published, and renewable capacity added. Figures are statistical estimates based on annual data rates."
     },
     "diseaseOutbreaks": {
       "infoTooltip": "<strong>Disease Outbreaks</strong> Active outbreak alerts from WHO, ProMED, and health ministries. Tracks confirmed outbreaks, affected regions, case counts, and threat levels. Updated as new reports are published.",

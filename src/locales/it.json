@@ -3498,7 +3498,7 @@
   },
   "shell": {
     "documentTitle": "HIGH-HANDS — Dashboard di intelligence globale in tempo reale",
-    "metaDescription": "Piattaforma di intelligence globale in tempo reale. In primo piano su WIRED. Utilizzata da 2M+ persone in 190 paesi. Conflitti, mercati, militari, OSINT in un'unica vista.",
+    "metaDescription": "HIGH-HANDS — self-hosted real-time global intelligence dashboard. Live conflicts, markets, military movement, webcams and OSINT in one view.",
     "offlineTitle": "Sei Offline",
     "offlineMessage": "HIGH-HANDS richiede una connessione Internet per i dati di intelligence in tempo reale.",
     "offlineRetry": "Riprova"

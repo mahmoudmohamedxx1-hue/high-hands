@@ -361,9 +361,18 @@ export async function fetchCountryMarkets(country: string, countryCode: string):
       cursor: '',
     }).catch(() => null);
     if (response?.markets?.length) {
-      return response.markets.map(protoToMarket).filter(m => !isExpired(m.endDate)).slice(0, 5);
+      // Never trust the category alone — filter every result through the
+      // country search index so a generic pool can't leak unrelated markets
+      // (e.g. US election questions) into a country deep-dive.
+      const { matchers, shadows } = await loadCountrySearchIndex(country, normalizedCode);
+      const filtered = response.markets.map(protoToMarket)
+        .filter(m => !isExpired(m.endDate) && matchesCountryTerms(m.title, normalizedCode, matchers, shadows))
+        .slice(0, 5);
+      if (filtered.length > 0) return filtered;
+      // Nothing in the live pool mentions this country — fall through to the
+      // bootstrap buckets rather than showing wrong-content markets.
     }
-    if (response?.dataAvailable) return [];
+    if (response?.dataAvailable && !response?.markets?.length) return [];
   }
 
   // Fallback: search bootstrap data across all buckets. `tech` must be included

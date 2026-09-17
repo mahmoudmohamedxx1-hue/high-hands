@@ -15,7 +15,9 @@ export async function fetchLiveVideoInfo(channelHandle: string): Promise<LiveVid
   }
 
   try {
-    const res = await fetch(toApiUrl(`/api/youtube/live?channel=${encodeURIComponent(channelHandle)}`));
+    const res = await fetch(toApiUrl(`/api/youtube/live?channel=${encodeURIComponent(channelHandle)}`), {
+      signal: AbortSignal.timeout(20_000),
+    });
     if (!res.ok) throw new Error('API error');
     const data = await res.json();
     const videoId = data.videoId || null;

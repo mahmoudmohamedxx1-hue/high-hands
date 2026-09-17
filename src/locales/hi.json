@@ -1,7 +1,7 @@
 {
   "shell": {
     "documentTitle": "वर्ल्ड मॉनिटर — रियल-टाइम ग्लोबल इंटेलिजेंस डैशबोर्ड",
-    "metaDescription": "रियल-टाइम ग्लोबल जानकारी का मंच। WIRED में दिखाया गया। 190 देशों में 2 मिलियन से ज्यादा लोग इस्तेमाल करते हैं। झगड़े, बाजार, सेना, OSINT एक साथ देखें।",
+    "metaDescription": "HIGH-HANDS — self-hosted real-time global intelligence dashboard. Live conflicts, markets, military movement, webcams and OSINT in one view.",
     "offlineTitle": "आप ऑफलाइन हैं",
     "offlineMessage": "वर्ल्ड मॉनिटर के लिए रियल-टाइम जानकारी के लिए इंटरनेट कनेक्शन चाहिए।",
     "offlineRetry": "फिर कोशिश करें"

@@ -1225,6 +1225,7 @@ export class MapComponent {
   private async loadMapData(): Promise<void> {
     try {
       const worldResponse = await fetch(worldTopologyUrl(this.isMobile));
+      if (!worldResponse.ok) throw new Error(`topology HTTP ${worldResponse.status}`);
       this.worldData = await worldResponse.json();
       if (this.worldData) {
         const countries = topojson.feature(
@@ -3797,6 +3798,8 @@ export class MapComponent {
           if (img.thumbnailUrl) {
             const imgEl = document.createElement('img');
             imgEl.src = img.thumbnailUrl;
+            imgEl.alt = `$cam.title live webcam preview`;
+            imgEl.referrerPolicy = 'no-referrer';
             imgEl.style.cssText = 'width:200px;border-radius:4px;margin-bottom:4px;';
             imgEl.loading = 'lazy';
             previewDiv.appendChild(imgEl);

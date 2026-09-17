@@ -123,6 +123,15 @@ function navigateToWebSurface(url: string): void {
     void openExternalUrl(url);
     return;
   }
+  // Self-hosted deployments (non-worldmonitor.app hosts) have no checkout or
+  // billing backend — the local /pro surface is just this dashboard again.
+  // Say so instead of navigating the user into a dead end.
+  if (WEB_APP_ORIGIN === window.location.origin && url.startsWith(WEB_APP_ORIGIN)) {
+    void import('@/utils/toast').then(({ showToast }) => {
+      showToast('Checkout is unavailable in this self-hosted deployment — every feature is already unlocked.');
+    });
+    return;
+  }
   window.location.assign(url);
 }
 

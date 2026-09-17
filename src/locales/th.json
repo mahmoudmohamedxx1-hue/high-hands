@@ -3460,7 +3460,7 @@
   },
   "shell": {
     "documentTitle": "HIGH-HANDS — แดชบอร์ดข่าวกรรมการระดับโลกแบบเรียลไทม์",
-    "metaDescription": "แพลตฟอร์มข่าวกรรมการระดับโลกแบบเรียลไทม์ ลงนามในวิจารณ์ WIRED ใช้งานโดยผู้ใช้ 2 ล้านคนขึ้นไปทั่วโลก 190 ประเทศ ข้อมูลความขัดแย้ง ตลาด ทหาร OSINT ในมุมมองเดียว",
+    "metaDescription": "HIGH-HANDS — self-hosted real-time global intelligence dashboard. Live conflicts, markets, military movement, webcams and OSINT in one view.",
     "offlineTitle": "คุณออนไลน์ไม่ได้",
     "offlineMessage": "HIGH-HANDS ต้องการการเชื่อมต่ออินเทอร์เน็ตเพื่อรับข้อมูลข่าวกรรมการแบบเรียลไทม์",
     "offlineRetry": "ลองใหม่"

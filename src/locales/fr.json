@@ -3498,7 +3498,7 @@
   },
   "shell": {
     "documentTitle": "HIGH-HANDS — Tableau de Bord de Renseignement Mondial en Temps Réel",
-    "metaDescription": "Plateforme de renseignement mondial en temps réel. Présenté dans WIRED. Utilisé par plus de 2 millions de personnes dans 190 pays. Conflits, marchés, militaire, OSINT en une seule vue.",
+    "metaDescription": "HIGH-HANDS — self-hosted real-time global intelligence dashboard. Live conflicts, markets, military movement, webcams and OSINT in one view.",
     "offlineTitle": "Vous êtes hors ligne",
     "offlineMessage": "HIGH-HANDS nécessite une connexion Internet pour les données de renseignement en temps réel.",
     "offlineRetry": "Réessayer"

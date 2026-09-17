@@ -3460,7 +3460,7 @@
   },
   "shell": {
     "documentTitle": "HIGH-HANDS — 실시간 글로벌 인텔리전스 대시보드",
-    "metaDescription": "실시간 글로벌 인텔리전스 플랫폼. WIRED 소개. 190개 국가 200만+ 사용자 이용. 분쟁, 시장, 군사, OSINT을 한 화면에서 확인.",
+    "metaDescription": "HIGH-HANDS — self-hosted real-time global intelligence dashboard. Live conflicts, markets, military movement, webcams and OSINT in one view.",
     "offlineTitle": "오프라인입니다",
     "offlineMessage": "HIGH-HANDS는 실시간 인텔리전스 데이터를 위해 인터넷 연결이 필요합니다.",
     "offlineRetry": "다시 시도"
